@@ -1,0 +1,3 @@
+/mnt/c/Users/BHaType/Documents/GitHub/actions.ext/build/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/BHaType/Documents/GitHub/actions.ext/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/BHaType/Documents/GitHub/actions.ext/build/CMakeFiles/actions.ext.2.l4d.dir

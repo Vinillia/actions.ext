@@ -1,0 +1,41 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${HL2SDKL4D2}/public",
+                "${HL2SDKL4D2}/public/engine",
+                "${HL2SDKL4D2}/public/game/server",
+                "${HL2SDKL4D2}/public/tier0",
+                "${HL2SDKL4D2}/public/tier1",
+                "${HL2SDKL4D2}/mathlib/",
+                "${HL2SDKL4D2}/public/mathlib/",
+                "${SOURCEMOD}/core",
+                "${SOURCEMOD}/public",
+                "${SOURCEMOD}/public/amtl",
+                "${SOURCEMOD}/public/amtl/amtl",
+                "${SOURCEMOD}/public/asm",
+                "${SOURCEMOD}/public/CDetour",
+                "${SOURCEMOD}/public/jit",
+                "${SOURCEMOD}/public/jit/x86",
+                "${SOURCEMOD}/sourcepawn/include/",
+                "${SOURCEMM}/core",
+                "${SOURCEMM}/core/sourcehook"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "SOURCE_ENGINE=9"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-clang-x86",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}
