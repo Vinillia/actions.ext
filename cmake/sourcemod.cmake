@@ -37,6 +37,7 @@ function(add_extension ext_name)
     endif()
 	
 	add_library(${ext_name} SHARED ${ARGN} "${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp")
+	set_target_properties(${ext_name} PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
 
 	target_sources(${ext_name} PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp
@@ -52,8 +53,9 @@ function(add_extension ext_name)
 	${SDK_PATH}/public/tier1
 	${SDK_PATH}/game/shared
 	${SDK_PATH}/game/server)
-	
-	target_compile_options(${ext_name} PUBLIC
+
+    if (UNIX)
+		target_compile_options(${ext_name} PUBLIC
 		-Wall
 		-Wno-class-memaccess
 		-Wno-delete-non-virtual-dtor
@@ -73,15 +75,13 @@ function(add_extension ext_name)
 		-march=pentium3
 		-mmmx
 		-msse
-		-std=c++11
-	)
-
-    if (UNIX)
+		-std=c++11)
+		
 		add_compile_definitions(
 			_LINUX
 			stricmp=strcmp
 			_vsnprintf=vsnprintf)
-
+		
 		target_compile_definitions(${ext_name} PUBLIC SOURCEMOD_BUILD)
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/linux/mathlib_i486.a
@@ -114,18 +114,21 @@ function(add_extension ext_name)
 			
             target_link_options(${ext_name} PUBLIC -static-libstdc++ -static-libgcc)
         endif()
+
+		set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 14)
 	else()
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/public/tier0.lib
 		${SDK_PATH}/lib/public/tier1.lib
 		${SDK_PATH}/lib/public/vstdlib.lib)
 
-		add_compile_definitions(_WIN32)
+		add_compile_definitions(WIN32)
+		set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 17)
     endif()
 
 	set_target_properties(${ext_name} PROPERTIES POSITION_INDEPENDENT_CODE True)
 
-    set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 14)
+    
     set_target_properties(${ext_name} PROPERTIES CXX_STANDARD_REQUIRED ON)
 
     set_target_properties(${ext_name} PROPERTIES PREFIX "")

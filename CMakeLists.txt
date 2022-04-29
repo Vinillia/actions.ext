@@ -24,7 +24,6 @@ endif()
 
 include("cmake/sourcemod.cmake")
 
-# Compiler specific jobs #
 if(MSVC AND NOT CMAKE_SIZEOF_VOID_P EQUAL 4)
     message(FATAL_ERROR "Arch must be Win32")
 endif()
@@ -35,7 +34,6 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
 endif()
 
-# Add header and source files #
 include_directories("source")
 include_directories("source/other")
 include_directories("source/public")

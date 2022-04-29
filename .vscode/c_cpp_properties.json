@@ -1,27 +1,27 @@
 {
     "configurations": [
         {
-            "name": "Linux",
+            "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${HL2SDKL4D2}/public",
-                "${HL2SDKL4D2}/public/engine",
-                "${HL2SDKL4D2}/public/game/server",
-                "${HL2SDKL4D2}/public/tier0",
-                "${HL2SDKL4D2}/public/tier1",
-                "${HL2SDKL4D2}/mathlib/",
-                "${HL2SDKL4D2}/public/mathlib/",
-                "${SOURCEMOD}/core",
-                "${SOURCEMOD}/public",
-                "${SOURCEMOD}/public/amtl",
-                "${SOURCEMOD}/public/amtl/amtl",
-                "${SOURCEMOD}/public/asm",
-                "${SOURCEMOD}/public/CDetour",
-                "${SOURCEMOD}/public/jit",
-                "${SOURCEMOD}/public/jit/x86",
-                "${SOURCEMOD}/sourcepawn/include/",
-                "${SOURCEMM}/core",
-                "${SOURCEMM}/core/sourcehook"
+                "D:/l4d2sdk/public",
+                "D:/l4d2sdk/public/engine",
+                "D:/l4d2sdk/public/game/server",
+                "D:/l4d2sdk/public/tier0",
+                "D:/l4d2sdk/public/tier1",
+                "D:/l4d2sdk/mathlib/",
+                "D:/l4d2sdk/public/mathlib/",
+                "D:/sourcemod/core",
+                "D:/sourcemod/public",
+                "D:/sourcemod/public/amtl",
+                "D:/sourcemod/public/amtl/amtl",
+                "D:/sourcemod/public/asm",
+                "D:/sourcemod/public/CDetour",
+                "D:/sourcemod/public/jit",
+                "D:/sourcemod/public/jit/x86",
+                "D:/sourcemod/sourcepawn/include/",
+                "D:/metamod/core",
+                "D:/metamod/core/sourcehook"
             ],
             "defines": [
                 "_DEBUG",
@@ -30,11 +30,61 @@
                 "SOURCE_ENGINE=9"
             ],
             "windowsSdkVersion": "10.0.19041.0",
-            "compilerPath": "/usr/bin/gcc",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29110/bin/Hostx64/x86/cl.exe",
             "cStandard": "c17",
             "cppStandard": "c++17",
-            "intelliSenseMode": "linux-clang-x86",
-            "configurationProvider": "ms-vscode.cmake-tools"
+            "intelliSenseMode": "windows-msvc-x86",
+            "configurationProvider": "ms-vscode.cmake-tools",
+            "compilerArgs": [],
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "D:/l4d2sdk/public",
+                    "D:/l4d2sdk/public/engine",
+                    "D:/l4d2sdk/public/game/server",
+                    "D:/l4d2sdk/public/tier0",
+                    "D:/l4d2sdk/public/tier1",
+                    "D:/l4d2sdk/mathlib/",
+                    "D:/l4d2sdk/public/mathlib/",
+                    "D:/sourcemod/core",
+                    "D:/sourcemod/public",
+                    "D:/sourcemod/public/amtl",
+                    "D:/sourcemod/public/amtl/amtl",
+                    "D:/sourcemod/public/asm",
+                    "D:/sourcemod/public/CDetour",
+                    "D:/sourcemod/public/jit",
+                    "D:/sourcemod/public/jit/x86",
+                    "D:/sourcemod/sourcepawn/include/",
+                    "D:/metamod/core",
+                    "D:/metamod/core/sourcehook"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.27.29110/bin/Hostx64/x86/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x86",
+            "compilerArgs": [],
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
