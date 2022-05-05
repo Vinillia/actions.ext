@@ -37,7 +37,7 @@ bool ActionsManager::Add(cell_t entity, Action* action)
 	if (IsCaptured(entity, action))
 		return false;
 
-	DEBUG("ActionsManager::Add -> %s", action->GetName());
+	LOGDEBUG("ActionsManager::Add -> %s", action->GetName());
 	i->value.push_back(action);
 	ActionsManager::OnActionAdded(action);
 	return true;
@@ -72,7 +72,7 @@ bool ActionsManager::Remove(cell_t entity, Action* action)
 		if (*iter == action)
 		{
 			queque.erase(iter);
-			DEBUG("ActionsManager::Remove -> %s", action->GetName());
+			LOGDEBUG("ActionsManager::Remove -> %s", action->GetName());
 			ActionsManager::OnActionDestroyed(action);
 			return true;
 		}

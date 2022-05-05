@@ -1,13 +1,5 @@
 #pragma once
 
-#define ENTINDEX_TO_CBASEENTITY(ref, buffer) \
-	buffer = gamehelpers->ReferenceToEntity(ref); \
-	if (!buffer) \
-	{ \
-		pContext->ReportError("Entity %d (%d) is not a CBaseEntity", gamehelpers->ReferenceToIndex(ref), ref); \
-		return 0; \
-	}
-
 cell_t NAT_GetActionParent(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];

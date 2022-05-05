@@ -40,7 +40,7 @@
 /* Basic information exposed publicly */
 #define SMEXT_CONF_NAME			"Actions"
 #define SMEXT_CONF_DESCRIPTION	"Provides a functions to control behavior Actions"
-#define SMEXT_CONF_VERSION		"1.0"
+#define SMEXT_CONF_VERSION		"2.1"
 #define SMEXT_CONF_AUTHOR		"BHaType"
 #define SMEXT_CONF_URL			"http://www.sourcemod.net/"
 #define SMEXT_CONF_LOGTAG		"Actions"

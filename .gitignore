@@ -1,2 +1,5 @@
 .vscode/
 cmake/
+*.cmake
+*.check_cache
+Makefile

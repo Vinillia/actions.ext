@@ -11,9 +11,6 @@
 // #define NOLOGS
 // #define NO_RUNTIME_VALIDATE_CHECK
 
-#define STRIP(x) x
-#define STRIPEX(x) STRIP x
-
 #ifndef __linux__
 	MEM_INTERFACE IMemAlloc* g_pMemAlloc;
 #endif
@@ -24,17 +21,23 @@
 #   else
 #       define NODISCARD
 #   endif
+#	if __has_cpp_attribute(maybe_unused)
+#       define MAYBE_UNSED [[maybe_unused]]
+#   else
+#       define MAYBE_UNSED
+#   endif
 #else
 #   define NODISCARD
+#   define MAYBE_UNSED
 #endif
 
 #ifndef NOLOGS
 	#define LOG(fmt, ...) g_pSM->LogMessage(myself, fmt, ##__VA_ARGS__)
 	#define LOGERROR(fmt, ...) g_pSM->LogError(myself, fmt, ##__VA_ARGS__)
 	#ifdef _DEBUG
-		#define DEBUG(fmt, ...) g_pSM->LogMessage(myself, fmt, ##__VA_ARGS__)
+		#define LOGDEBUG(fmt, ...) g_pSM->LogMessage(myself, fmt, ##__VA_ARGS__)
 	#else
-		#define DEBUG(fmt, ...) ((void)0)
+		#define LOGDEBUG(fmt, ...) ((void)0)
 	#endif
 #else
 	#define LOG(fmt, ...) ((void)0)

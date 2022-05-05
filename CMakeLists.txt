@@ -4,12 +4,14 @@ project(actions_ext)
 
 # CMake configuration #
 
+option(DEBUG_OUTPUT "Used to disable/enable logs" OFF)
+
 set(GAME "")
 set(GAME "" CACHE STRING "Description")
 
 if (GAME STREQUAL "")
     set(GAME "L4D2")
-    message(WARNING "GAME ignored use default build: ${GAME}")
+    message(NOTICE "GAME ignored use default build: ${GAME}")
 endif()
 
 if (GAME STREQUAL "L4D2")
