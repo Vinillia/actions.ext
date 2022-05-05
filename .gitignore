@@ -80,3 +80,8 @@ build/actions.ext.2.l4d2.dir/Debug/actions..7AD52590.tlog/CL.read.1.tlog
 build/actions.ext.2.l4d2.dir/Debug/actions..7AD52590.tlog/CL.command.1.tlog
 build/actions.ext.2.l4d2.dir/Debug/actions..7AD52590.tlog/actions.ext.2.l4d2.write.1u.tlog
 build/actions.ext.2.l4d2.dir/Debug/actions..7AD52590.tlog/actions.ext.2.l4d2.lastbuildstate
+*.dll
+*.obj
+*.recipe
+*.tlog
+*.lastbuildstate
