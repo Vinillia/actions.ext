@@ -4,7 +4,7 @@
 
 enum
 {
-    DUMP_FLAG_CLIENTS = 0x01,
+    DUMP_FLAG_CLIENTS   = 0x01,
     DUMP_FLAG_INFECTED  = 0x02,
     DUMP_FLAG_WITCHES   = 0x04,
     DUMP_FLAG_ALL       = 0xFFFFFFFF
@@ -76,7 +76,7 @@ CON_COMMAND(ext_actions_dump, "Dumps all actions")
             if (flags & DUMP_FLAG_CLIENTS)
                 dump(entity);
         }
-        else if (entity > clients)
+        else
         {
             if (flags & DUMP_FLAG_WITCHES && ClassMatchesComplex(entity, "witch"))
                 dump(entity);
