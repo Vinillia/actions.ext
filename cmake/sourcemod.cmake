@@ -12,6 +12,8 @@ endif()
 set(MM_PATH $ENV{SOURCEMM})
 set(SM_PATH $ENV{SOURCEMOD})
 
+add_compile_definitions(SE_LEFT4DEAD2=9 SE_LEFT4DEAD=8)
+
 include_directories("${SDK_PATH}/public")
 include_directories("${SDK_PATH}/public/engine")
 include_directories("${SDK_PATH}/public/game/server")

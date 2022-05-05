@@ -35,7 +35,7 @@ void OnSurviovrIntentionReset()
 
 void HookIntention(IGameConfig* cfg, const char* name, fastdelegate::FastDelegate<void> fastDelegate = SH_STATIC(OnIntentionReset))
 {
-	void* addr = NULL, **pAddr = NULL;
+	void* addr = NULL;
 
 	if (!cfg->GetAddress(name, &addr))
 	{
@@ -43,8 +43,7 @@ void HookIntention(IGameConfig* cfg, const char* name, fastdelegate::FastDelegat
 		return;
 	}
 
-	pAddr = &addr;
-	SH_ADD_MANUALVPHOOK(OnIntentionReset, pAddr, fastDelegate, true);
+	SH_ADD_MANUALDVPHOOK(OnIntentionReset, addr, fastDelegate, true);
 }
 
 void CreateHooks(IGameConfig* config)
