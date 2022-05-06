@@ -6,7 +6,6 @@ project(actions_ext)
 
 option(DEBUG_OUTPUT "Used to disable/enable logs" OFF)
 
-set(GAME "")
 set(GAME "" CACHE STRING "Description")
 
 if (GAME STREQUAL "")

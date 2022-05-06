@@ -42,12 +42,14 @@ void HookIntention(IGameConfig* cfg, const char* name, fastdelegate::FastDelegat
 		LOGERROR("Failed to find address for \"%s\" key. Check your gamedata...", name);
 		return;
 	}
-
+	
 	SH_ADD_MANUALDVPHOOK(OnIntentionReset, addr, fastDelegate, true);
 }
 
 void CreateHooks(IGameConfig* config)
 {
+	LOGDEBUG("CreateHooks: INTENTION_RESET_OFFSET %i", INTENTION_RESET_OFFSET);
+
 	HookIntention(config, "SurvivorIntention::Reset", SH_STATIC(OnSurviovrIntentionReset));
 	HookIntention(config, "HunterIntention::Reset");
 	HookIntention(config, "BoomerIntention::Reset");

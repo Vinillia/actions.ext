@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\public\actions_manager.cpp">
+      <Filter>source\actions\public</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\public\actions_processor.cpp">
+      <Filter>source\actions\public</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\public\actions_propagate.cpp">
+      <Filter>source\actions\public</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\public\extension.cpp">
+      <Filter>source\public</Filter>
+    </ClCompile>
+    <ClCompile Include="D:\sourcemod\public\smsdk_ext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\actions_commands.h">
+      <Filter>source\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\actions_custom.h">
+      <Filter>source\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\actions_manager.h">
+      <Filter>source\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\actions_processor.h">
+      <Filter>source\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\actions_propagate.h">
+      <Filter>source\actions</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\natives\actions_custom_natives.h">
+      <Filter>source\actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\natives\actions_natives.h">
+      <Filter>source\actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\actions\natives\actions_processors_natives.h">
+      <Filter>source\actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\extension.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\other\hooks.h">
+      <Filter>source\other</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\other\utils.h">
+      <Filter>source\other</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotBehavior.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotComponentInterface.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotContextualQueryInterface.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotDebug.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotEventResponderInterface.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotIntentionInterface.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotInterface.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\sdk\NextBotManager.h">
+      <Filter>source\sdk</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\BHaType\Documents\GitHub\actions.ext\source\smsdk_config.h">
+      <Filter>source</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\BHaType\Documents\GitHub\actions.ext\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{A4BBE9A7-69D5-3A43-8792-DEF4AA9730A8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source">
+      <UniqueIdentifier>{5D8B4ADF-1CA6-3127-B2EE-4783A95FA336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\actions">
+      <UniqueIdentifier>{E16B7649-5D59-3C27-96F4-D50290296BCE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\actions\natives">
+      <UniqueIdentifier>{3BD1FBE9-0F5C-3F75-9F15-1D7F6D087F8C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\actions\public">
+      <UniqueIdentifier>{A26F8E54-AA13-37B2-AFB8-169F809E1770}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\other">
+      <UniqueIdentifier>{984B6D6A-1974-3F72-8BE1-C2BCA5BEE3BB}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\public">
+      <UniqueIdentifier>{D1DF5403-6215-3060-A9CA-60173D75C296}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="source\sdk">
+      <UniqueIdentifier>{2A4366B3-10CE-34E8-B78C-B6CFCBB4D98A}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
