@@ -80,8 +80,10 @@ public:
 			}
 			else
 			{
-				typedef typename T::something_made_up X;
-				bool x = decltype(arg)::nothing; 
+				/* TO DO: */
+				listener->PushCell((cell_t)arg);
+				//typedef typename T::something_made_up X;
+				//bool x = decltype(arg)::nothing; 
 				//static_assert(false);
 			}
 		}
@@ -102,7 +104,8 @@ public:
 		if (listeners.size() == 0)
 			return Pl_Continue;
 
-		ResultType executeResult = Pl_Continue;
+		ResultType returnResult, executeResult = Pl_Continue;
+		returnResult = executeResult;
 
 		ProcessHandleArg<Action*>(listeners, std::forward<Action*>(g_pActionsManager->GetRuntimeAction()));
 		(ProcessHandleArg<Args>(listeners, std::forward<Args>(args)), ...);
@@ -119,9 +122,12 @@ public:
 			}
 
 			listener->Execute((cell_t*)&executeResult);
+
+			if (executeResult > returnResult)
+				returnResult = executeResult;
 		}
 
-		return executeResult;
+		return returnResult;
 	}
 
 private:

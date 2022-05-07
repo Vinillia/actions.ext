@@ -57,7 +57,6 @@
 
 ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_action(action)
 {
-	std::map<std::string, size_t>& offsets = GetOffsetsInfo();
 	g_pActionsManager->Add(entity, action);
 
 	for (auto name : m_hookedNames)
@@ -66,9 +65,9 @@ ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_
 			return;
 	}
 
+	std::map<std::string, size_t>& offsets = GetOffsetsInfo();
 	m_hookedNames.push_back(action->GetName());
 
-#pragma region start_processors
 	START_PROCESSOR(OnDestroyed, dctor);
 	START_PROCESSOR(OnStart, start);
 	START_PROCESSOR(OnUpdate, update);
@@ -117,7 +116,6 @@ ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_
 		START_PROCESSOR(OnCommandString, commandString);
 	#endif
 
-#pragma endregion start_processors
 }
 
 ActionProcessor::ActionProcessor(Action<void>* action) : ActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), action)
