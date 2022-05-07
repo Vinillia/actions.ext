@@ -34,7 +34,7 @@ cell_t NAT_ActionHandler(IPluginContext* pContext, const cell_t* params)
 	{
 		if (!propagate->RemoveListener(vtableidx, action, pContext))
 		{
-			pContext->ReportError("You don't have any listener for %s", name.c_str());
+			// pContext->ReportError("You don't have any listener for %s", name.c_str());
 			return 0;
 		}
 	}
@@ -42,7 +42,7 @@ cell_t NAT_ActionHandler(IPluginContext* pContext, const cell_t* params)
 	{
 		if (!propagate->AddListener(vtableidx, action, listener))
 		{
-			pContext->ReportError("You already have listener for %s", name.c_str());
+			// pContext->ReportError("You already have listener for %s", name.c_str());
 			return 0;
 		}
 	}

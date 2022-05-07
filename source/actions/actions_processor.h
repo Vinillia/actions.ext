@@ -67,6 +67,18 @@ struct HandlerProcessor
 			{
 				g_pActionsManager->Remove(action);
 			}
+			else
+			{
+				void* returnValue = NULL;
+				ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, &returnValue, std::forward<Args>(arg)...);
+
+				if (result > Pl_Continue)
+				{
+					RETURN_META(MRES_SUPERCEDE);
+				}
+
+				RETURN_META(MRES_IGNORED);
+			}
 		}
 		else
 		{
@@ -115,7 +127,22 @@ struct HandlerProcessor
 
 		if constexpr (std::is_void<retn>::value)
 		{
-			return;
+		#ifndef __linux__
+			if (vtableindex != 0)
+		#else
+			if (vtableindex != 1)
+		#endif
+			{
+				void* returnValue = NULL;
+				ResultType result = g_pActionsPropagatePost->ProcessHandler(vtableindex, &returnValue, std::forward<Args>(arg)...);
+
+				if (result > Pl_Continue)
+				{
+					RETURN_META(MRES_SUPERCEDE);
+				}
+
+				RETURN_META(MRES_IGNORED);
+			}
 		}
 		else
 		{
@@ -182,7 +209,6 @@ class ActionProcessor
 	inline static std::vector<std::string> m_hookedNames;
 
 public:
-
 	ActionProcessor(CBaseEntity* entity, Action<void>* action);
 	ActionProcessor(Action<void>* action);
 

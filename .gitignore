@@ -1,2 +1,9 @@
 .vscode/
 cmake/
+build/
+*.cmake
+*.dll
+*.obj
+*.recipe
+*.tlog
+*.lastbuildstate

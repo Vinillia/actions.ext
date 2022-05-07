@@ -3,14 +3,15 @@ cmake_minimum_required(VERSION 3.2)
 # CMake configuration #
 # SourceMod SDK
 
-if (GAME STREQUAL "L4D2")
-	set(SDK_PATH $ENV{HL2SDKL4D2})
-else()
-	set(SDK_PATH $ENV{HL2SDKL4D})
-endif()
-
+set(SDK_PATH $ENV{HL2SDKL4D2})
 set(MM_PATH $ENV{SOURCEMM})
 set(SM_PATH $ENV{SOURCEMOD})
+
+add_compile_definitions(SE_LEFT4DEAD2=9 SE_LEFT4DEAD=8 SOURCEMOD_BUILD)
+
+if (DEBUG_OUTPUT)
+	add_compile_definitions(_DEBUG)
+endif()
 
 include_directories("${SDK_PATH}/public")
 include_directories("${SDK_PATH}/public/engine")
@@ -24,7 +25,6 @@ include_directories("${SM_PATH}/public")
 include_directories("${SM_PATH}/public/amtl")
 include_directories("${SM_PATH}/public/amtl/amtl")
 include_directories("${SM_PATH}/public/asm")
-include_directories("${SM_PATH}/public/CDetour")
 include_directories("${SM_PATH}/public/jit")
 include_directories("${SM_PATH}/public/jit/x86")
 include_directories("${SM_PATH}/sourcepawn/include/")
@@ -74,48 +74,26 @@ function(add_extension ext_name)
 		-m32
 		-march=pentium3
 		-mmmx
-		-msse
-		-std=c++11)
-		
+		-msse)
+
 		add_compile_definitions(
 			_LINUX
 			stricmp=strcmp
 			_vsnprintf=vsnprintf)
 		
-		target_compile_definitions(${ext_name} PUBLIC SOURCEMOD_BUILD)
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/linux/mathlib_i486.a
 		${SDK_PATH}/lib/linux/tier1_i486.a
 		${SDK_PATH}/lib/linux/tier2_i486.a
 		${SDK_PATH}/lib/linux/tier3_i486.a)
 
-		if (GAME STREQUAL "L4D2")
-			target_link_libraries(${ext_name} PUBLIC 
-			${SDK_PATH}/lib/linux/libtier0_srv.so
-			${SDK_PATH}/lib/linux/libvstdlib_srv.so)
-		else()
-			target_link_libraries(${ext_name} PUBLIC 
-			${SDK_PATH}/lib/linux/libtier0.so
-			${SDK_PATH}/lib/linux/libvstdlib.so)
-		endif()
-        
-		if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" OR "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-            # Lesser than 3.13
-            if(NOT COMMAND target_link_options)
-                function(target_link_options)
-                    target_link_libraries(${ARGV})
-                endfunction()
-            endif()
+		target_link_libraries(${ext_name} PUBLIC 
+		${SDK_PATH}/lib/linux/libtier0_srv.so
+		${SDK_PATH}/lib/linux/libvstdlib_srv.so)
 
-            # Use libstdc++ instead of libc++
-			if ("${CMAKE_C_COMPILER_ID}" MATCHES "Clang")
-				target_compile_options(${ext_name} PUBLIC -stdlib=libstdc++)
-			endif()
-			
-            target_link_options(${ext_name} PUBLIC -static-libstdc++ -static-libgcc)
-        endif()
-
-		set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 14)
+		target_compile_options(${ext_name} PUBLIC -stdlib=libstdc++)
+        target_link_options(${ext_name} PUBLIC -static-libgcc)
+	
 	else()
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/public/tier0.lib
@@ -123,12 +101,11 @@ function(add_extension ext_name)
 		${SDK_PATH}/lib/public/vstdlib.lib)
 
 		add_compile_definitions(WIN32)
-		set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 17)
     endif()
 
-	set_target_properties(${ext_name} PROPERTIES POSITION_INDEPENDENT_CODE True)
+	#set_target_properties(${ext_name} PROPERTIES POSITION_INDEPENDENT_CODE True)
 
-    
+	set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 17)
     set_target_properties(${ext_name} PROPERTIES CXX_STANDARD_REQUIRED ON)
 
     set_target_properties(${ext_name} PROPERTIES PREFIX "")

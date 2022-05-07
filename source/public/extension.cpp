@@ -3,12 +3,14 @@
 #include "actions_manager.h"
 #include "actions_processor.h"
 #include "actions_custom.h"
+#include "actions_commands.h"
 
 #include "actions_natives.h"
 #include "actions_processors_natives.h"
 #include "actions_custom_natives.h"
 
-#include "intention_hook.h"
+#include "hooks.h"
+#include <compat_wrappers.h>
 
 #pragma comment(lib, "legacy_stdio_definitions.lib")
 
@@ -16,6 +18,8 @@ CExtBehaviorActions g_BehaviorActions;
 SMEXT_LINK(&g_BehaviorActions);
 
 IGameConfig* g_pGameConf;
+CGlobalVars *gpGlobals;
+ICvar *icvar;
 
 bool CExtBehaviorActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
@@ -39,19 +43,33 @@ bool CExtBehaviorActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 void CExtBehaviorActions::SDK_OnAllLoaded()
 {
 	ReconfigureHooks();
-	HookIntentions(g_pGameConf);
+	CreateHooks(g_pGameConf);
 }
 
 void CExtBehaviorActions::SDK_OnUnload()
 {
-	gameconfs->CloseGameConfigFile(g_pGameConf);
 	plsys->RemovePluginsListener(this);
+	gameconfs->CloseGameConfigFile(g_pGameConf);
 }
 
 void CExtBehaviorActions::OnPluginUnloaded(IPlugin* plugin)
 {
 	g_pActionsPropagatePre->RemoveListeners(plugin->GetBaseContext());
 	g_pActionsPropagatePost->RemoveListeners(plugin->GetBaseContext());
+}
+
+bool CExtBehaviorActions::SDK_OnMetamodLoad(ISmmAPI *ismm, char *error, size_t maxlen, bool late)
+{
+	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
+	g_pCVar = icvar;
+	gpGlobals = ismm->GetCGlobals();
+	CONVAR_REGISTER(this);
+	return true;
+}
+
+bool CExtBehaviorActions::RegisterConCommandBase(ConCommandBase* command)
+{
+	return META_REGCVAR(command);
 }
 
 #ifndef __linux__
