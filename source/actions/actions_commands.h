@@ -12,7 +12,7 @@ enum
 
 inline bool ClassMatchesComplex(cell_t entity, const char* match);
 
-CON_COMMAND(ext_actions_dump, "Dumps all actions")
+CON_COMMAND(ext_actions_dump, "Dump entities actions")
 {
     LOG("DUPMING ACTIONS START");
 
@@ -87,6 +87,25 @@ CON_COMMAND(ext_actions_dump, "Dumps all actions")
     }
 
     LOG("DUPMING ACTIONS END");
+}
+
+CON_COMMAND(ext_actions_offsets, "Dump extension functions offset")
+{
+    auto&& offsets = GetOffsetsInfo();
+
+    #ifndef __linux__ 
+        static const char* OS = "Win";
+    #else
+        static const char* OS = "Linux";
+    #endif
+
+    LOG("OS: %s | Game: %s", OS, g_pSM->GetGameFolderName());
+    LOG("INTENTION_RESET_OFFSET: %i", INTENTION_RESET_OFFSET);
+
+    for(auto offset : offsets)
+    {
+        LOG("%s: %i", offset.first.c_str(), offset.second);
+    }
 }
 
 inline bool ClassMatchesComplex(cell_t entity, const char* match)

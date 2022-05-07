@@ -187,11 +187,35 @@ cell_t NAT_StorePendingEventResult(IPluginContext* pContext, const cell_t* param
 	return 0;
 }
 
+cell_t NAT_GetEntityAction(IPluginContext* pContext, const cell_t* params)
+{
+	std::vector<Action<void>*> actions; 
+	cell_t entity;
+	char* match;
+
+	entity = params[1];
+	pContext->LocalToString(params[2], &match);
+	
+	size_t num = g_pActionsManager->GetEntityActions(entity, &actions);
+
+	if (num == 0)
+		return 0;
+
+	for(auto action : actions)
+	{
+		if (strcmp(action->GetName(), match) == 0)
+			return (cell_t)action;
+	}
+
+	return 0;
+}
+
 sp_nativeinfo_t g_ActionNatives[] =
 {
 	{ "ActionsManager.Allocate", NAT_ActionsAllocate },
 	{ "ActionsManager.Deallocate", NAT_ActionsDeallocate },
 	{ "ActionsManager.Iterator", NAT_GetEntityActions },
+	{ "ActionsManager.GetAction", NAT_GetEntityAction },
 
 	{ "BehaviorAction.StorePendingEventResult", NAT_StorePendingEventResult },
 	{ "BehaviorAction.GetName", NAT_GetActionName },

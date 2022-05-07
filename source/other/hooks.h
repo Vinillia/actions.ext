@@ -48,8 +48,6 @@ void HookIntention(IGameConfig* cfg, const char* name, fastdelegate::FastDelegat
 
 void CreateHooks(IGameConfig* config)
 {
-	LOGDEBUG("CreateHooks: INTENTION_RESET_OFFSET %i", INTENTION_RESET_OFFSET);
-
 	HookIntention(config, "SurvivorIntention::Reset", SH_STATIC(OnSurviovrIntentionReset));
 	HookIntention(config, "HunterIntention::Reset");
 	HookIntention(config, "BoomerIntention::Reset");
