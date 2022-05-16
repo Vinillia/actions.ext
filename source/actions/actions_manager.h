@@ -3,15 +3,9 @@
 #include "utils.h"
 
 #include <am-hashmap.h>
-#include <vector>
+#include <am-deque.h>
 
 #include "NextBotBehavior.h"
-
-/* 	
-	I don't know why but compile for l4d1 throws error if i use am-deque.h
-	error: call to 'swap' is ambiguous
-   	#include <am-deque.h>
-*/
 
 class ActionsManager;
 
@@ -35,8 +29,8 @@ public:
 	~ActionsManager();
 
 	using Action = Action<void>;
-	//using ActionsQueque = std::deque<ActionsManager::Action*>; 
-	using ActionsQueque = std::vector<ActionsManager::Action*>;
+	using ActionsQueque = std::deque<ActionsManager::Action*>; 
+	//using ActionsQueque = std::vector<ActionsManager::Action*>;
 	using Actions = ke::HashMap<cell_t, ActionsQueque, IntegerPolicy>;
 
 	bool Add(cell_t entity, Action* action);

@@ -159,6 +159,9 @@ cell_t NAT_ActionsDeallocate(IPluginContext* pContext, const cell_t* params)
 		return 0;
 	}
 
+	if (g_pActionsManager->GetRuntimeAction() == action)
+		g_pActionsManager->SetRuntimeAction(NULL);
+
 	delete action;
 	return 0;
 }

@@ -65,14 +65,12 @@ public:
 			}
 			else if constexpr (std::is_same<type, CBaseEntity*>::value)
 			{
-				/*
 				cell_t entity = -1;
 
 				if (arg != NULL)
 					entity = gamehelpers->EntityToBCompatRef(arg);
 
 				listener->PushCell(entity);
-				*/
 			}
 			else if constexpr (std::is_same<type, int>::value || std::is_pointer<T>::value || std::is_enum<T>::value)
 			{
@@ -90,11 +88,11 @@ public:
 	}
 
 	template<typename returnType, typename ...Args>
-	ResultType ProcessHandler(size_t vtableidx, returnType* result, Args&&... args)
+	ResultType ProcessHandler(size_t vtableidx, Action* action, returnType* result, Args&&... args)
 	{
 		constexpr size_t num = sizeof...(Args);
 
-		auto r = m_handlers.find(g_pActionsManager->GetRuntimeAction());
+		auto r = m_handlers.find(action);
 
 		if (!r.found())
 			return Pl_Continue;
@@ -107,10 +105,10 @@ public:
 		ResultType returnResult, executeResult = Pl_Continue;
 		returnResult = executeResult;
 
-		ProcessHandleArg<Action*>(listeners, std::forward<Action*>(g_pActionsManager->GetRuntimeAction()));
+		ProcessHandleArg<Action*>(listeners, std::forward<Action*>(action));
 		(ProcessHandleArg<Args>(listeners, std::forward<Args>(args)), ...);
 
-		for (auto listener : listeners)
+		for (IPluginFunction* listener : listeners)
 		{
 			if constexpr (std::is_same<returnType, ActionResult<void>>::value || std::is_same<returnType, EventDesiredResult<void>>::value)
 			{
@@ -122,6 +120,34 @@ public:
 			}
 
 			listener->Execute((cell_t*)&executeResult);
+
+			if constexpr (std::is_same<returnType, ActionResult<void>>::value || std::is_same<returnType, EventDesiredResult<void>>::value)
+			{
+				if (result->IsRequestingChange() && !result->IsDone())
+				{
+					if (result->m_action == nullptr)
+					{
+						listener->GetParentRuntime()->GetDefaultContext()->ReportError("Tried to change to NULL action");
+						break;
+					}
+				}
+
+				Action* runtimeAction = g_pActionsManager->GetRuntimeAction();
+
+				if (runtimeAction)
+				{
+					if (result->m_action != runtimeAction)
+					{
+						g_pActionsManager->SetRuntimeAction(result->m_action);
+					}
+					else if (result->IsContinue())
+					{
+						g_pActionsManager->SetRuntimeAction(NULL);
+					}
+
+					delete runtimeAction;
+				}
+			}
 
 			if (executeResult > returnResult)
 				returnResult = executeResult;

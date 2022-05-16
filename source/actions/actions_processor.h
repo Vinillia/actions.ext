@@ -55,8 +55,6 @@ struct HandlerProcessor
 		Action<void>* action = META_IFACEPTR(Action<void>);
 		CBaseEntity* actor = static_cast<CBaseEntity*>(action->GetActor());
 
-		g_pActionsManager->SetRuntimeAction(action);
-
 		if constexpr (std::is_void<retn>::value)
 		{
 		#ifndef __linux__
@@ -70,7 +68,7 @@ struct HandlerProcessor
 			else
 			{
 				void* returnValue = NULL;
-				ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, &returnValue, std::forward<Args>(arg)...);
+				ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, action, &returnValue, std::forward<Args>(arg)...);
 
 				if (result > Pl_Continue)
 				{
@@ -85,7 +83,7 @@ struct HandlerProcessor
 			retn returnValue = META_RESULT_ORIG_RET(retn), originalReturn;
 			originalReturn = returnValue;
 
-			ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, &returnValue, std::forward<Args>(arg)...);
+			ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, action, &returnValue, std::forward<Args>(arg)...);
 
 			if (result == Pl_Continue)
 				returnValue = originalReturn;
@@ -134,7 +132,7 @@ struct HandlerProcessor
 		#endif
 			{
 				void* returnValue = NULL;
-				ResultType result = g_pActionsPropagatePost->ProcessHandler(vtableindex, &returnValue, std::forward<Args>(arg)...);
+				ResultType result = g_pActionsPropagatePost->ProcessHandler(vtableindex, action, &returnValue, std::forward<Args>(arg)...);
 
 				if (result > Pl_Continue)
 				{
@@ -149,7 +147,10 @@ struct HandlerProcessor
 			retn returnValue = META_RESULT_ORIG_RET(retn), originalReturn;
 			originalReturn = returnValue;
 
-			ResultType result = g_pActionsPropagatePost->ProcessHandler(vtableindex, &returnValue, std::forward<Args>(arg)...);
+			if constexpr (std::is_same<retn, ActionResult<void>>::value || std::is_same<retn, EventDesiredResult<void>>::value)
+				g_pActionsManager->SetRuntimeAction(returnValue.m_action);
+
+			ResultType result = g_pActionsPropagatePost->ProcessHandler(vtableindex, action, &returnValue, std::forward<Args>(arg)...);
 
 			if (result == Pl_Continue)
 				returnValue = originalReturn;
