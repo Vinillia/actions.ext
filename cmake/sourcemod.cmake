@@ -79,7 +79,8 @@ function(add_extension ext_name)
 		add_compile_definitions(
 			_LINUX
 			stricmp=strcmp
-			_vsnprintf=vsnprintf)
+			_vsnprintf=vsnprintf
+			_GLIBCXX_USE_CXX11_ABI=0)
 		
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/linux/mathlib_i486.a
@@ -91,8 +92,8 @@ function(add_extension ext_name)
 		${SDK_PATH}/lib/linux/libtier0_srv.so
 		${SDK_PATH}/lib/linux/libvstdlib_srv.so)
 
-		target_compile_options(${ext_name} PUBLIC -stdlib=libstdc++)
-        target_link_options(${ext_name} PUBLIC -static-libgcc)
+		target_compile_options(${ext_name} PUBLIC -static-libstdc++ -stdlib=libstdc++)
+        target_link_options(${ext_name} PUBLIC -static-libstdc++ -static-libgcc)
 	
 	else()
 		target_link_libraries(${ext_name} PUBLIC 
