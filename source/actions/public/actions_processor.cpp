@@ -56,6 +56,7 @@ SH_DECL_MANUALHOOK1(IsAbleToBlockMovementOf, 0, 0, 0, bool, const INextBot*);
 
 ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_action(action)
 {
+	g_pActionsManager->SetRuntimeActor(entity);
 	g_pActionsManager->Add(entity, action);
 
 	for (auto name : m_hookedNames)

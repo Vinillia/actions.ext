@@ -11,7 +11,7 @@ cell_t NAT_ActionHandler(IPluginContext* pContext, const cell_t* params)
 	IPluginFunction* listener = NULL;
 	ActionsPropagate* propagate = NULL;
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -69,9 +69,15 @@ cell_t NAT_ActionResultGetReason(IPluginContext* pContext, const cell_t* params)
 {
 	ActionResult<void>* actionResult = (ActionResult<void>*)params[1];
 
-	if (actionResult == NULL || actionResult->m_reason == NULL)
-		return -1;
+	if (g_pActionsManager->GetRuntimeResult() != actionResult)
+	{
+		pContext->ReportError("Invalid action result passed %X. Check callback params.", actionResult);
+		return 0;
+	}
 	
+	if (actionResult->m_reason == NULL)
+		return 0;
+
 	return pContext->StringToLocal(params[2], params[3], actionResult->m_reason);
 }
 
@@ -79,8 +85,11 @@ cell_t NAT_ActionResultSetReason(IPluginContext* pContext, const cell_t* params)
 {
 	ActionResult<void>* actionResult = (ActionResult<void>*)params[1];
 
-	if (actionResult == NULL)
+	if (g_pActionsManager->GetRuntimeResult() != actionResult)
+	{
+		pContext->ReportError("Invalid action result passed %X. Check callback params.", actionResult);
 		return 0;
+	}
 
 	char* reason;
 	pContext->LocalToString(params[2], &reason);
@@ -93,8 +102,11 @@ cell_t NAT_ActionResultType(IPluginContext* pContext, const cell_t* params)
 {
 	ActionResult<void>* actionResult = (ActionResult<void>*)params[1];
 
-	if (actionResult == NULL)
+	if (g_pActionsManager->GetRuntimeResult() != actionResult)
+	{
+		pContext->ReportError("Invalid action result passed %X. Check callback params.", actionResult);
 		return 0;
+	}
 
 	ActionResultType result = actionResult->m_type;
 
@@ -108,8 +120,11 @@ cell_t NAT_ActionActionType(IPluginContext* pContext, const cell_t* params)
 {
 	ActionResult<void>* actionResult = (ActionResult<void>*)params[1];
 
-	if (actionResult == NULL)
+	if (g_pActionsManager->GetRuntimeResult() != actionResult)
+	{
+		pContext->ReportError("Invalid action result passed %X. Check callback params.", actionResult);
 		return 0;
+	}
 
 	Action<void>* action = actionResult->m_action;
 
@@ -125,8 +140,11 @@ cell_t NAT_ActionPriorityType(IPluginContext* pContext, const cell_t* params)
 {
 	EventDesiredResult<void>* actionResult = (EventDesiredResult<void>*)params[1];
 
-	if (actionResult == NULL)
+	if (g_pActionsManager->GetRuntimeResult() != actionResult)
+	{
+		pContext->ReportError("Invalid action result passed %X. Check callback params.", actionResult);
 		return 0;
+	}
 
 	EventResultPriorityType result = actionResult->m_priority;
 

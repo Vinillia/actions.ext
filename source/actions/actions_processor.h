@@ -31,8 +31,8 @@ extern void ReconfigureHooks();
 class ActionProcessor;
 static void CreateActionProcessor(CBaseEntity* entity, Action<void>* action);
 
-template<typename Q>
-static void CheckActionResult(Action<void>* action, Q& result)
+template<typename T>
+static void CheckActionResult(Action<void>* action, T& result)
 {
 	if (!result.IsRequestingChange())
 		return;

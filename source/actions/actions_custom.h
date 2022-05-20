@@ -10,6 +10,7 @@ public:
 
 	virtual const char* GetName(void) const override { return m_szName; }
 private:
-	char m_szName[32];
+#define MAX_NAME_LENGTH 32
+	char m_szName[MAX_NAME_LENGTH * 2];
 };
 

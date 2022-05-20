@@ -6,7 +6,7 @@
 ActionsManager g_ActionsManager;
 ActionsManager* g_pActionsManager = &g_ActionsManager;
 
-ActionsManager::ActionsManager() : m_pRuntimeAction(NULL)
+ActionsManager::ActionsManager() : m_pRuntimeAction(NULL), m_pRuntimeResult(NULL), m_pRuntimeActor(NULL)
 {
 	m_init = m_actions.init();
 
@@ -22,6 +22,7 @@ ActionsManager::~ActionsManager()
 		return;
 
 	m_actions.clear();
+	m_pendingActions.clear();
 }
 
 bool ActionsManager::Add(cell_t entity, Action* action)
@@ -168,17 +169,85 @@ size_t ActionsManager::GetEntityActions(cell_t entity, std::vector<Action*>* act
 	return count;
 }
 
-bool ActionsManager::IsValid(Action* action) const
+bool ActionsManager::IsValidAction(Action* action) const
 {
-#ifdef NO_RUNTIME_VALIDATE_CHECK
+#ifdef NO_RUNTIME_VALIDATION
 	return true;
 #else
 	if (action == NULL)
 		return false;
 	
-	return IsCaptured(action) || GetRuntimeAction() == action;
+	return GetRuntimeAction() == action || IsCaptured(action) || IsPending(action);
 #endif
 }
+
+bool ActionsManager::IsValidResult(const void* const result) const
+{
+#ifdef NO_RUNTIME_VALIDATION
+	return true;
+#else
+	if (result == NULL)
+		return false;
+	
+	return GetRuntimeResult() == result;
+#endif
+}
+
+bool ActionsManager::AddPending(Action* action)
+{
+	if (IsPending(action))
+		return false;
+
+	m_pendingActions.push_back(action);
+	return true;
+}
+
+bool ActionsManager::RemovePending(Action* action)
+{
+	return IsPending(action, true);
+}
+
+bool ActionsManager::IsPending(Action* action, bool erase) const
+{	
+	for(iterator iter = m_pendingActions.begin(); iter != m_pendingActions.end(); iter++)
+	{
+		if (*iter == action)
+		{
+			if (erase)
+				m_pendingActions.erase(iter);
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+void ActionsManager::OnActionAdded(Action* action)
+{
+	static IForward* forward = forwards->CreateForward("OnActionCreated", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String); 
+
+	forward->PushCell((cell_t)action);
+	forward->PushCell(gamehelpers->EntityToBCompatRef(g_pActionsManager->m_pRuntimeActor));
+	forward->PushString(action->GetName());
+	forward->Execute();
+	
+	g_pActionsManager->RemovePending(action);
+	ActionsPropagate::OnActionAdded(action);
+}
+
+void ActionsManager::OnActionDestroyed(Action* action)
+{
+	static IForward* forward = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
+
+	forward->PushCell((cell_t)action);
+	forward->PushCell(gamehelpers->EntityToBCompatRef(static_cast<CBaseEntity*>(action->GetActor())));
+	forward->PushString(action->GetName());
+	forward->Execute();
+
+	ActionsPropagate::OnActionDestroyed(action);
+}
+
 
 void ActionsManager::SetRuntimeAction(Action* action) noexcept
 {
@@ -190,26 +259,22 @@ Action<void>* ActionsManager::GetRuntimeAction() const noexcept
 	return m_pRuntimeAction;
 }
 
-void ActionsManager::OnActionAdded(Action* action)
+void ActionsManager::SetRuntimeResult(void* const result) noexcept
 {
-	static IForward* forward = forwards->CreateForward("OnActionCreated", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
-
-	ActionsPropagate::OnActionAdded(action);
-
-	forward->PushCell((cell_t)action);
-	forward->PushCell((cell_t)action->GetActor());
-	forward->PushString(action->GetName());
-	forward->Execute();
+	m_pRuntimeResult = result;
 }
 
-void ActionsManager::OnActionDestroyed(Action* action)
+void* const ActionsManager::GetRuntimeResult() const noexcept
 {
-	static IForward* forward = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
+	return m_pRuntimeResult;
+}
 
-	ActionsPropagate::OnActionDestroyed(action);
+void ActionsManager::SetRuntimeActor(CBaseEntity* actor) noexcept
+{
+	m_pRuntimeActor = actor;
+}
 
-	forward->PushCell((cell_t)action);
-	forward->PushCell((cell_t)action->GetActor());
-	forward->PushString(action->GetName());
-	forward->Execute();
+CBaseEntity* ActionsManager::GetRuntimeActor() const noexcept
+{
+	return m_pRuntimeActor;
 }

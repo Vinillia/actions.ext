@@ -1,17 +1,8 @@
 cmake_minimum_required(VERSION 3.2)
 
-# CMake configuration #
-# SourceMod SDK
-
 set(SDK_PATH $ENV{HL2SDKL4D2})
 set(MM_PATH $ENV{SOURCEMM})
 set(SM_PATH $ENV{SOURCEMOD})
-
-add_compile_definitions(SE_LEFT4DEAD2=9 SE_LEFT4DEAD=8 SOURCEMOD_BUILD)
-
-if (DEBUG_OUTPUT)
-	add_compile_definitions(_DEBUG)
-endif()
 
 include_directories("${SDK_PATH}/public")
 include_directories("${SDK_PATH}/public/engine")
@@ -31,13 +22,13 @@ include_directories("${SM_PATH}/sourcepawn/include/")
 include_directories("${MM_PATH}/core")
 include_directories("${MM_PATH}/core/sourcehook")
 
-function(add_extension ext_name)
+function(add_extension ext_name engine)
     if(ARGC LESS 3)
         message(FATAL_ERROR "Missing arguments for add_extension")
     endif()
 	
 	add_library(${ext_name} SHARED ${ARGN} "${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp")
-	set_target_properties(${ext_name} PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
+	target_compile_definitions(${ext_name} PUBLIC SOURCE_ENGINE=${engine})
 
 	target_sources(${ext_name} PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp
@@ -55,9 +46,10 @@ function(add_extension ext_name)
 	${SDK_PATH}/game/server)
 
     if (UNIX)
+		set_target_properties(${ext_name} PROPERTIES COMPILE_OPTIONS "-m32" LINK_FLAGS "-m32")
+
 		target_compile_options(${ext_name} PUBLIC
 		-Wall
-		-Wno-class-memaccess
 		-Wno-delete-non-virtual-dtor
 		-Wno-invalid-offsetof
 		-Wno-overloaded-virtual
@@ -86,25 +78,34 @@ function(add_extension ext_name)
 		${SDK_PATH}/lib/linux/mathlib_i486.a
 		${SDK_PATH}/lib/linux/tier1_i486.a
 		${SDK_PATH}/lib/linux/tier2_i486.a
-		${SDK_PATH}/lib/linux/tier3_i486.a)
-
-		target_link_libraries(${ext_name} PUBLIC 
+		${SDK_PATH}/lib/linux/tier3_i486.a
 		${SDK_PATH}/lib/linux/libtier0_srv.so
 		${SDK_PATH}/lib/linux/libvstdlib_srv.so)
 
-		target_compile_options(${ext_name} PUBLIC -static-libstdc++ -stdlib=libstdc++)
+		#target_compile_options(${ext_name} PUBLIC -static-libstdc++ -stdlib=libstdc++)
         target_link_options(${ext_name} PUBLIC -static-libstdc++ -static-libgcc)
 	
 	else()
+		add_compile_definitions(
+			_ITERATOR_DEBUG_LEVEL=0
+			_CRT_SECURE_NO_DEPRECATE
+			_CRT_SECURE_NO_WARNINGS
+			_CRT_NONSTDC_NO_DEPRECATE
+			WIN32)
+
+		target_compile_options(${ext_name} PUBLIC
+			"/W3"
+			"/EHsc"
+			"/GR-"
+			"/TP")
+
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/public/tier0.lib
 		${SDK_PATH}/lib/public/tier1.lib
 		${SDK_PATH}/lib/public/vstdlib.lib)
-
-		add_compile_definitions(WIN32)
     endif()
 
-	#set_target_properties(${ext_name} PROPERTIES POSITION_INDEPENDENT_CODE True)
+	set_target_properties(${ext_name} PROPERTIES POSITION_INDEPENDENT_CODE True)
 
 	set_target_properties(${ext_name} PROPERTIES CXX_STANDARD 17)
     set_target_properties(${ext_name} PROPERTIES CXX_STANDARD_REQUIRED ON)

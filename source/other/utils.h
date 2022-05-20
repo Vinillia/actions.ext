@@ -9,7 +9,7 @@
 #endif
 
 // #define NOLOGS
-// #define NO_RUNTIME_VALIDATE_CHECK
+// #define NO_RUNTIME_VALIDATION
 
 #ifndef __linux__
 	MEM_INTERFACE IMemAlloc* g_pMemAlloc;

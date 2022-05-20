@@ -105,6 +105,7 @@ public:
 		ResultType returnResult, executeResult = Pl_Continue;
 		returnResult = executeResult;
 
+		g_pActionsManager->SetRuntimeResult((void*)result);
 		ProcessHandleArg<Action*>(listeners, std::forward<Action*>(action));
 		(ProcessHandleArg<Args>(listeners, std::forward<Args>(args)), ...);
 

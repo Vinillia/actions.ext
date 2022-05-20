@@ -33,6 +33,9 @@ public:
 	//using ActionsQueque = std::vector<ActionsManager::Action*>;
 	using Actions = ke::HashMap<cell_t, ActionsQueque, IntegerPolicy>;
 
+	using iterator = ActionsQueque::iterator;
+	using citerator = ActionsQueque::const_iterator;
+
 	bool Add(cell_t entity, Action* action);
 	bool Add(CBaseEntity* entity, Action* action);
 	bool Add(Action* action);
@@ -42,10 +45,23 @@ public:
 	bool Remove(Action* action);
 
 	size_t GetEntityActions(cell_t entity, std::vector<Action*>* actions = NULL);
-	bool IsValid(Action* action) const;
+	
+	bool AddPending(Action* action);
+	bool RemovePending(Action* action);
+
+	bool IsPending(Action* action, bool erase = false) const;
+
+	bool IsValidAction(Action* action) const;
+	bool IsValidResult(const void* const result) const;
 
 	void SetRuntimeAction(Action* action) noexcept;
 	Action* GetRuntimeAction() const noexcept;
+
+	void SetRuntimeResult(void* const result) noexcept;
+	void* const GetRuntimeResult() const noexcept;
+
+	void SetRuntimeActor(CBaseEntity* actor) noexcept;
+	CBaseEntity* GetRuntimeActor() const noexcept;
 
 private:
 	static void OnActionAdded(Action* action);
@@ -56,10 +72,14 @@ private:
 	NODISCARD bool IsCaptured(cell_t entity) const;
 
 private:
-	mutable Actions m_actions;
 	bool m_init;
 
+	mutable Actions m_actions;
+	mutable ActionsQueque m_pendingActions;
+
+	CBaseEntity* m_pRuntimeActor;
 	Action* m_pRuntimeAction;
+	void* m_pRuntimeResult;
 };
 
 extern ActionsManager* g_pActionsManager;

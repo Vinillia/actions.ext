@@ -4,7 +4,7 @@ cell_t NAT_GetActionParent(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -17,7 +17,7 @@ cell_t NAT_GetActionChild(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -30,7 +30,7 @@ cell_t NAT_GetActionUnder(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -43,7 +43,7 @@ cell_t NAT_GetActionAbove(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -56,7 +56,7 @@ cell_t NAT_GetActionActor(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -73,7 +73,7 @@ cell_t NAT_ActionSuspend(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -93,7 +93,7 @@ cell_t NAT_ActionStarted(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -113,7 +113,7 @@ cell_t NAT_GetActionName(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
@@ -153,7 +153,7 @@ cell_t NAT_ActionsDeallocate(IPluginContext* pContext, const cell_t* params)
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("You are trying to delete invalid action %X", action);
 		return 0;
@@ -170,7 +170,7 @@ cell_t NAT_StorePendingEventResult(IPluginContext* pContext, const cell_t* param
 {
 	Action<void>* action = (Action<void>*)params[1];
 
-	if (!g_pActionsManager->IsValid(action))
+	if (!g_pActionsManager->IsValidAction(action))
 	{
 		pContext->ReportError("Invalid action passed %X", action);
 		return 0;
