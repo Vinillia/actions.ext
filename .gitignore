@@ -2,7 +2,6 @@
 cmake/
 build/
 *.cmake
-*.dll
 *.obj
 *.recipe
 *.tlog
