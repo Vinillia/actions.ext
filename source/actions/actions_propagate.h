@@ -131,22 +131,14 @@ public:
 						listener->GetParentRuntime()->GetDefaultContext()->ReportError("Tried to change to NULL action");
 						break;
 					}
-				}
 
-				Action* runtimeAction = g_pActionsManager->GetRuntimeAction();
+					Action* runtimeAction = g_pActionsManager->GetRuntimeAction();
 
-				if (runtimeAction)
-				{
-					if (result->m_action != runtimeAction)
+					if (runtimeAction && result->m_action != runtimeAction)
 					{
 						g_pActionsManager->SetRuntimeAction(result->m_action);
+						delete runtimeAction;
 					}
-					else if (result->IsContinue())
-					{
-						g_pActionsManager->SetRuntimeAction(NULL);
-					}
-
-					delete runtimeAction;
 				}
 			}
 

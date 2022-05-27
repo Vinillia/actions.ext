@@ -83,6 +83,9 @@ struct HandlerProcessor
 			retn returnValue = META_RESULT_ORIG_RET(retn), originalReturn;
 			originalReturn = returnValue;
 
+			if constexpr (std::is_same<retn, ActionResult<void>>::value || std::is_same<retn, EventDesiredResult<void>>::value)
+				g_pActionsManager->SetRuntimeAction(NULL);
+
 			ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, action, &returnValue, std::forward<Args>(arg)...);
 
 			if (result == Pl_Continue)

@@ -22,7 +22,7 @@ bool ActionsPropagate::AddListener(size_t vtableidx, Action* action, IPluginFunc
 
 	if (!i.found())
 	{
-		m_handlers.add(i, action, std::move(HandlersArray(SIZE)));
+		m_handlers.add(i, action, HandlersArray(SIZE));
 	}
 	else if (FindListener(vtableidx, action, listener))
 	{
