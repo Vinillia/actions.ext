@@ -296,7 +296,6 @@ methodmap BehaviorAction
  	* @param int			Offset to data 
  	* @param type			How many bytes read (See NumberType)
  	*
-	* @error				Invalid action passed
  	* @return				Stored data
  	*/
 	public any Get( int offset, NumberType type = NumberType_Int32 )
@@ -311,14 +310,19 @@ methodmap BehaviorAction
  	* @param data			Data to set
  	* @param type			How many bytes set (See NumberType)
  	*
-	* @error				Invalid action passed
  	* @noreturn
  	*/
+ #if SOURCEMOD_V_MINOR < 11
+	public void Set( int offset, any data, NumberType type = NumberType_Int32 )
+	{
+		StoreToAddress(view_as<Address>(this) + view_as<Address>(offset), data, type);
+	}
+ #else
 	public void Set( int offset, any data, NumberType type = NumberType_Int32, bool updateMemAccess = true )
 	{
 		StoreToAddress(view_as<Address>(this) + view_as<Address>(offset), data, type, updateMemAccess);
 	}
-	
+ #endif	
 	// ====================================================================================================
 	// ACTION PROPERTIES
 	// ====================================================================================================
