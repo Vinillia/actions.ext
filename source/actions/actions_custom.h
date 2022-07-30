@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _INCLUDE_ACTIONS_CUSTOM_H
+#define _INCLUDE_ACTIONS_CUSTOM_H
+
 class PluginAction : public Action<void>
 {
 public:
@@ -11,6 +14,7 @@ public:
 	virtual const char* GetName(void) const override { return m_szName; }
 private:
 #define MAX_NAME_LENGTH 32
-	char m_szName[MAX_NAME_LENGTH * 2];
+	char m_szName[MAX_NAME_LENGTH];
 };
 
+#endif // _INCLUDE_ACTIONS_CUSTOM_H

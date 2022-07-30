@@ -3,10 +3,10 @@
 template<bool post, const char ... s>
 cell_t NAT_ActionHandler(IPluginContext* pContext, const cell_t* params)
 {
-	std::map<std::string, size_t>& offsets = GetOffsetsInfo();
+	static auto& offsets = GetOffsetsManager()->GetRequestedOffsets();
 	Action<void>* action = (Action<void>*)params[1];
 	std::string name;
-	size_t vtableidx = 0;
+	int32_t vtableidx = 0;
 
 	IPluginFunction* listener = NULL;
 	ActionsPropagate* propagate = NULL;
@@ -29,7 +29,8 @@ cell_t NAT_ActionHandler(IPluginContext* pContext, const cell_t* params)
 		propagate = g_pActionsPropagatePost;
 	}
 
-	//vtableidx = offsets[name];
+	// NameToOffset ??
+	// vtableidx = offsets[name];
 	for (auto iter = offsets.cbegin(); iter != offsets.cend(); iter++)
 	{
 		if (iter->first.find(name) != std::string::npos)
@@ -201,7 +202,14 @@ sp_nativeinfo_t g_ActionProcessorNatives[] =
 	{ "BehaviorAction.OnCommandResume.set", 						NAT_ActionHandler<false, 'O', 'n', 'C', 'o', 'm', 'm', 'a', 'n', 'd', 'R', 'e', 's', 'u', 'm', 'e'> },
 	{ "BehaviorAction.OnCommandString.set", 						NAT_ActionHandler<false, 'O', 'n', 'C', 'o', 'm', 'm', 'a', 'n', 'd', 'S', 't', 'r', 'i', 'n', 'g'> },
 	{ "BehaviorAction.IsAbleToBlockMovementOf.set", 				NAT_ActionHandler<false, 'I', 's', 'A', 'b', 'l', 'e', 'T', 'o', 'B', 'l', 'o', 'c', 'k', 'M', 'o', 'v', 'e', 'm', 'e', 'n', 't', 'O', 'f'> },
-
+	{ "BehaviorAction.ShouldPickUp.set", 							NAT_ActionHandler<false, 'S', 'h', 'o', 'u', 'l', 'd', 'P', 'i', 'c', 'k', 'U', 'p'> },
+	{ "BehaviorAction.ShouldHurry.set", 							NAT_ActionHandler<false, 'S', 'h', 'o', 'u', 'l', 'd', 'H', 'u', 'r', 'r', 'y'> },
+	{ "BehaviorAction.IsHindrance.set", 							NAT_ActionHandler<false, 'I', 's', 'H', 'i', 'n', 'd', 'r', 'a', 'n', 'c', 'e'> },
+	{ "BehaviorAction.SelectTargetPoint.set", 						NAT_ActionHandler<false, 'S', 'e', 'l', 'e', 'c', 't', 'T', 'a', 'r', 'g', 'e', 't', 'P', 'o', 'i', 'n', 't'> },
+	{ "BehaviorAction.IsPositionAllowed.set", 						NAT_ActionHandler<false, 'I', 's', 'P', 'o', 's', 'i', 't', 'i', 'o', 'n', 'A', 'l', 'l', 'o', 'w', 'e', 'd'> },
+	{ "BehaviorAction.QueryCurrentPath.set", 						NAT_ActionHandler<false, 'Q', 'u', 'e', 'r', 'y', 'C', 'u', 'r', 'r', 'e', 'n', 't', 'P', 'a', 't', 'h'> },
+	{ "BehaviorAction.SelectMoreDangerousThreat.set", 				NAT_ActionHandler<false, 'S', 'e', 'l', 'e', 'c', 't', 'M', 'o', 'r', 'e', 'D', 'a', 'n', 'g', 'e', 'r', 'o', 'u', 's', 'T', 'h', 'r', 'e', 'a', 't'> },
+	
 	{ "BehaviorAction.OnStartPost.set", 							NAT_ActionHandler<true, 'O', 'n', 'S', 't', 'a', 'r', 't'> },
 	{ "BehaviorAction.OnUpdatePost.set", 							NAT_ActionHandler<true, 'O', 'n', 'U', 'p', 'd', 'a', 't', 'e'> },
 	{ "BehaviorAction.OnEndPost.set", 								NAT_ActionHandler<true, 'O', 'n', 'E', 'n', 'd'> },
@@ -245,6 +253,13 @@ sp_nativeinfo_t g_ActionProcessorNatives[] =
 	{ "BehaviorAction.OnCommandResumePost.set", 					NAT_ActionHandler<true, 'O', 'n', 'C', 'o', 'm', 'm', 'a', 'n', 'd', 'R', 'e', 's', 'u', 'm', 'e'> },
 	{ "BehaviorAction.OnCommandStringPost.set", 					NAT_ActionHandler<true, 'O', 'n', 'C', 'o', 'm', 'm', 'a', 'n', 'd', 'S', 't', 'r', 'i', 'n', 'g'> },
 	{ "BehaviorAction.IsAbleToBlockMovementOfPost.set", 			NAT_ActionHandler<true, 'I', 's', 'A', 'b', 'l', 'e', 'T', 'o', 'B', 'l', 'o', 'c', 'k', 'M', 'o', 'v', 'e', 'm', 'e', 'n', 't', 'O', 'f'> },
+	{ "BehaviorAction.ShouldPickUpPost.set", 						NAT_ActionHandler<true, 'S', 'h', 'o', 'u', 'l', 'd', 'P', 'i', 'c', 'k', 'U', 'p'> },
+	{ "BehaviorAction.ShouldHurryPost.set", 						NAT_ActionHandler<true, 'S', 'h', 'o', 'u', 'l', 'd', 'H', 'u', 'r', 'r', 'y'> },
+	{ "BehaviorAction.IsHindrancePost.set", 						NAT_ActionHandler<true, 'I', 's', 'H', 'i', 'n', 'd', 'r', 'a', 'n', 'c', 'e'> },
+	{ "BehaviorAction.SelectTargetPointPost.set", 					NAT_ActionHandler<true, 'S', 'e', 'l', 'e', 'c', 't', 'T', 'a', 'r', 'g', 'e', 't', 'P', 'o', 'i', 'n', 't'> },
+	{ "BehaviorAction.IsPositionAllowedPost.set", 					NAT_ActionHandler<true, 'I', 's', 'P', 'o', 's', 'i', 't', 'i', 'o', 'n', 'A', 'l', 'l', 'o', 'w', 'e', 'd'> },
+	{ "BehaviorAction.QueryCurrentPathPost.set", 					NAT_ActionHandler<true, 'Q', 'u', 'e', 'r', 'y', 'C', 'u', 'r', 'r', 'e', 'n', 't', 'P', 'a', 't', 'h'> },
+	{ "BehaviorAction.SelectMoreDangerousThreatPost.set", 			NAT_ActionHandler<true, 'S', 'e', 'l', 'e', 'c', 't', 'M', 'o', 'r', 'e', 'D', 'a', 'n', 'g', 'e', 'r', 'o', 'u', 's', 'T', 'h', 'r', 'e', 'a', 't'> },
 
 	{ "ActionResult.GetReason",										NAT_ActionResultGetReason },
 	{ "ActionResult.SetReason",										NAT_ActionResultSetReason },

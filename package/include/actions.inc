@@ -6,6 +6,13 @@
 
 #define ACTION_NAME_LENGTH 32
 
+enum QueryResultType
+{
+	ANSWER_NO,
+	ANSWER_YES,
+	ANSWER_UNDEFINED
+};
+
 enum ActionResultType
 { 
 	CONTINUE,			// continue executing this action next frame - nothing has changed
@@ -205,6 +212,27 @@ typeset ActionHandler
 	function Action (BehaviorAction action, int actor, Address nextbot, ActionDesiredResult result);
 }
 
+typeset ActionContextualHandler
+{
+	/* ShouldPickUp, IsHindrance*/
+	function Action (BehaviorAction action, Address nextbot, int entity, QueryResultType& result);
+	
+	/* ShouldHurry */
+	function Action (BehaviorAction action, Address nextbot, QueryResultType& result);
+	
+	/* SelectTargetPoint */
+	function Action (BehaviorAction action, Address nextbot, int entity, float vec[3]);
+
+	/* IsPositionAllowed */
+	function Action (BehaviorAction action, Address nextbot, float vec[3], QueryResultType& result);
+	
+	/* QueryCurrentPath */
+	function Action (BehaviorAction action, Address nextbot, Address& path);
+	
+	/* SelectMoreDangerousThreat */
+	function Action (BehaviorAction action, Address nextbot, int entity, Address threat1, Address threat2, Address& knownEntity);
+}
+
 methodmap ActionsManager
 {
 	/**
@@ -318,7 +346,7 @@ methodmap BehaviorAction
 		StoreToAddress(view_as<Address>(this) + view_as<Address>(offset), data, type);
 	}
  #else
-	public void Set( int offset, any data, NumberType type = NumberType_Int32, bool updateMemAccess = true )
+	public void Set( int offset, any data, NumberType type = NumberType_Int32, bool updateMemAccess = false )
 	{
 		StoreToAddress(view_as<Address>(this) + view_as<Address>(offset), data, type, updateMemAccess);
 	}
@@ -403,6 +431,84 @@ methodmap BehaviorAction
 		public native set(bool started);
 	}
 	
+	// ====================================================================================================
+	// ACTION PRE CONTEXTUAL HANDLERS
+	// ====================================================================================================
+
+	property ActionContextualHandler ShouldPickUp
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler ShouldHurry
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler IsHindrance
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler SelectTargetPoint
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler IsPositionAllowed
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler QueryCurrentPath
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler SelectMoreDangerousThreat
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	// ====================================================================================================
+	// ACTION POST CONTEXTUAL HANDLERS
+	// ====================================================================================================
+
+	property ActionContextualHandler ShouldPickUpPost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler ShouldHurryPost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler IsHindrancePost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler SelectTargetPointPost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler IsPositionAllowedPost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler QueryCurrentPathPost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
+	property ActionContextualHandler SelectMoreDangerousThreatPost
+	{
+		public native set(ActionContextualHandler func);
+	}
+
 	// ====================================================================================================
 	// ACTION PRE EVENT HANDLERS
 	// ====================================================================================================
@@ -851,112 +957,127 @@ public Extension __ext_actions =
 #if !defined REQUIRE_EXTENSIONS
 public void __ext_actions_SetNTVOptional()
 {
-    MarkNativeAsOptional("ActionResult.GetReason");
-    MarkNativeAsOptional("ActionResult.SetReason");
-    MarkNativeAsOptional("ActionResult.type.get");
-    MarkNativeAsOptional("ActionResult.type.set");
-    MarkNativeAsOptional("ActionResult.action.get");
-    MarkNativeAsOptional("ActionResult.action.set");
-    MarkNativeAsOptional("ActionDesiredResult.priority.get");
-    MarkNativeAsOptional("ActionDesiredResult.priority.set");
-    MarkNativeAsOptional("ActionsManager.Create");
-    MarkNativeAsOptional("ActionsManager.Allocate");
-    MarkNativeAsOptional("ActionsManager.Deallocate");
-    MarkNativeAsOptional("ActionsManager.Iterator");
-    MarkNativeAsOptional("ActionsManager.GetAction");
-    MarkNativeAsOptional("BehaviorAction.StorePendingEventResult");
-    MarkNativeAsOptional("BehaviorAction.GetName");
-    MarkNativeAsOptional("BehaviorAction.Parent.get");
-    MarkNativeAsOptional("BehaviorAction.Child.get");
-    MarkNativeAsOptional("BehaviorAction.Under.get");
-    MarkNativeAsOptional("BehaviorAction.Above.get");
-    MarkNativeAsOptional("BehaviorAction.Actor.get");
-    MarkNativeAsOptional("BehaviorAction.IsSuspended.get");
-    MarkNativeAsOptional("BehaviorAction.IsSuspended.set");
-    MarkNativeAsOptional("BehaviorAction.IsStarted.get");
-    MarkNativeAsOptional("BehaviorAction.IsStarted.set");
-    MarkNativeAsOptional("BehaviorAction.OnStart.set");
-    MarkNativeAsOptional("BehaviorAction.OnUpdate.set");
-    MarkNativeAsOptional("BehaviorAction.OnEnd.set");
-    MarkNativeAsOptional("BehaviorAction.OnSuspend.set");
-    MarkNativeAsOptional("BehaviorAction.OnResume.set");
-    MarkNativeAsOptional("BehaviorAction.OnInitialContainedAction.set");
-    MarkNativeAsOptional("BehaviorAction.OnLeaveGround.set");
-    MarkNativeAsOptional("BehaviorAction.OnLandOnGround.set");
-    MarkNativeAsOptional("BehaviorAction.OnContact.set");
-    MarkNativeAsOptional("BehaviorAction.OnMoveToSuccess.set");
-    MarkNativeAsOptional("BehaviorAction.OnMoveToFailure.set");
-    MarkNativeAsOptional("BehaviorAction.OnStuck.set");
-    MarkNativeAsOptional("BehaviorAction.OnUnStuck.set");
-    MarkNativeAsOptional("BehaviorAction.OnPostureChanged.set");
-    MarkNativeAsOptional("BehaviorAction.OnAnimationActivityComplete.set");
-    MarkNativeAsOptional("BehaviorAction.OnAnimationActivityInterrupted.set");
-    MarkNativeAsOptional("BehaviorAction.OnAnimationEvent.set");
-    MarkNativeAsOptional("BehaviorAction.OnIgnite.set");
-    MarkNativeAsOptional("BehaviorAction.OnInjured.set");
-    MarkNativeAsOptional("BehaviorAction.OnKilled.set");
-    MarkNativeAsOptional("BehaviorAction.OnOtherKilled.set");
-    MarkNativeAsOptional("BehaviorAction.OnSight.set");
-    MarkNativeAsOptional("BehaviorAction.OnLostSight.set");
-    MarkNativeAsOptional("BehaviorAction.OnThreatChanged.set");
-    MarkNativeAsOptional("BehaviorAction.OnSound.set");
-    MarkNativeAsOptional("BehaviorAction.OnSpokeConcept.set");
-    MarkNativeAsOptional("BehaviorAction.OnNavAreaChanged.set");
-    MarkNativeAsOptional("BehaviorAction.OnModelChanged.set");
-    MarkNativeAsOptional("BehaviorAction.OnPickUp.set");
-    MarkNativeAsOptional("BehaviorAction.OnShoved.set");
-    MarkNativeAsOptional("BehaviorAction.OnBlinded.set");
-    MarkNativeAsOptional("BehaviorAction.OnEnteredSpit.set");
-    MarkNativeAsOptional("BehaviorAction.OnHitByVomitJar.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandAttack.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandAssault.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandApproachV.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandApproachE.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandRetreat.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandPause.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandResume.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandString.set");
-    MarkNativeAsOptional("BehaviorAction.IsAbleToBlockMovementOf.set");
-    MarkNativeAsOptional("BehaviorAction.OnStartPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnUpdatePost.set");
-    MarkNativeAsOptional("BehaviorAction.OnEndPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnSuspendPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnResumePost.set");
-    MarkNativeAsOptional("BehaviorAction.OnInitialContainedActionPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnLeaveGroundPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnLandOnGroundPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnContactPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnMoveToSuccessPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnMoveToFailurePost.set");
-    MarkNativeAsOptional("BehaviorAction.OnStuckPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnUnStuckPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnPostureChangedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnAnimationActivityCompletePost.set");
-    MarkNativeAsOptional("BehaviorAction.OnAnimationActivityInterruptedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnAnimationEventPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnIgnitePost.set");
-    MarkNativeAsOptional("BehaviorAction.OnInjuredPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnKilledPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnOtherKilledPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnSightPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnLostSightPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnThreatChangedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnSoundPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnSpokeConceptPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnNavAreaChangedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnModelChangedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnPickUpPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnShovedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnBlindedPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnEnteredSpitPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnHitByVomitJarPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandAttackPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandAssaultPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandApproachVPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandApproachEPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandRetreatPost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandPausePost.set");
-    MarkNativeAsOptional("BehaviorAction.OnCommandResumePost.set");
-    MarkNativeAsOptional("BehaviorAction.IsAbleToBlockMovementOfPost.set");
+	MarkNativeAsOptional("ActionResult.GetReason");
+	MarkNativeAsOptional("ActionResult.SetReason");
+	MarkNativeAsOptional("ActionResult.type.get");
+	MarkNativeAsOptional("ActionResult.type.set");
+	MarkNativeAsOptional("ActionResult.action.get");
+	MarkNativeAsOptional("ActionResult.action.set");
+	MarkNativeAsOptional("ActionDesiredResult.priority.get");
+	MarkNativeAsOptional("ActionDesiredResult.priority.set");
+	MarkNativeAsOptional("ActionsManager.Create");
+	MarkNativeAsOptional("ActionsManager.Allocate");
+	MarkNativeAsOptional("ActionsManager.Deallocate");
+	MarkNativeAsOptional("ActionsManager.Iterator");
+	MarkNativeAsOptional("ActionsManager.GetAction");
+	MarkNativeAsOptional("BehaviorAction.StorePendingEventResult");
+	MarkNativeAsOptional("BehaviorAction.GetName");
+	MarkNativeAsOptional("BehaviorAction.Parent.get");
+	MarkNativeAsOptional("BehaviorAction.Child.get");
+	MarkNativeAsOptional("BehaviorAction.Under.get");
+	MarkNativeAsOptional("BehaviorAction.Above.get");
+	MarkNativeAsOptional("BehaviorAction.Actor.get");
+	MarkNativeAsOptional("BehaviorAction.IsSuspended.get");
+	MarkNativeAsOptional("BehaviorAction.IsSuspended.set");
+	MarkNativeAsOptional("BehaviorAction.IsStarted.get");
+	MarkNativeAsOptional("BehaviorAction.IsStarted.set");
+	MarkNativeAsOptional("BehaviorAction.OnStart.set");
+	MarkNativeAsOptional("BehaviorAction.OnUpdate.set");
+	MarkNativeAsOptional("BehaviorAction.OnEnd.set");
+	MarkNativeAsOptional("BehaviorAction.OnSuspend.set");
+	MarkNativeAsOptional("BehaviorAction.OnResume.set");
+	MarkNativeAsOptional("BehaviorAction.OnInitialContainedAction.set");
+	MarkNativeAsOptional("BehaviorAction.OnLeaveGround.set");
+	MarkNativeAsOptional("BehaviorAction.OnLandOnGround.set");
+	MarkNativeAsOptional("BehaviorAction.OnContact.set");
+	MarkNativeAsOptional("BehaviorAction.OnMoveToSuccess.set");
+	MarkNativeAsOptional("BehaviorAction.OnMoveToFailure.set");
+	MarkNativeAsOptional("BehaviorAction.OnStuck.set");
+	MarkNativeAsOptional("BehaviorAction.OnUnStuck.set");
+	MarkNativeAsOptional("BehaviorAction.OnPostureChanged.set");
+	MarkNativeAsOptional("BehaviorAction.OnAnimationActivityComplete.set");
+	MarkNativeAsOptional("BehaviorAction.OnAnimationActivityInterrupted.set");
+	MarkNativeAsOptional("BehaviorAction.OnAnimationEvent.set");
+	MarkNativeAsOptional("BehaviorAction.OnIgnite.set");
+	MarkNativeAsOptional("BehaviorAction.OnInjured.set");
+	MarkNativeAsOptional("BehaviorAction.OnKilled.set");
+	MarkNativeAsOptional("BehaviorAction.OnOtherKilled.set");
+	MarkNativeAsOptional("BehaviorAction.OnSight.set");
+	MarkNativeAsOptional("BehaviorAction.OnLostSight.set");
+	MarkNativeAsOptional("BehaviorAction.OnThreatChanged.set");
+	MarkNativeAsOptional("BehaviorAction.OnSound.set");
+	MarkNativeAsOptional("BehaviorAction.OnSpokeConcept.set");
+	MarkNativeAsOptional("BehaviorAction.OnNavAreaChanged.set");
+	MarkNativeAsOptional("BehaviorAction.OnModelChanged.set");
+	MarkNativeAsOptional("BehaviorAction.OnPickUp.set");
+	MarkNativeAsOptional("BehaviorAction.OnShoved.set");
+	MarkNativeAsOptional("BehaviorAction.OnBlinded.set");
+	MarkNativeAsOptional("BehaviorAction.OnEnteredSpit.set");
+	MarkNativeAsOptional("BehaviorAction.OnHitByVomitJar.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandAttack.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandAssault.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandApproachV.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandApproachE.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandRetreat.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandPause.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandResume.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandString.set");
+	MarkNativeAsOptional("BehaviorAction.IsAbleToBlockMovementOf.set");
+	MarkNativeAsOptional("BehaviorAction.ShouldPickUp.set");
+	MarkNativeAsOptional("BehaviorAction.ShouldHurry.set");
+	MarkNativeAsOptional("BehaviorAction.IsHindrance.set");
+	MarkNativeAsOptional("BehaviorAction.SelectTargetPoint.set");
+	MarkNativeAsOptional("BehaviorAction.IsPositionAllowed.set");
+	MarkNativeAsOptional("BehaviorAction.QueryCurrentPath.set");
+	MarkNativeAsOptional("BehaviorAction.SelectMoreDangerousThreat.set");
+	
+	MarkNativeAsOptional("BehaviorAction.OnStartPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnUpdatePost.set");
+	MarkNativeAsOptional("BehaviorAction.OnEndPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnSuspendPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnResumePost.set");
+	MarkNativeAsOptional("BehaviorAction.OnInitialContainedActionPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnLeaveGroundPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnLandOnGroundPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnContactPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnMoveToSuccessPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnMoveToFailurePost.set");
+	MarkNativeAsOptional("BehaviorAction.OnStuckPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnUnStuckPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnPostureChangedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnAnimationActivityCompletePost.set");
+	MarkNativeAsOptional("BehaviorAction.OnAnimationActivityInterruptedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnAnimationEventPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnIgnitePost.set");
+	MarkNativeAsOptional("BehaviorAction.OnInjuredPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnKilledPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnOtherKilledPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnSightPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnLostSightPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnThreatChangedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnSoundPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnSpokeConceptPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnNavAreaChangedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnModelChangedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnPickUpPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnShovedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnBlindedPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnEnteredSpitPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnHitByVomitJarPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandAttackPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandAssaultPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandApproachVPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandApproachEPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandRetreatPost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandPausePost.set");
+	MarkNativeAsOptional("BehaviorAction.OnCommandResumePost.set");
+	MarkNativeAsOptional("BehaviorAction.IsAbleToBlockMovementOfPost.set");
+	MarkNativeAsOptional("BehaviorAction.ShouldPickUpPost.set");
+	MarkNativeAsOptional("BehaviorAction.ShouldHurryPost.set");
+	MarkNativeAsOptional("BehaviorAction.IsHindrancePost.set");
+	MarkNativeAsOptional("BehaviorAction.SelectTargetPointPost.set");
+	MarkNativeAsOptional("BehaviorAction.IsPositionAllowedPost.set");
+	MarkNativeAsOptional("BehaviorAction.QueryCurrentPathPost.set");
+	MarkNativeAsOptional("BehaviorAction.SelectMoreDangerousThreatPost.set");
 }
 #endif 

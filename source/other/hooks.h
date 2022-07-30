@@ -3,6 +3,9 @@
 #include "NextBotEventResponderInterface.h"
 #include "NextBotInterface.h"
 
+extern void ExecuteContextualProcessor(CBaseEntity* entity, Action<void>* action);
+SH_DECL_MANUALHOOK0_void(OnIntentionReset, 0, 0, 0);
+
 class NextBotIntention : public IIntention
 {
 public:
@@ -14,30 +17,25 @@ public:
 	Action<void>* GetSubAction() { return static_cast<Action<void>*>(subehavior->FirstContainedResponder()); }
 };
 
-SH_DECL_MANUALHOOK0_void(OnIntentionReset, INTENTION_RESET_OFFSET, 0, 0);
-
 void OnIntentionReset()
 {
 	NextBotIntention* pIntention = META_IFACEPTR(NextBotIntention);
-	ActionProcessor processor(pIntention->entity, pIntention->GetAction());
+	ExecuteContextualProcessor(pIntention->entity, pIntention->GetAction());
 }
 
 void OnSurviovrIntentionReset()
 {
 	NextBotIntention* pIntention = META_IFACEPTR(NextBotIntention);
 
-	Action<void>* action = reinterpret_cast<Action<void>*>(pIntention->behavior->FirstContainedResponder());
-	Action<void>* subaction = reinterpret_cast<Action<void>*>(pIntention->subehavior->FirstContainedResponder());
-
-	ActionProcessor processor(pIntention->entity, action);
-	ActionProcessor subprocessor(pIntention->entity, subaction);
+	ExecuteContextualProcessor(pIntention->entity, pIntention->GetAction());
+	ExecuteContextualProcessor(pIntention->entity, pIntention->GetSubAction());
 }
 
-void HookIntention(IGameConfig* cfg, const char* name, fastdelegate::FastDelegate<void> fastDelegate = SH_STATIC(OnIntentionReset))
+void HookIntention(const char* name, fastdelegate::FastDelegate<void> fastDelegate = SH_STATIC(OnIntentionReset))
 {
-	void* addr = NULL;
+	void* addr = static_cast<void*>(GetOffsetsManager()->RequestAddress(name));
 
-	if (!cfg->GetAddress(name, &addr))
+	if (addr == nullptr)
 	{
 		LOGERROR("Failed to find address for \"%s\" key. Check your gamedata...", name);
 		return;
@@ -46,19 +44,23 @@ void HookIntention(IGameConfig* cfg, const char* name, fastdelegate::FastDelegat
 	SH_ADD_MANUALDVPHOOK(OnIntentionReset, addr, fastDelegate, true);
 }
 
-void CreateHooks(IGameConfig* config)
+void CreateHooks()
 {
-	HookIntention(config, "SurvivorIntention::Reset", SH_STATIC(OnSurviovrIntentionReset));
-	HookIntention(config, "HunterIntention::Reset");
-	HookIntention(config, "BoomerIntention::Reset");
-	HookIntention(config, "TankIntention::Reset");
-	HookIntention(config, "InfectedIntention::Reset");
-	HookIntention(config, "WitchIntention::Reset");
-	HookIntention(config, "SmokerIntention::Reset");
+	int32_t intention_reset = GetOffsetsManager()->RequestOffset("IIntention::Reset");
 
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-		HookIntention(config, "ChargerIntention::Reset");
-		HookIntention(config, "JockeyIntention::Reset");
-		HookIntention(config, "SpitterIntention::Reset");
-	#endif
+	if (GetOffsetsManager()->HaveFailedRequest())
+		return;
+
+	SH_MANUALHOOK_RECONFIGURE(OnIntentionReset, intention_reset, 0, 0);
+
+	HookIntention("SurvivorIntention::Reset", SH_STATIC(OnSurviovrIntentionReset));
+	HookIntention("HunterIntention::Reset");
+	HookIntention("BoomerIntention::Reset");
+	HookIntention("TankIntention::Reset");
+	HookIntention("InfectedIntention::Reset");
+	HookIntention("WitchIntention::Reset");
+	HookIntention("SmokerIntention::Reset");
+	HookIntention("ChargerIntention::Reset");
+	HookIntention("JockeyIntention::Reset");
+	HookIntention("SpitterIntention::Reset");
 }

@@ -13,6 +13,7 @@ class CBaseEntity;
 class CBaseCombatCharacter;
 class Path;
 class CKnownEntity;
+class PathFollower;
 
 /**
  * Since behaviors can have several concurrent actions active, we ask
@@ -52,7 +53,7 @@ public:
 	 * the player movement system.
 	 */
 	virtual QueryResultType IsPositionAllowed(const INextBot* me, const Vector& pos) const;
-	virtual QueryResultType QueryCurrentPath(const INextBot* me) const;
+	virtual PathFollower* QueryCurrentPath(const INextBot* me) const;
 
 	virtual const CKnownEntity* SelectMoreDangerousThreat(const INextBot* me,
 		const CBaseCombatCharacter* subject,
@@ -60,9 +61,9 @@ public:
 		const CKnownEntity* threat2) const;	// return the more dangerous of the two threats to 'subject', or NULL if we have no opinion
 };
 
-inline QueryResultType IContextualQuery::QueryCurrentPath(const INextBot* me) const
+inline PathFollower* IContextualQuery::QueryCurrentPath(const INextBot* me) const
 {
-	return ANSWER_NO;
+	return nullptr;
 }
 
 inline QueryResultType IContextualQuery::ShouldPickUp(const INextBot* me, CBaseEntity* item) const

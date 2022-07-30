@@ -1,6 +1,10 @@
 #pragma once
 
+#ifndef _INCLUDE_ACTIONS_COMMANDS_H
+#define _INCLUDE_ACTIONS_COMMANDS_H
+
 #include <iplayerinfo.h>
+#include "offset_manager.h"
 
 enum
 {
@@ -15,6 +19,7 @@ inline bool ClassMatchesComplex(cell_t entity, const char* match);
 CON_COMMAND(ext_actions_dump, "Dump entities actions")
 {
     LOG("DUPMING ACTIONS START");
+    LOG("/----------------------------------/");
 
     std::vector<Action<void>*> actions;
     int flags = DUMP_FLAG_ALL;
@@ -38,12 +43,13 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
             if (!num)
                 return;
 
-            LOG("/----------------------------------/");
             LOG("BOT %s has %i actions:", player->GetName(), num);
 
             for(size_t i = 0; i < num; i++)
             {
-                LOG("%i. %s ( %X )", i + 1, actions.at(i)->GetName(), actions.at(i));
+                LOG("%i. %s %s %s ( %X ) ", i + 1, actions.at(i)->GetName(), actions.at(i)->m_isStarted ? "STARTED" : "NOT STARTED", 
+                actions.at(i)->IsSuspended() ? "SUSPENDED" : "",
+                actions.at(i));
             }
         }
         else
@@ -58,14 +64,17 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
             if (!num)
                 return;
 
-            LOG("/----------------------------------/");
             LOG("ENTITY %s(%i) has %i actions:", gamehelpers->GetEntityClassname(pEntity), entity, num);
 
             for(size_t i = 0; i < num; i++)
             {
-                LOG("%i. %s ( %X )", i + 1, actions.at(i)->GetName(), actions.at(i));
+                LOG("%i. %s %s %s ( %X ) ", i + 1, actions.at(i)->GetName(), actions.at(i)->m_isStarted ? "STARTED" : "NOT STARTED", 
+                actions.at(i)->IsSuspended() ? "SUSPENDED" : "",
+                actions.at(i));
             }
         }
+        
+        LOG("/----------------------------------/");
     };
 
     int clients = playerhelpers->GetMaxClients();
@@ -91,21 +100,33 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
 
 CON_COMMAND(ext_actions_offsets, "Dump extension functions offset")
 {
-    auto&& offsets = GetOffsetsInfo();
-
     #ifndef __linux__ 
-        static const char* OS = "Win";
+    static const char* OS = "Windows";
     #else
-        static const char* OS = "Linux";
+    static const char* OS = "Linux";
     #endif
 
     LOG("OS: %s | Game: %s", OS, g_pSM->GetGameFolderName());
-    LOG("INTENTION_RESET_OFFSET: %i", INTENTION_RESET_OFFSET);
+    GetOffsetsManager()->Dump();
+}
 
-    for(auto offset : offsets)
+CON_COMMAND(ext_actions_listeners, "Dump actions listeners")
+{
+    if (args.ArgC() > 1)
     {
-        LOG("%s: %i", offset.first.c_str(), offset.second);
+        g_pActionsPropagatePost->Dump();
     }
+    else
+    {
+        g_pActionsPropagatePre->Dump();
+    }
+}
+
+CON_COMMAND(ext_actions_list, "Dump every action that manager currently holds")
+{
+    LOG("/----------------------------------/");
+    g_pActionsManager->Dump();
+    LOG("/----------------------------------/");
 }
 
 inline bool ClassMatchesComplex(cell_t entity, const char* match)
@@ -117,3 +138,5 @@ inline bool ClassMatchesComplex(cell_t entity, const char* match)
 
     return strcmp(gamehelpers->GetEntityClassname(pEntity), match) == 0;
 }
+
+#endif // _INCLUDE_ACTIONS_COMMANDS_H

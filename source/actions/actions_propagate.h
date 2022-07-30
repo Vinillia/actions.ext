@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _INCLUDE_ACTIONS_PROPAGATE_H
+#define _INCLUDE_ACTIONS_PROPAGATE_H
+
 #include "utils.h"
 
 #include "extension.h"
@@ -32,17 +35,19 @@ public:
 	ActionsPropagate();
 	~ActionsPropagate() = delete;
 
-	bool AddListener(size_t vtableidx, Action* action, IPluginFunction* listener);
+	void Dump();
+
+	bool AddListener(int32_t vtableidx, Action* action, IPluginFunction* listener);
 	
-	bool RemoveListener(size_t vtableidx, Action* action, IPluginFunction* listener);
-	bool RemoveListener(size_t vtableidx, Action* action, IPluginContext* context);
+	bool RemoveListener(int32_t vtableidx, Action* action, IPluginFunction* listener);
+	bool RemoveListener(int32_t vtableidx, Action* action, IPluginContext* context);
 
 	void RemoveListeners(Action* action, IPluginContext* context);
 	void RemoveListeners(IPluginContext* context);
 	void RemoveListeners(Action* action);
 
-	bool FindListener(size_t vtableidx, Action* action, IPluginFunction* listener, PluginCallbacks::iterator* iter = NULL);
-	bool FindListener(size_t vtableidx, IPluginFunction* listener, PluginCallbacks::iterator* iter = NULL);
+	bool FindListener(int32_t vtableidx, Action* action, IPluginFunction* listener, PluginCallbacks::iterator* iter = NULL);
+	bool FindListener(int32_t vtableidx, IPluginFunction* listener, PluginCallbacks::iterator* iter = NULL);
 
 	template<typename T>
 	void ProcessHandleArg(PluginCallbacks& callbacks, T&& arg)
@@ -78,7 +83,8 @@ public:
 			}
 			else
 			{
-				/* TO DO: */
+				/* TO DO: */ 
+				/* EDIT: TO DO WHAT? */
 				listener->PushCell((cell_t)arg);
 				//typedef typename T::something_made_up X;
 				//bool x = decltype(arg)::nothing; 
@@ -88,15 +94,15 @@ public:
 	}
 
 	template<typename returnType, typename ...Args>
-	ResultType ProcessHandler(size_t vtableidx, Action* action, returnType* result, Args&&... args)
+	ResultType ProcessHandler(int32_t vtableidx, Action* action, returnType* result, Args&&... args)
 	{
-		constexpr size_t num = sizeof...(Args);
+		constexpr int32_t num = sizeof...(Args);
 
 		auto r = m_handlers.find(action);
-
+		
 		if (!r.found())
 			return Pl_Continue;
-		
+
 		auto& listeners = r->value[vtableidx];
 
 		if (listeners.size() == 0)
@@ -156,3 +162,5 @@ private:
 
 extern ActionsPropagate* g_pActionsPropagatePre;
 extern ActionsPropagate* g_pActionsPropagatePost;
+
+#endif _INCLUDE_ACTIONS_PROPAGATE_H

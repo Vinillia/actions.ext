@@ -1,7 +1,11 @@
 #include <utility>
+#include <map>
 
 #include "extension.h"
 #include "actions_propagate.h"
+#include "offset_manager.h"
+
+extern OffsetManager* GetOffsetsManager();
 
 ActionsPropagate* g_pActionsPropagatePre = new ActionsPropagate();
 ActionsPropagate* g_pActionsPropagatePost = new ActionsPropagate();
@@ -16,7 +20,7 @@ ActionsPropagate::ActionsPropagate()
 	}
 }
 
-bool ActionsPropagate::AddListener(size_t vtableidx, Action* action, IPluginFunction* listener)
+bool ActionsPropagate::AddListener(int32_t vtableidx, Action* action, IPluginFunction* listener)
 {
 	auto i = m_handlers.findForAdd(action);
 
@@ -33,7 +37,7 @@ bool ActionsPropagate::AddListener(size_t vtableidx, Action* action, IPluginFunc
 	return true;
 }
 
-bool ActionsPropagate::RemoveListener(size_t vtableidx, Action* action, IPluginFunction* listener)
+bool ActionsPropagate::RemoveListener(int32_t vtableidx, Action* action, IPluginFunction* listener)
 {
 	auto r = m_handlers.find(action);
 
@@ -46,13 +50,16 @@ bool ActionsPropagate::RemoveListener(size_t vtableidx, Action* action, IPluginF
 		auto& listeners = r->value[vtableidx];
 		listeners.erase(iterator);
 
+		if (listeners.size() == 0)
+			m_handlers.remove(r);
+
 		return true;
 	}
 
 	return false;
 }
 
-bool ActionsPropagate::RemoveListener(size_t vtableidx, Action* action, IPluginContext* context)
+bool ActionsPropagate::RemoveListener(int32_t vtableidx, Action* action, IPluginContext* context)
 {
 	auto r = m_handlers.find(action);
 
@@ -67,6 +74,10 @@ bool ActionsPropagate::RemoveListener(size_t vtableidx, Action* action, IPluginC
 			continue;
 
 		listeners.erase(iter);
+		
+		if (listeners.size() == 0)
+			m_handlers.remove(r);
+		
 		return true;
 	}
 
@@ -80,11 +91,14 @@ void ActionsPropagate::RemoveListeners(Action* action)
 	if (!r.found())
 		return;
 	
-	const size_t size = r->value.size();
-	for (size_t i = 0; i < size; i++)
+	m_handlers.remove(r);
+	/*
+	const int32_t size = r->value.size();
+	for (int32_t i = 0; i < size; i++)
 	{
 		r->value[i].clear();
 	}
+	*/
 }
 
 void ActionsPropagate::RemoveListeners(Action* action, IPluginContext* context)
@@ -94,11 +108,15 @@ void ActionsPropagate::RemoveListeners(Action* action, IPluginContext* context)
 	if (!r.found())
 		return;
 	
-	const size_t size = r->value.size();
-	for (size_t i = 0; i < size; i++)
+	m_handlers.remove(r);
+
+	/*
+	const int32_t size = r->value.size();
+	for (int32_t i = 0; i < size; i++)
 	{
 		RemoveListener(i, action, context);
 	}
+	*/
 }
 
 void ActionsPropagate::RemoveListeners(IPluginContext* context)
@@ -107,17 +125,12 @@ void ActionsPropagate::RemoveListeners(IPluginContext* context)
 
 	while (!iter.empty())
 	{
-		const size_t size = iter->value.size();
-		for (size_t i = 0; i < size; i++)
-		{
-			RemoveListener(i, iter->key, context);
-		}
-
+		RemoveListeners(iter->key, context);
 		iter.next();
 	}
 }
 
-bool ActionsPropagate::FindListener(size_t vtableidx, Action* action, IPluginFunction* listener, PluginCallbacks::iterator* iterator)
+bool ActionsPropagate::FindListener(int32_t vtableidx, Action* action, IPluginFunction* listener, PluginCallbacks::iterator* iterator)
 {
 	auto r = m_handlers.find(action);
 
@@ -140,7 +153,7 @@ bool ActionsPropagate::FindListener(size_t vtableidx, Action* action, IPluginFun
 	return false;
 }
 
-bool ActionsPropagate::FindListener(size_t vtableidx, IPluginFunction* listener, PluginCallbacks::iterator* iterator)
+bool ActionsPropagate::FindListener(int32_t vtableidx, IPluginFunction* listener, PluginCallbacks::iterator* iterator)
 {
 	auto iter = m_handlers.iter();
 
@@ -166,4 +179,34 @@ void ActionsPropagate::OnActionDestroyed(Action* action)
 {
 	g_pActionsPropagatePre->RemoveListeners(action);
 	g_pActionsPropagatePost->RemoveListeners(action);
+}
+
+void ActionsPropagate::Dump()
+{
+	auto iter = m_handlers.iter();
+
+	while (!iter.empty())
+	{
+        LOG("/----------------------------------/");
+		LOG("Dump of %s(%X) action listeners:", iter->key->GetName(), iter->key);
+
+		auto& action_handlers = iter->value;
+
+		const int32_t size = action_handlers.size();
+		for (int32_t i = 0; i < size; i++)
+		{
+			if (!action_handlers[i].size())
+				continue;
+
+			int32_t count = 0;
+			auto& listeners = action_handlers[i];
+			for(auto plistener = listeners.cbegin(); plistener != listeners.cend(); plistener++)
+			{
+				auto listener = *plistener;
+				LOG("%i. Function: %s, Handler: %s, Vtableindex: %i", ++count, listener->DebugName(), GetOffsetsManager()->OffsetToName(i), i);
+			}
+		}
+
+		iter.next();
+	}
 }

@@ -1,8 +1,5 @@
 #include "actions_processor.h"
-
-#define RECONFIGURE_MANUALHOOK(hookname, vtableidx) \
-		SH_MANUALHOOK_RECONFIGURE(hookname, vtableidx, 0, 0); \
-		map[#hookname] = vtableidx
+#include "offset_manager.h"
 
 #if defined __linux__
 	SH_DECL_MANUALHOOK0_void(OnDestroyed, 1, 0, 0);
@@ -54,20 +51,23 @@ SH_DECL_MANUALHOOK1(OnCommandResume, 0, 0, 0, EventDesiredResult<void>, CBaseEnt
 SH_DECL_MANUALHOOK2(OnCommandString, 0, 0, 0, EventDesiredResult<void>, CBaseEntity*, const char*);
 SH_DECL_MANUALHOOK1(IsAbleToBlockMovementOf, 0, 0, 0, bool, const INextBot*);
 
+const std::map<std::string, int32_t>* g_CachedOffsets;
+
 ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_action(action)
 {
 	g_pActionsManager->SetRuntimeActor(entity);
 	g_pActionsManager->Add(entity, action);
 
-	for (auto name : m_hookedNames)
+	static std::vector<std::string> g_hookedNames;
+
+	for (auto name : g_hookedNames)
 	{
 		if (strcmp(name.c_str(), action->GetName()) == 0)
 			return;
 	}
 
-	std::map<std::string, size_t>& offsets = GetOffsetsInfo();
-	m_hookedNames.push_back(action->GetName());
-
+	g_hookedNames.push_back(action->GetName());
+	
 	START_PROCESSOR(OnDestroyed, dctor);
 	START_PROCESSOR(OnStart, start);
 	START_PROCESSOR(OnUpdate, update);
@@ -108,126 +108,110 @@ ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_
 	START_PROCESSOR(OnCommandPause, commandPause);
 	START_PROCESSOR(OnCommandResume, commandResume);
 	START_PROCESSOR(IsAbleToBlockMovementOf, abletoBlock);
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-		START_PROCESSOR(OnCommandAssault, commandAssault);
-		START_PROCESSOR(OnEnteredSpit, enteredSpit);
-		START_PROCESSOR(OnHitByVomitJar, hitVomitjar);
-		START_PROCESSOR(OnCommandString, commandString);
-	#endif
-
+	START_PROCESSOR(OnCommandAssault, commandAssault);
+	START_PROCESSOR(OnEnteredSpit, enteredSpit);
+	START_PROCESSOR(OnHitByVomitJar, hitVomitjar);
+	START_PROCESSOR(OnCommandString, commandString);
 }
 
 ActionProcessor::ActionProcessor(Action<void>* action) : ActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), action)
 {
 }
 
-void ReconfigureHooks()
+bool ConfigureHooks()
 {
-	auto& map = GetOffsetsInfo();
+	g_CachedOffsets = &GetOffsetsManager()->GetRequestedOffsets();
 
-	#ifndef __linux__ 
-		RECONFIGURE_MANUALHOOK(OnDestroyed, 0);
-	#else
-		RECONFIGURE_MANUALHOOK(OnDestroyed, 1);
-	#endif
+	RECONFIGURE_MANUALHOOK(OnDestroyed);
+	RECONFIGURE_MANUALHOOK(OnStart);
+	RECONFIGURE_MANUALHOOK(OnUpdate);
+	RECONFIGURE_MANUALHOOK(OnEnd);
+	RECONFIGURE_MANUALHOOK(OnSuspend);
+	RECONFIGURE_MANUALHOOK(OnResume);
+	RECONFIGURE_MANUALHOOK(OnInitialContainedAction);
+	RECONFIGURE_MANUALHOOK(OnLeaveGround);
+	RECONFIGURE_MANUALHOOK(OnLandOnGround);
+	RECONFIGURE_MANUALHOOK(OnContact);
+	RECONFIGURE_MANUALHOOK(OnMoveToSuccess);
+	RECONFIGURE_MANUALHOOK(OnMoveToFailure);
+	RECONFIGURE_MANUALHOOK(OnStuck);
+	RECONFIGURE_MANUALHOOK(OnUnStuck);
+	RECONFIGURE_MANUALHOOK(OnPostureChanged);
+	RECONFIGURE_MANUALHOOK(OnAnimationActivityComplete);
+	RECONFIGURE_MANUALHOOK(OnAnimationActivityInterrupted);
+	RECONFIGURE_MANUALHOOK(OnAnimationEvent);
+	RECONFIGURE_MANUALHOOK(OnIgnite);
+	RECONFIGURE_MANUALHOOK(OnInjured);
+	RECONFIGURE_MANUALHOOK(OnKilled);
+	RECONFIGURE_MANUALHOOK(OnOtherKilled);
+	RECONFIGURE_MANUALHOOK(OnSight);
+	RECONFIGURE_MANUALHOOK(OnLostSight);
+	RECONFIGURE_MANUALHOOK(OnThreatChanged);
+	RECONFIGURE_MANUALHOOK(OnSound);
+	RECONFIGURE_MANUALHOOK(OnSpokeConcept);
+	RECONFIGURE_MANUALHOOK(OnNavAreaChanged);
+	RECONFIGURE_MANUALHOOK(OnModelChanged);
+	RECONFIGURE_MANUALHOOK(OnPickUp);
+	RECONFIGURE_MANUALHOOK(OnDrop);
+	RECONFIGURE_MANUALHOOK(OnShoved);
+	RECONFIGURE_MANUALHOOK(OnBlinded);
+	RECONFIGURE_MANUALHOOK(OnCommandApproachVector);
+	RECONFIGURE_MANUALHOOK(OnCommandAttack);
+	RECONFIGURE_MANUALHOOK(OnCommandRetreat);
+	RECONFIGURE_MANUALHOOK(OnCommandPause);
+	RECONFIGURE_MANUALHOOK(OnCommandResume);
+	RECONFIGURE_MANUALHOOK(OnEnteredSpit);
+	RECONFIGURE_MANUALHOOK(OnHitByVomitJar);
+	RECONFIGURE_MANUALHOOK(OnCommandAssault);
+	RECONFIGURE_MANUALHOOK(OnCommandString);
+	RECONFIGURE_MANUALHOOK(IsAbleToBlockMovementOf);
+	RECONFIGURE_MANUALHOOK(OnCommandApproachEntity);
 
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-		#ifndef __linux__
-			constexpr size_t offset = 0;
-		#else
-			constexpr size_t offset = 1;
-		#endif
-	#else
-		#ifndef __linux__
-			constexpr size_t offset = -5;
-		#else
-			constexpr size_t offset = -4;
-		#endif
-	#endif
-
-	RECONFIGURE_MANUALHOOK(OnStart, 43 + offset);
-	RECONFIGURE_MANUALHOOK(OnUpdate, 44 + offset);
-	RECONFIGURE_MANUALHOOK(OnEnd, 45 + offset);
-	RECONFIGURE_MANUALHOOK(OnSuspend, 46 + offset);
-	RECONFIGURE_MANUALHOOK(OnResume, 47 + offset);
-	RECONFIGURE_MANUALHOOK(OnInitialContainedAction, 48 + offset);
-	RECONFIGURE_MANUALHOOK(OnLeaveGround, 49 + offset);
-	RECONFIGURE_MANUALHOOK(OnLandOnGround, 50 + offset);
-	RECONFIGURE_MANUALHOOK(OnContact, 51 + offset);
-	RECONFIGURE_MANUALHOOK(OnMoveToSuccess, 52 + offset);
-	RECONFIGURE_MANUALHOOK(OnMoveToFailure, 53 + offset);
-	RECONFIGURE_MANUALHOOK(OnStuck, 54 + offset);
-	RECONFIGURE_MANUALHOOK(OnUnStuck, 55 + offset);
-	RECONFIGURE_MANUALHOOK(OnPostureChanged, 56 + offset);
-	RECONFIGURE_MANUALHOOK(OnAnimationActivityComplete, 57 + offset);
-	RECONFIGURE_MANUALHOOK(OnAnimationActivityInterrupted, 58 + offset);
-	RECONFIGURE_MANUALHOOK(OnAnimationEvent, 59 + offset);
-	RECONFIGURE_MANUALHOOK(OnIgnite, 60 + offset);
-	RECONFIGURE_MANUALHOOK(OnInjured, 61 + offset);
-	RECONFIGURE_MANUALHOOK(OnKilled, 62 + offset);
-	RECONFIGURE_MANUALHOOK(OnOtherKilled, 63 + offset);
-	RECONFIGURE_MANUALHOOK(OnSight, 64 + offset);
-	RECONFIGURE_MANUALHOOK(OnLostSight, 65 + offset);
-	RECONFIGURE_MANUALHOOK(OnThreatChanged, 66 + offset);
-	RECONFIGURE_MANUALHOOK(OnSound, 67 + offset);
-	RECONFIGURE_MANUALHOOK(OnSpokeConcept, 68 + offset);
-	RECONFIGURE_MANUALHOOK(OnNavAreaChanged, 69 + offset);
-	RECONFIGURE_MANUALHOOK(OnModelChanged, 70 + offset);
-	RECONFIGURE_MANUALHOOK(OnPickUp, 71 + offset);
-	RECONFIGURE_MANUALHOOK(OnDrop, 72 + offset);
-	RECONFIGURE_MANUALHOOK(OnShoved, 73 + offset);
-	RECONFIGURE_MANUALHOOK(OnBlinded, 74 + offset);
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-		RECONFIGURE_MANUALHOOK(OnCommandApproachVector, 80);
-		#ifndef __linux__
-			RECONFIGURE_MANUALHOOK(OnCommandAttack, 77);
-			RECONFIGURE_MANUALHOOK(OnCommandRetreat, 81);
-			RECONFIGURE_MANUALHOOK(OnCommandPause, 82);
-			RECONFIGURE_MANUALHOOK(OnCommandResume, 83);
-			RECONFIGURE_MANUALHOOK(OnEnteredSpit, 75);
-			RECONFIGURE_MANUALHOOK(OnHitByVomitJar, 76);
-			RECONFIGURE_MANUALHOOK(OnCommandAssault, 78);
-			RECONFIGURE_MANUALHOOK(OnCommandString, 84);
-			RECONFIGURE_MANUALHOOK(IsAbleToBlockMovementOf, 85);
-
-			RECONFIGURE_MANUALHOOK(OnCommandApproachEntity, 79);
-		#else
-			RECONFIGURE_MANUALHOOK(OnCommandAttack, 78);
-			RECONFIGURE_MANUALHOOK(OnCommandRetreat, 82);
-			RECONFIGURE_MANUALHOOK(OnCommandPause, 83);
-			RECONFIGURE_MANUALHOOK(OnCommandResume, 84);
-			RECONFIGURE_MANUALHOOK(OnEnteredSpit, 76);
-			RECONFIGURE_MANUALHOOK(OnHitByVomitJar, 77);
-			RECONFIGURE_MANUALHOOK(OnCommandAssault, 79);
-			RECONFIGURE_MANUALHOOK(OnCommandString, 85);
-			RECONFIGURE_MANUALHOOK(IsAbleToBlockMovementOf, 86);
-
-			RECONFIGURE_MANUALHOOK(OnCommandApproachEntity, 81);
-		#endif
-	#else
-		RECONFIGURE_MANUALHOOK(OnCommandApproachVector, 72);
-		#ifndef __linux__
-			RECONFIGURE_MANUALHOOK(OnCommandAttack, 70);
-			RECONFIGURE_MANUALHOOK(OnCommandRetreat, 73);
-			RECONFIGURE_MANUALHOOK(OnCommandPause, 74);
-			RECONFIGURE_MANUALHOOK(OnCommandResume, 75);
-			RECONFIGURE_MANUALHOOK(IsAbleToBlockMovementOf, 76);
-			RECONFIGURE_MANUALHOOK(OnCommandApproachEntity, 71);
-		#else
-			RECONFIGURE_MANUALHOOK(OnCommandAttack, 71);
-			RECONFIGURE_MANUALHOOK(OnCommandRetreat, 74);
-			RECONFIGURE_MANUALHOOK(OnCommandPause, 75);
-			RECONFIGURE_MANUALHOOK(OnCommandResume, 76);
-			RECONFIGURE_MANUALHOOK(IsAbleToBlockMovementOf, 77);
-			RECONFIGURE_MANUALHOOK(OnCommandApproachEntity, 73);
-		#endif
-	#endif
+	return !GetOffsetsManager()->HaveFailedRequest();
 }
 
-std::map<std::string, size_t>& GetOffsetsInfo()
+OffsetManager* GetOffsetsManager()
 {
-	static std::map<std::string, size_t> map;
-	return map;
+	static OffsetManager offsmgr(CONFIG_FILE_NAME);
+	return &offsmgr;
+}
+
+template<typename T>
+void CheckActionResult(Action<void>* action, T& result)
+{
+	if (!result.IsRequestingChange())
+		return;
+
+	if (ext_actions_debug.GetBool())
+	{
+		cell_t actor = gamehelpers->EntityToBCompatRef((CBaseEntity*)action->GetActor());
+		const char* classname = gamehelpers->GetEntityClassname((CBaseEntity*)action->GetActor());
+
+		if(result.IsDone())
+		{
+			if (action->GetActionBuriedUnderMe())
+				LOG("%i(%s): %s is done because '%s'. Continue suspended action %s.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN", action->GetActionBuriedUnderMe()->GetName());
+			else
+				LOG("%i(%s): %s is done because '%s'.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
+		}
+		else if (result.m_type == SUSPEND_FOR)
+		{
+			LOG("%i(%s): %s suspended for %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
+		}
+		else
+		{
+			LOG("%i(%s): %s changed to %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
+		}
+	}
+
+	if (!result.IsDone())
+		ExecuteContextualProcessor(static_cast<CBaseEntity*>(action->GetActor()), result.m_action);
+
+	if (result.m_type != SUSPEND_FOR)
+		g_pActionsManager->Remove(action);
+}
+
+void ExecuteProcessor(CBaseEntity* entity, Action<void>* action)
+{
+	ActionProcessor processor(entity, action);
 }

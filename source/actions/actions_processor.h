@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _INCLUDE_ACTIONS_PROCESSOR_H
+#define _INCLUDE_ACTIONS_PROCESSOR_H
+
 #include <utility>
 #include <map>
 
@@ -14,46 +17,54 @@
 #include "NextBotBehavior.h"
 #include "NextBotIntentionInterface.h"
 
-extern std::map<std::string, size_t>& GetOffsetsInfo();
-
-extern void HookIntentions(IGameConfig* config);
-extern void ReconfigureHooks();
-
 #define DEFINE_PROCESSOR(unique, name, ret, ...)	\
 	HandlerProcessor<unique, ret, ##__VA_ARGS__> name
 
 #define START_PROCESSOR(hookname, varname)	\
 	SH_ADD_MANUALVPHOOK(hookname, static_cast<void*>(action), SH_STATIC(decltype(varname)::Process), false); \
 	SH_ADD_MANUALVPHOOK(hookname, static_cast<void*>(action), SH_STATIC(decltype(varname)::ProcessPost), true); \
-	varname.vtableindex = offsets[#hookname]; \
+	varname.vtableindex = g_CachedOffsets->at(#hookname); \
 	varname.name = #hookname
 
+#define RECONFIGURE_MANUALHOOK(hookname) \
+		do { \
+			int32_t vtableidx = GetOffsetsManager()->RequestOffset(#hookname); \
+			SH_MANUALHOOK_RECONFIGURE(hookname, vtableidx, 0, 0); \
+		} while(0)
+
+class OffsetManager;
 class ActionProcessor;
-static void CreateActionProcessor(CBaseEntity* entity, Action<void>* action);
+
+static ConVar ext_actions_debug_processors("ext_actions_debug_processors", "-2", 0, "Logs processors. -2 - Disabled, -1 - Debug all, N - function vtable index to debug");
+static ConVar ext_actions_debug_post("ext_actions_debug_post", "0", 0, "Allow to log post processors. 1 - to allow, 0 - to block");
 
 template<typename T>
-static void CheckActionResult(Action<void>* action, T& result)
-{
-	if (!result.IsRequestingChange())
-		return;
+void CheckActionResult(Action<void>* action, T& result);
 
-	if (!result.IsDone())
-		CreateActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), result.m_action);
+extern void ExecuteProcessor(CBaseEntity* entity, Action<void>* action);
+extern void ExecuteContextualProcessor(CBaseEntity* entity, Action<void>* action);
 
-	if (result.m_type != SUSPEND_FOR)
-		g_pActionsManager->Remove(action);
-}
+extern bool ConfigureHooks();
+extern void HookIntentions(IGameConfig* config);
 
-template<size_t unique, typename retn, typename... Args>
+extern OffsetManager* GetOffsetsManager();
+extern const std::map<std::string, int32_t>* g_CachedOffsets;
+
+template<int32_t unique, typename retn, typename... Args>
 struct HandlerProcessor
 {
-	inline static size_t vtableindex;
+	inline static int32_t vtableindex;
 	inline static const char* name;
 
 	static retn Process(Args... arg)
 	{
 		Action<void>* action = META_IFACEPTR(Action<void>);
 		CBaseEntity* actor = static_cast<CBaseEntity*>(action->GetActor());
+
+		if (IsDebugging(vtableindex, false))
+		{
+			LOG("%s -> %s(%i)", action->GetName(), name, vtableindex);
+		}
 
 		if constexpr (std::is_void<retn>::value)
 		{
@@ -80,7 +91,7 @@ struct HandlerProcessor
 		}
 		else
 		{
-			retn returnValue = META_RESULT_ORIG_RET(retn), originalReturn;
+			retn returnValue = retn()/* META_RESULT_ORIG_RET(retn) */, originalReturn;
 			originalReturn = returnValue;
 
 			if constexpr (std::is_same<retn, ActionResult<void>>::value || std::is_same<retn, EventDesiredResult<void>>::value)
@@ -89,7 +100,9 @@ struct HandlerProcessor
 			ResultType result = g_pActionsPropagatePre->ProcessHandler(vtableindex, action, &returnValue, std::forward<Args>(arg)...);
 
 			if (result == Pl_Continue)
+			{
 				returnValue = originalReturn;
+			}
 
 			if constexpr (std::is_same<retn, Action<void>*>::value)
 			{
@@ -125,6 +138,11 @@ struct HandlerProcessor
 	{
 		Action<void>* action = META_IFACEPTR(Action<void>);
 		CBaseEntity* actor = static_cast<CBaseEntity*>(action->GetActor());
+
+		if (IsDebugging(vtableindex, true))
+		{
+			LOG("%s -> %sPost(%i)", action->GetName(), name, vtableindex);
+		}
 
 		if constexpr (std::is_void<retn>::value)
 		{
@@ -164,7 +182,7 @@ struct HandlerProcessor
 
 				if (originalAction && result == Pl_Continue)
 				{
-					CreateActionProcessor(actor, originalAction);
+					ExecuteContextualProcessor(actor, originalAction);
 				}
 				else
 				{
@@ -178,7 +196,7 @@ struct HandlerProcessor
 					else if (result == Pl_Changed)
 					{
 						if (returnValue)
-							CreateActionProcessor(actor, returnValue);
+							ExecuteContextualProcessor(actor, returnValue);
 
 						RETURN_META_VALUE(MRES_SUPERCEDE, returnValue);
 					}
@@ -206,12 +224,21 @@ struct HandlerProcessor
 			}
 		}
 	}
+
+	static const bool IsDebugging(const int vtableindex, const bool post)
+	{
+		if (post && !ext_actions_debug_post.GetBool())
+			return false;
+
+		if (ext_actions_debug_processors.GetInt() == vtableindex)
+			return true;
+
+		return ext_actions_debug_processors.GetInt() == -1;
+	}
 };
 
 class ActionProcessor
 {
-	inline static std::vector<std::string> m_hookedNames;
-
 public:
 	ActionProcessor(CBaseEntity* entity, Action<void>* action);
 	ActionProcessor(Action<void>* action);
@@ -220,7 +247,6 @@ public:
 public:
 	Action<void>* m_action;
 
-#pragma region processors
 	#ifndef __linux__
 		DEFINE_PROCESSOR(0, dctor, void, bool);
 	#else
@@ -266,17 +292,10 @@ public:
 	DEFINE_PROCESSOR(46, commandPause, EventDesiredResult<void>, CBaseEntity*, float);
 	DEFINE_PROCESSOR(47, commandResume, EventDesiredResult<void>, CBaseEntity*);
 	DEFINE_PROCESSOR(48, abletoBlock, bool, const INextBot*);
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-		DEFINE_PROCESSOR(49, enteredSpit, EventDesiredResult<void>, CBaseEntity*);
-		DEFINE_PROCESSOR(50, hitVomitjar, EventDesiredResult<void>, CBaseEntity*, CBaseEntity*);
-		DEFINE_PROCESSOR(51, commandAssault, EventDesiredResult<void>, CBaseEntity*);
-		DEFINE_PROCESSOR(52, commandString, EventDesiredResult<void>, CBaseEntity*, const char*);
-	#endif
-#pragma endregion processors
+	DEFINE_PROCESSOR(49, enteredSpit, EventDesiredResult<void>, CBaseEntity*);
+	DEFINE_PROCESSOR(50, hitVomitjar, EventDesiredResult<void>, CBaseEntity*, CBaseEntity*);
+	DEFINE_PROCESSOR(51, commandAssault, EventDesiredResult<void>, CBaseEntity*);
+	DEFINE_PROCESSOR(52, commandString, EventDesiredResult<void>, CBaseEntity*, const char*);
 };
 
-static void CreateActionProcessor(CBaseEntity* entity, Action<void>* action)
-{
-	ActionProcessor processor(entity, action);
-}
+#endif // _INCLUDE_ACTIONS_PROCESSOR_H

@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef _INCLUDE_ACTIONS_MANAGER_H
+#define _INCLUDE_ACTIONS_MANAGER_H
+
 #include "utils.h"
 
 #include <am-hashmap.h>
@@ -63,6 +66,7 @@ public:
 	void SetRuntimeActor(CBaseEntity* actor) noexcept;
 	CBaseEntity* GetRuntimeActor() const noexcept;
 
+	void Dump();
 private:
 	static void OnActionAdded(Action* action);
 	static void OnActionDestroyed(Action* action);
@@ -83,3 +87,5 @@ private:
 };
 
 extern ActionsManager* g_pActionsManager;
+
+#endif // _INCLUDE_ACTIONS_MANAGER_H

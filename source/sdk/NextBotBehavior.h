@@ -547,30 +547,18 @@ public:
 	virtual EventDesiredResult< Actor > OnModelChanged(Actor* me) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnPickUp(Actor* me, CBaseEntity* item, CBaseCombatCharacter* giver) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnDrop(Actor* me, CBaseEntity* item) { return TryContinue(); }
-
 	virtual EventDesiredResult< Actor > OnShoved(Actor* me, CBaseEntity* pusher) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnBlinded(Actor* me, CBaseEntity* blinder) { return TryContinue(); }
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
 	virtual EventDesiredResult< Actor > OnHitByVomitJar(Actor* me, CBaseEntity* owner) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnEnteredSpit(Actor* me) { return TryContinue(); }
-	#endif
-
 	virtual EventDesiredResult< Actor > OnCommandAttack(Actor* me, CBaseEntity* victim) { return TryContinue(); }
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
 	virtual EventDesiredResult< Actor > OnCommandAssault(Actor* me) { return TryContinue(); }
-	#endif
-
 	virtual EventDesiredResult< Actor > OnCommandApproach(Actor* me, const Vector& pos, float range) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandApproach(Actor* me, CBaseEntity* goal) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandRetreat(Actor* me, CBaseEntity* threat, float range) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandPause(Actor* me, float duration) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandResume(Actor* me) { return TryContinue(); }
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
 	virtual EventDesiredResult< Actor > OnCommandString(Actor* me, const char* command) { return TryContinue(); }
-	#endif
 
 	/**
 	 * Event handlers must return one of these.
@@ -766,23 +754,18 @@ private:
 	virtual void OnModelChanged(void) override { PROCESS_EVENT(OnModelChanged); }
 	virtual void OnPickUp(CBaseEntity* item, CBaseCombatCharacter* giver) override { PROCESS_EVENT_WITH_2_ARGS(OnPickUp, item, giver); }
 	virtual void OnDrop(CBaseEntity* item) override { PROCESS_EVENT_WITH_1_ARG(OnDrop, item); }
-	
 	virtual void OnShoved(CBaseEntity* pusher) override { PROCESS_EVENT_WITH_1_ARG(OnShoved, pusher); }
 	virtual void OnBlinded(CBaseEntity* blinder) override { PROCESS_EVENT_WITH_1_ARG(OnBlinded, blinder); }
-	
 	virtual void OnCommandAttack(CBaseEntity* victim) override { PROCESS_EVENT_WITH_1_ARG(OnCommandAttack, victim); }
 	virtual void OnCommandApproach(const Vector& pos, float range) override { PROCESS_EVENT_WITH_2_ARGS(OnCommandApproach, pos, range); }
 	virtual void OnCommandApproach(CBaseEntity* goal) override { PROCESS_EVENT_WITH_1_ARG(OnCommandApproach, goal); }
 	virtual void OnCommandRetreat(CBaseEntity* threat, float range) override { PROCESS_EVENT_WITH_2_ARGS(OnCommandRetreat, threat, range); }
 	virtual void OnCommandPause(float duration) override { PROCESS_EVENT_WITH_1_ARG(OnCommandPause, duration); }
 	virtual void OnCommandResume(void) override { PROCESS_EVENT(OnCommandResume); }
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
 	virtual void OnCommandAssault() override { PROCESS_EVENT(OnCommandAssault); }
 	virtual void OnHitByVomitJar(CBaseEntity* owner) override { PROCESS_EVENT_WITH_1_ARG(OnHitByVomitJar, owner); }
 	virtual void OnEnteredSpit() override { PROCESS_EVENT(OnEnteredSpit); }
 	virtual void OnCommandString(const char* command) override { PROCESS_EVENT_WITH_1_ARG(OnCommandString, command); }
-	#endif
 
 public:
 	friend class Behavior< Actor>;							// the containing Behavior class

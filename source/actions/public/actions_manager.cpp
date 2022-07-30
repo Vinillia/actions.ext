@@ -38,7 +38,6 @@ bool ActionsManager::Add(cell_t entity, Action* action)
 	if (IsCaptured(entity, action))
 		return false;
 
-	LOGDEBUG("ActionsManager::Add -> %s", action->GetName());
 	i->value.push_back(action);
 	ActionsManager::OnActionAdded(action);
 	return true;
@@ -73,7 +72,6 @@ bool ActionsManager::Remove(cell_t entity, Action* action)
 		if (*iter == action)
 		{
 			queque.erase(iter);
-			LOGDEBUG("ActionsManager::Remove -> %s", action->GetName());
 			ActionsManager::OnActionDestroyed(action);
 			return true;
 		}
@@ -225,6 +223,9 @@ bool ActionsManager::IsPending(Action* action, bool erase) const
 
 void ActionsManager::OnActionAdded(Action* action)
 {
+	if (ext_actions_debug.GetInt() > 1)
+		LOG("ActionsManager::OnActionAdded -> %s", action->GetName());
+
 	static IForward* forward = forwards->CreateForward("OnActionCreated", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String); 
 
 	forward->PushCell((cell_t)action);
@@ -238,6 +239,9 @@ void ActionsManager::OnActionAdded(Action* action)
 
 void ActionsManager::OnActionDestroyed(Action* action)
 {
+	if (ext_actions_debug.GetInt() > 1)
+		LOG("ActionsManager::OnActionDestroyed -> %s", action->GetName());
+
 	static IForward* forward = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
 
 	forward->PushCell((cell_t)action);
@@ -277,4 +281,22 @@ void ActionsManager::SetRuntimeActor(CBaseEntity* actor) noexcept
 CBaseEntity* ActionsManager::GetRuntimeActor() const noexcept
 {
 	return m_pRuntimeActor;
+}
+
+void ActionsManager::Dump()
+{
+	auto iter = m_actions.iter();
+	size_t count = 0;
+
+	while(!iter.empty())
+	{
+		auto& dq = iter->value;
+		
+		for(auto iter = dq.cbegin(); iter != dq.cend(); iter++)
+		{
+			LOG("%i. %s ( %X )", ++count, (*iter)->GetName(), *iter);			
+		} 
+
+		iter.next();
+	}
 }

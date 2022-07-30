@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.2)
 
-set(SDK_PATH $ENV{HL2SDKL4D2})
-set(MM_PATH $ENV{SOURCEMM})
+set(SDK_PATH $ENV{L4D2SDK})
+set(MM_PATH $ENV{METAMOD})
 set(SM_PATH $ENV{SOURCEMOD})
 
 include_directories("${SDK_PATH}/public")
@@ -96,8 +96,8 @@ function(add_extension ext_name engine)
 		target_compile_options(${ext_name} PUBLIC
 			"/W3"
 			"/EHsc"
-			"/GR-"
-			"/TP")
+			"/TP"
+			"/MT")
 
 		target_link_libraries(${ext_name} PUBLIC 
 		${SDK_PATH}/lib/public/tier0.lib

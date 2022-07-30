@@ -49,9 +49,7 @@ public:
 	virtual INextBotEventResponder* FirstContainedResponder(void) const { return 0; }
 	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const { return 0; }
 
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
 	virtual const char* GetDebugString() const { return ""; }
-	#endif
 	//
 	// Events.  All events must be 'extended' by calling the derived class explicitly to ensure propagation.
 	// Each event must implement its propagation in this interface class.
@@ -86,26 +84,17 @@ public:
 	virtual void OnSpokeConcept(CBaseCombatCharacter* who, AIConcept_t concept, AI_Response* response, void* last);	// when an Actor speaks a concept
 
 	virtual void OnNavAreaChanged(CNavArea* newArea, CNavArea* oldArea);	// when bot enters a new navigation area
-
 	virtual void OnModelChanged(void);					// when the entity's model has been changed	
-
 	virtual void OnPickUp(CBaseEntity* item, CBaseCombatCharacter* giver);	// when something is added to our inventory
 	virtual void OnDrop(CBaseEntity* item);									// when something is removed from our inventory
 
-
 	virtual void OnShoved(CBaseEntity* pusher);									// when something is removed from our inventory
 	virtual void OnBlinded(CBaseEntity* blinder);									// when something is removed from our inventory
-
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-	virtual void OnEnteredSpit();									// when something is removed from our inventory
-	virtual void OnHitByVomitJar(CBaseEntity* shover);									// when something is removed from our inventory
-	#endif
+	virtual void OnEnteredSpit();									
+	virtual void OnHitByVomitJar(CBaseEntity* shover);								
 
 	virtual void OnCommandAttack(CBaseEntity* victim);	// attack the given entity
-	
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
-	virtual void OnCommandAssault(void);	// attack the given entity
-	#endif
+	virtual void OnCommandAssault(void);	
 
 	virtual void OnCommandApproach(const Vector& pos, float range = 0.0f);	// move to within range of the given position
 	virtual void OnCommandApproach(CBaseEntity* goal);	// follow the given leader
@@ -113,12 +102,9 @@ public:
 	virtual void OnCommandPause(float duration = 0.0f);	// pause for the given duration (0 == forever)
 	virtual void OnCommandResume(void);					// resume after a pause
 
-	#if SOURCE_ENGINE == SE_LEFT4DEAD2
 	virtual void OnCommandString(const char* command);	// for debugging: respond to an arbitrary string representing a generalized command
-	#endif
 };
 
-#if SOURCE_ENGINE == SE_LEFT4DEAD2
 inline void INextBotEventResponder::OnCommandAssault()
 {
 	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
@@ -142,7 +128,6 @@ inline void INextBotEventResponder::OnHitByVomitJar(CBaseEntity* shover)
 		sub->OnHitByVomitJar(shover);
 	}
 }
-#endif
 
 inline void INextBotEventResponder::OnThreatChanged(CBaseEntity* subject)
 {
@@ -400,7 +385,6 @@ inline void INextBotEventResponder::OnCommandResume(void)
 	}
 }
 
-#if SOURCE_ENGINE == SE_LEFT4DEAD2
 inline void INextBotEventResponder::OnCommandString(const char* command)
 {
 	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
@@ -408,6 +392,5 @@ inline void INextBotEventResponder::OnCommandString(const char* command)
 		sub->OnCommandString(command);
 	}
 }
-#endif
 
 #endif // _NEXT_BOT_EVENT_RESPONDER_INTERFACE_H_

@@ -2,6 +2,7 @@
 
 #include "actions_manager.h"
 #include "actions_processor.h"
+#include "actions_cquery.h"
 #include "actions_custom.h"
 #include "actions_commands.h"
 
@@ -17,17 +18,22 @@
 CExtBehaviorActions g_BehaviorActions;
 SMEXT_LINK(&g_BehaviorActions);
 
-IGameConfig* g_pGameConf;
 CGlobalVars *gpGlobals;
 ICvar *icvar;
 
+ConVar ext_actions_debug("ext_actions_debug", "0", 0, "1 - Enable debug, 0 - Disable debug");
+
 bool CExtBehaviorActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
-	char szError[255];
-
-	if (!gameconfs->LoadGameConfigFile("l4d_actions", &g_pGameConf, szError, sizeof(szError)))
+	if (!ConfigureHooks())
 	{
-		snprintf(error, maxlen, "Failed to load game config file: %s", szError);
+		snprintf(error, maxlen, "Failed to configure hooks");
+		return false;
+	}
+
+	if (!ConfigureContextualHooks())
+	{
+		snprintf(error, maxlen, "Failed to configure contextual hooks");
 		return false;
 	}
 
@@ -37,19 +43,19 @@ bool CExtBehaviorActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	sharesys->AddNatives(myself, g_ActionNatives);
 	sharesys->AddNatives(myself, g_ActionProcessorNatives);
 	sharesys->AddNatives(myself, g_ActionCustomNatives);
+
 	return true;
 }
 
 void CExtBehaviorActions::SDK_OnAllLoaded()
 {
-	ReconfigureHooks();
-	CreateHooks(g_pGameConf);
+	CreateHooks();
 }
 
 void CExtBehaviorActions::SDK_OnUnload()
 {
+	GetOffsetsManager()->ReleaseConfig();
 	plsys->RemovePluginsListener(this);
-	gameconfs->CloseGameConfigFile(g_pGameConf);
 }
 
 void CExtBehaviorActions::OnPluginUnloaded(IPlugin* plugin)

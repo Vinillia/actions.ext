@@ -186,7 +186,25 @@ cell_t NAT_StorePendingEventResult(IPluginContext* pContext, const cell_t* param
 	result.m_reason = reason;
 	result.m_priority = (EventResultPriorityType)params[5];
 
+	if (result.IsContinue())
+		return 0;
+
+	bool check = false;
+
+	if (result.m_priority > action->m_eventResult.m_priority)
+	{
+		check = true;
+	}
+	else if (result.m_priority == action->m_eventResult.m_priority && action->m_eventResult.m_type == SUSTAIN)
+	{
+		check = true;
+	}
+
 	action->StorePendingEventResult(result, NULL);
+
+	if (check)
+		CheckActionResult(action, result);
+		
 	return 0;
 }
 

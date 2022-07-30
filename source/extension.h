@@ -24,8 +24,8 @@ public:
 #endif
 };
 
-extern IGameConfig* g_pGameConf;
 extern CGlobalVars *gpGlobals;
 extern ICvar *icvar;
+extern ConVar ext_actions_debug;
 
 #endif // _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
