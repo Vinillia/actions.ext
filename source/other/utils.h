@@ -3,7 +3,7 @@
 #include <commonmacros.h>
 #include <memalloc.h>
 
-#define CONFIG_FILE_NAME "actions.l4d2"
+#define CONFIG_FILE_NAME "actions.games"
 
 #ifndef __linux__
 	void* operator new(size_t size);

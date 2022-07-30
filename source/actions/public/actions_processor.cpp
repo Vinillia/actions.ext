@@ -2,13 +2,13 @@
 #include "offset_manager.h"
 
 #if defined __linux__
-	SH_DECL_MANUALHOOK0_void(OnDestroyed, 1, 0, 0);
+	SH_DECL_MANUALHOOK0_void(Destructor, 1, 0, 0);
 #else
-	SH_DECL_MANUALHOOK1_void(OnDestroyed, 0, 0, 0, bool);
+	SH_DECL_MANUALHOOK1_void(Destructor, 0, 0, 0, bool);
 #endif
 
 SH_DECL_MANUALHOOK2(OnStart, 0, 0, 0, ActionResult<void>, CBaseEntity*, Action<void>*);
-SH_DECL_MANUALHOOK2(OnUpdate, 0, 0, 0, ActionResult<void>, CBaseEntity*, float);
+SH_DECL_MANUALHOOK2(Update, 0, 0, 0, ActionResult<void>, CBaseEntity*, float);
 SH_DECL_MANUALHOOK2_void(OnEnd, 0, 0, 0, CBaseEntity*, Action<void>*);
 SH_DECL_MANUALHOOK2(OnSuspend, 0, 0, 0, ActionResult<void>, CBaseEntity*, Action<void>*);
 SH_DECL_MANUALHOOK2(OnResume, 0, 0, 0, ActionResult<void>, CBaseEntity*, Action<void>*);
@@ -68,9 +68,9 @@ ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_
 
 	g_hookedNames.push_back(action->GetName());
 	
-	START_PROCESSOR(OnDestroyed, dctor);
+	START_PROCESSOR(Destructor, dctor);
 	START_PROCESSOR(OnStart, start);
-	START_PROCESSOR(OnUpdate, update);
+	START_PROCESSOR(Update, update);
 	START_PROCESSOR(OnEnd, end);
 	START_PROCESSOR(OnSuspend, suspend);
 	START_PROCESSOR(OnResume, resume);
@@ -122,9 +122,9 @@ bool ConfigureHooks()
 {
 	g_CachedOffsets = &GetOffsetsManager()->GetRequestedOffsets();
 
-	RECONFIGURE_MANUALHOOK(OnDestroyed);
+	RECONFIGURE_MANUALHOOK(Destructor);
 	RECONFIGURE_MANUALHOOK(OnStart);
-	RECONFIGURE_MANUALHOOK(OnUpdate);
+	RECONFIGURE_MANUALHOOK(Update);
 	RECONFIGURE_MANUALHOOK(OnEnd);
 	RECONFIGURE_MANUALHOOK(OnSuspend);
 	RECONFIGURE_MANUALHOOK(OnResume);

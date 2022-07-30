@@ -69,7 +69,7 @@ uintptr_t* const OffsetManager::RequestAddress(const char* name)
 template<typename T>
 T* const OffsetManager::RequestAddress(const char* name)
 {
-    T* offset;
+    T* addr;
     if (addrmap.count(name))
         return addrmap[name];
     if (config->GetAddress(name, (void**)&addr))
