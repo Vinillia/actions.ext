@@ -12,7 +12,7 @@ SH_DECL_MANUALHOOK2(Update, 0, 0, 0, ActionResult<void>, CBaseEntity*, float);
 SH_DECL_MANUALHOOK2_void(OnEnd, 0, 0, 0, CBaseEntity*, Action<void>*);
 SH_DECL_MANUALHOOK2(OnSuspend, 0, 0, 0, ActionResult<void>, CBaseEntity*, Action<void>*);
 SH_DECL_MANUALHOOK2(OnResume, 0, 0, 0, ActionResult<void>, CBaseEntity*, Action<void>*);
-SH_DECL_MANUALHOOK1(OnInitialContainedAction, 0, 0, 0, Action<void>*, CBaseEntity*);
+SH_DECL_MANUALHOOK1(InitialContainedAction, 0, 0, 0, Action<void>*, CBaseEntity*);
 SH_DECL_MANUALHOOK2(OnLeaveGround, 0, 0, 0, EventDesiredResult<void>, CBaseEntity*, CBaseEntity*);
 SH_DECL_MANUALHOOK2(OnLandOnGround, 0, 0, 0, EventDesiredResult<void>, CBaseEntity*, CBaseEntity*);
 SH_DECL_MANUALHOOK3(OnContact, 0, 0, 0, EventDesiredResult<void>, CBaseEntity*, CBaseEntity*, CGameTrace*);
@@ -74,7 +74,7 @@ ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_
 	START_PROCESSOR(OnEnd, end);
 	START_PROCESSOR(OnSuspend, suspend);
 	START_PROCESSOR(OnResume, resume);
-	START_PROCESSOR(OnInitialContainedAction, initialAction);
+	START_PROCESSOR(InitialContainedAction, initialAction);
 	START_PROCESSOR(OnLeaveGround, leaveGround);
 	START_PROCESSOR(OnLandOnGround, landGround);
 	START_PROCESSOR(OnContact, contact);
@@ -128,7 +128,7 @@ bool ConfigureHooks()
 	RECONFIGURE_MANUALHOOK(OnEnd);
 	RECONFIGURE_MANUALHOOK(OnSuspend);
 	RECONFIGURE_MANUALHOOK(OnResume);
-	RECONFIGURE_MANUALHOOK(OnInitialContainedAction);
+	RECONFIGURE_MANUALHOOK(InitialContainedAction);
 	RECONFIGURE_MANUALHOOK(OnLeaveGround);
 	RECONFIGURE_MANUALHOOK(OnLandOnGround);
 	RECONFIGURE_MANUALHOOK(OnContact);
