@@ -74,7 +74,9 @@ function(add_extension ext_name engine)
 		-m32
 		-march=pentium3
 		-mmmx
-		-msse)
+		-msse		
+		-Wno-deprecated-register
+		-Wno-register)
 
 		add_compile_definitions(
 			_LINUX
@@ -87,8 +89,8 @@ function(add_extension ext_name engine)
 		${SDK_PATH}/lib/linux/tier1_i486.a
 		${SDK_PATH}/lib/linux/tier2_i486.a
 		${SDK_PATH}/lib/linux/tier3_i486.a
-		${SDK_PATH}/lib/linux/libtier0_srv.so
-		${SDK_PATH}/lib/linux/libvstdlib_srv.so)
+		${SDK_PATH}/lib/linux/libtier0.so
+		${SDK_PATH}/lib/linux/libvstdlib.so)
 
 		#target_compile_options(${ext_name} PUBLIC -static-libstdc++ -stdlib=libstdc++)
         target_link_options(${ext_name} PUBLIC -static-libstdc++ -static-libgcc)

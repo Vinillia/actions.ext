@@ -1,6 +1,8 @@
 #ifndef _INCLUDE_ACTIONS_PROCS_H
 #define _INCLUDE_ACTIONS_PROCS_H
 
+#include "actions_processor.h"
+
 class ActionProcessor
 {
     inline static std::vector<std::string> hookedNames;
@@ -65,4 +67,4 @@ protected:
 	DEFINE_PROCESSOR(48, abletoBlock, bool, const INextBot*);
 };
 
-#endif _INCLUDE_ACTIONS_PROCS_H
+#endif // _INCLUDE_ACTIONS_PROCS_H
