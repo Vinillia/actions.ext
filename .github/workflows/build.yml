@@ -99,12 +99,11 @@ jobs:
         - name: Copy output to package
           working-directory: actions-sdk
           if: runner.os == 'Linux'
-          run: cp /build/*.so /actions-ext/package/extensions/.
+          run: cp ${{github.workspace}}/actions-sdk/build/*.so ${{github.workspace}}/actions-sdk/actions-ext/package/extensions/.
 
         - name: Copy output to package
-          working-directory: actions-sdk
           if: runner.os == 'Windows'
-          run: copy /build/Release/*.dll /actions-ext/package/extensions/.
+          run: copy ${{github.workspace}}/actions-sdk/build/Release/*.dll ${{github.workspace}}/actions-sdk/actions-ext/package/extensions/.
 
         - name: Upload output files
           uses: actions/upload-artifact@v2
