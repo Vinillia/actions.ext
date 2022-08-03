@@ -33,6 +33,11 @@ jobs:
     steps:
         - uses: actions/checkout@v2
           with:
+            ref: 'dev-v2.7'
+            path: actions-ext
+
+        - uses: actions/checkout@v2
+          with:
             ref: '${{matrix.sdk}}-sdk'
             path: actions-ext
             
