@@ -1,4 +1,3 @@
-
 name: build-project
 
 on:
@@ -49,12 +48,14 @@ jobs:
               repository: alliedmodders/sourcemod
               submodules: recursive
               path: 'sourcemod'
+              ref: '1.11-dev'
           
         - name: Acquire MetaMod:Source
           uses: actions/checkout@v2
           with:
               repository: alliedmodders/metamod-source
               path: 'metamod'
+              ref: '1.11-dev'
         
         - name: Acquire SDK
           uses: actions/checkout@v2
