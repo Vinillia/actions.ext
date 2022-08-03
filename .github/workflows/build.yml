@@ -35,13 +35,11 @@ jobs:
           with:
             ref: 'dev-v2.7'
             path: actions-ext
-            clean: 'false'
             
         - uses: actions/checkout@v2
           with:
             ref: '${{matrix.sdk}}-sdk'
-            path: actions-sdk
-            clean: 'false'
+            path: actions-ext/actions-sdk
             
         - name: Acquire SourceMod
           uses: actions/checkout@v2
@@ -79,12 +77,12 @@ jobs:
         - name: Configure CMake (Windows)
           working-directory: actions-ext
           if: runner.os == 'Windows'
-          run: cmake -S .. -B build -A Win32 --no-warn-unused-cli
+          run: cmake -S . -B build -A Win32 --no-warn-unused-cli
               
         - name: Configure CMake (Linux)
           working-directory: actions-ext
           if: runner.os == 'Linux'
-          run: cmake -S .. -B build --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=${{env.BUILD_TYPE}} -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang
+          run: cmake -S . -B build --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=${{env.BUILD_TYPE}} -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang
               
         - name: Build (Windows)
           working-directory: actions-ext
