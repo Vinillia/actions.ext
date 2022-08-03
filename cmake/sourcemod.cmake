@@ -35,8 +35,8 @@ function(add_extension ext_name engine)
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_propagate.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_manager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_helpers.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/source/sdk/public/actions_cquery.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/source/sdk/public/actions_processor.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/sdk/public/actions_cquery.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/sdk/public/actions_processor.cpp
 	${SM_PATH}/public/smsdk_ext.cpp)
 
 	target_include_directories(${ext_name} PUBLIC 
