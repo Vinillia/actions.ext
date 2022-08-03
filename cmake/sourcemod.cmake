@@ -32,6 +32,7 @@ function(add_extension ext_name engine)
 
 	target_sources(${ext_name} PUBLIC
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/public/extension.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/public/offset_manager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_propagate.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_manager.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_helpers.cpp
