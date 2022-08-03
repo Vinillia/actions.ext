@@ -111,12 +111,5 @@ jobs:
           uses: actions/upload-artifact@v2
           with:
             name: release-linux
-            path: ${{github.workspace}}/actions-sdk/build/*.so
-            
-        - name: Upload output files (Windows)
-          if: runner.os == 'Windows'
-          uses: actions/upload-artifact@v2
-          with:
-            name: release-windows
-            path: ${{github.workspace}}/actions-sdk/build/Release/*.dll
+            path: ${{github.workspace}}/actions-sdk/actions-ext/package/**
   
