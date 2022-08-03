@@ -4,6 +4,11 @@ set(SDK_PATH $ENV{SDK})
 set(MM_PATH $ENV{METAMOD})
 set(SM_PATH $ENV{SOURCEMOD})
 
+if ("${SDK_PATH}" STREQUAL "")
+	message("Failed to get SDK, use L4D1SDK instead...")
+	set(SDK_PATH $ENV{L4D1SDK})
+endif()
+
 include_directories("${SDK_PATH}/public")
 include_directories("${SDK_PATH}/public/engine")
 include_directories("${SDK_PATH}/public/game/server")
