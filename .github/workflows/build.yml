@@ -36,10 +36,10 @@ jobs:
             ref: 'dev-v2.7'
             path: actions-ext
             
-        - uses: actions/checkout@v2
-          with:
-            ref: '${{matrix.sdk}}-sdk'
-            path: actions-ext/actions-sdk
+        #- uses: actions/checkout@v2
+        #  with:
+        #    ref: '${{matrix.sdk}}-sdk'
+        #    path: actions-ext/actions-sdk
             
         - name: Acquire SourceMod
           uses: actions/checkout@v2
