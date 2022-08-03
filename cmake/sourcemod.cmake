@@ -76,7 +76,12 @@ function(add_extension ext_name engine)
 		-mmmx
 		-msse		
 		-Wno-deprecated-register
-		-Wno-register)
+		-Wno-register
+		-Wno-implicit-exception-spec-mismatch
+		-Wno-varargs
+		-Wno-implicit-int-float-conversion
+		-Wno-inconsistent-missing-override
+		-Wno-expansion-to-defined)
 
 		add_compile_definitions(
 			_LINUX
