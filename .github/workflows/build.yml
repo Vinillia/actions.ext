@@ -34,12 +34,12 @@ jobs:
         - uses: actions/checkout@v2
           with:
             ref: 'dev-v2.7'
-            path: actions-ext
+            path: actions-sdk
             
-        #- uses: actions/checkout@v2
-        #  with:
-        #    ref: '${{matrix.sdk}}-sdk'
-        #    path: actions-ext/actions-sdk
+        - uses: actions/checkout@v2
+          with:
+            ref: '${{matrix.sdk}}-sdk'
+            path: actions-sdk/actions-ext
             
         - name: Acquire SourceMod
           uses: actions/checkout@v2
@@ -75,22 +75,22 @@ jobs:
           run: cmake -E make_directory ${{github.workspace}}/build
           
         - name: Configure CMake (Windows)
-          working-directory: actions-ext
+          working-directory: actions-sdk
           if: runner.os == 'Windows'
           run: cmake -S . -B build -A Win32 --no-warn-unused-cli
               
         - name: Configure CMake (Linux)
-          working-directory: actions-ext
+          working-directory: actions-sdk
           if: runner.os == 'Linux'
           run: cmake -S . -B build --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=${{env.BUILD_TYPE}} -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang
               
         - name: Build (Windows)
-          working-directory: actions-ext
+          working-directory: actions-sdk
           if: runner.os == 'Windows'
           run: cmake --build build --config ${{env.BUILD_TYPE}} -j 6
            
         - name: Build (Linux)
-          working-directory: actions-ext
+          working-directory: actions-sdk
           if: runner.os == 'Linux'
           run: cmake --build build -j 6
           
@@ -99,12 +99,12 @@ jobs:
           uses: actions/upload-artifact@v2
           with:
             name: release-linux
-            path: ${{github.workspace}}/actions-ext/build/*.so
+            path: ${{github.workspace}}/actions-sdk/build/*.so
             
         - name: Upload output files (Windows)
           if: runner.os == 'Windows'
           uses: actions/upload-artifact@v2
           with:
             name: release-windows
-            path: ${{github.workspace}}/actions-ext/build/Release/*.dll
+            path: ${{github.workspace}}/actions-sdk/build/Release/*.dll
   
