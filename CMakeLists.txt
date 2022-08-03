@@ -8,14 +8,15 @@ endif()
 
 include("cmake/sourcemod.cmake")
 
-include_directories("source")
-include_directories("source/other")
-include_directories("source/public")
-include_directories("source/sdk")
-include_directories("source/actions")
-include_directories("source/actions/natives")
-include_directories("source/actions/public")
-include_directories("source/actions/sdk")
+include_directories("actions-ext/source/actions/")
+include_directories("actions-ext/source/actions/natives")
+include_directories("actions-ext/source/actions/public")
+include_directories("actions-ext/source/")
+include_directories("actions-ext/source/public")
+
+include_directories("actions-sdk/source/actions/sdk/public")
+include_directories("actions-sdk/source/actions/sdk")
+include_directories("actions-sdk/source/sdk")
 
 add_compile_definitions(SE_EPISODEONE=1 SE_DARKMESSIAH=2 SE_ORANGEBOX=3 SE_BLOODYGOODTIME=4 SE_EYE=5 SE_ORANGEBOXVALVE=6 SE_LEFT4DEAD=7 SE_LEFT4DEAD2=8 SE_ALIENSWARM=9 SE_PORTAL2=10 SE_CSGO=11)
 
