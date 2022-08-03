@@ -1,8 +1,6 @@
-#include "utils.h"
-#include "extension.h"
 #include "actions_processor.h"
+#include "actions_procs.h"
 #include "actions_cquery.h"
-#include "offset_manager.h"
 
 #include "NextBotContextualQueryInterface.h"
 
@@ -16,6 +14,14 @@ SH_DECL_MANUALHOOK4(SelectMoreDangerousThreat, 0, 0, 4, CKnownEntity*, INextBot*
 
 ActionContextualProcessor::ActionContextualProcessor(CBaseEntity* entity, Action<void>* action) : ActionProcessor(entity, action)
 {
+}
+
+ActionContextualProcessor::ActionContextualProcessor(Action<void>* action) : ActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), action)
+{
+}
+
+void ActionContextualProcessor::StartProcessors()
+{
     START_PROCESSOR(ShouldPickUp, shouldPickUp);
 	START_PROCESSOR(ShouldHurry, shouldHurry);
 	START_PROCESSOR(IsHindrance, isHindrance);
@@ -23,14 +29,11 @@ ActionContextualProcessor::ActionContextualProcessor(CBaseEntity* entity, Action
 	START_PROCESSOR(IsPositionAllowed, isPositionAllowed);
 	START_PROCESSOR(QueryCurrentPath, queryCurrentPath);
 	START_PROCESSOR(SelectMoreDangerousThreat, selectMoreDangerousThreat);
+
+	ActionProcessor::StartProcessors();
 }
 
-ActionContextualProcessor::ActionContextualProcessor(Action<void>* action) : ActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), action)
-{
-
-}
-
-const bool ConfigureContextualHooks()
+const bool ActionContextualProcessor::ConfigureHooks()
 {
 	RECONFIGURE_MANUALHOOK(ShouldPickUp);
 	RECONFIGURE_MANUALHOOK(ShouldHurry);
@@ -40,10 +43,5 @@ const bool ConfigureContextualHooks()
 	RECONFIGURE_MANUALHOOK(QueryCurrentPath);
 	RECONFIGURE_MANUALHOOK(SelectMoreDangerousThreat);
 
-	return !GetOffsetsManager()->HaveFailedRequest();
-}
-
-void ExecuteContextualProcessor(CBaseEntity* entity, Action<void>* action)
-{
-    ActionContextualProcessor contextualProcessor(entity, action);
+	return ActionProcessor::ConfigureHooks();
 }

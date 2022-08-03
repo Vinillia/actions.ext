@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef _INCLUDE_ACTIONS_CQUERY_H
 #define _INCLUDE_ACTIONS_CQUERY_H
 
@@ -13,6 +11,9 @@ public:
 
     ~ActionContextualProcessor() = default;
 
+	static const bool ConfigureHooks();
+    void StartProcessors();
+	
 public:
 	DEFINE_PROCESSOR(100, shouldPickUp, QueryResultType, INextBot*, CBaseEntity*);
 	DEFINE_PROCESSOR(101, shouldHurry, QueryResultType, INextBot*);

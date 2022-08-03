@@ -2,6 +2,7 @@
 
 #include "actions_manager.h"
 #include "actions_processor.h"
+#include "actions_procs.h"
 #include "actions_cquery.h"
 #include "actions_custom.h"
 #include "actions_commands.h"
@@ -10,7 +11,7 @@
 #include "actions_processors_natives.h"
 #include "actions_custom_natives.h"
 
-#include "hooks.h"
+#include "actions_intention.h"
 #include <compat_wrappers.h>
 
 #pragma comment(lib, "legacy_stdio_definitions.lib")
@@ -28,12 +29,6 @@ bool CExtBehaviorActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	if (!ConfigureHooks())
 	{
 		snprintf(error, maxlen, "Failed to configure hooks");
-		return false;
-	}
-
-	if (!ConfigureContextualHooks())
-	{
-		snprintf(error, maxlen, "Failed to configure contextual hooks");
 		return false;
 	}
 

@@ -3,7 +3,7 @@
 #include "NextBotEventResponderInterface.h"
 #include "NextBotInterface.h"
 
-extern void ExecuteContextualProcessor(CBaseEntity* entity, Action<void>* action);
+extern void ExecuteProcessor(CBaseEntity* entity, Action<void>* action);
 SH_DECL_MANUALHOOK0_void(OnIntentionReset, 0, 0, 0);
 
 class NextBotIntention : public IIntention
@@ -20,15 +20,15 @@ public:
 void OnIntentionReset()
 {
 	NextBotIntention* pIntention = META_IFACEPTR(NextBotIntention);
-	ExecuteContextualProcessor(pIntention->entity, pIntention->GetAction());
+	ExecuteProcessor(pIntention->entity, pIntention->GetAction());
 }
 
 void OnSurviovrIntentionReset()
 {
 	NextBotIntention* pIntention = META_IFACEPTR(NextBotIntention);
 
-	ExecuteContextualProcessor(pIntention->entity, pIntention->GetAction());
-	ExecuteContextualProcessor(pIntention->entity, pIntention->GetSubAction());
+	ExecuteProcessor(pIntention->entity, pIntention->GetAction());
+	ExecuteProcessor(pIntention->entity, pIntention->GetSubAction());
 }
 
 void HookIntention(const char* name, fastdelegate::FastDelegate<void> fastDelegate = SH_STATIC(OnIntentionReset))

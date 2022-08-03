@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-set(SDK_PATH $ENV{L4D2SDK})
+set(SDK_PATH $ENV{SDK})
 set(MM_PATH $ENV{METAMOD})
 set(SM_PATH $ENV{SOURCEMOD})
 
@@ -34,7 +34,9 @@ function(add_extension ext_name engine)
 	${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_propagate.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_manager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_processor.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_helpers.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/sdk/actions_processor.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/sdk/actions_cquery.cpp
 	${SM_PATH}/public/smsdk_ext.cpp)
 
 	target_include_directories(${ext_name} PUBLIC 

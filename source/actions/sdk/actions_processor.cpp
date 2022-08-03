@@ -1,5 +1,5 @@
-#include "actions_processor.h"
-#include "offset_manager.h"
+#include "actions_helpers.h"
+#include "actions_procs.h"
 
 #if defined __linux__
 	SH_DECL_MANUALHOOK0_void(Destructor, 1, 0, 0);
@@ -51,23 +51,32 @@ SH_DECL_MANUALHOOK1(OnCommandResume, 0, 0, 0, EventDesiredResult<void>, CBaseEnt
 SH_DECL_MANUALHOOK2(OnCommandString, 0, 0, 0, EventDesiredResult<void>, CBaseEntity*, const char*);
 SH_DECL_MANUALHOOK1(IsAbleToBlockMovementOf, 0, 0, 0, bool, const INextBot*);
 
-const std::map<std::string, int32_t>* g_CachedOffsets;
 
 ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_action(action)
 {
 	g_pActionsManager->SetRuntimeActor(entity);
 	g_pActionsManager->Add(entity, action);
+}
 
-	static std::vector<std::string> g_hookedNames;
+ActionProcessor::ActionProcessor(Action<void>* action) : ActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), action)
+{
+}
 
-	for (auto name : g_hookedNames)
+const bool ActionProcessor::ShouldStartProcessors()
+{
+	for (auto name : hookedNames)
 	{
-		if (strcmp(name.c_str(), action->GetName()) == 0)
-			return;
+		if (strcmp(name.c_str(), m_action->GetName()) == 0)
+			return false;
 	}
 
-	g_hookedNames.push_back(action->GetName());
-	
+	return true;
+}
+
+void ActionProcessor::StartProcessors()
+{
+	hookedNames.push_back(m_action->GetName());
+
 	START_PROCESSOR(Destructor, dctor);
 	START_PROCESSOR(OnStart, start);
 	START_PROCESSOR(Update, update);
@@ -114,11 +123,7 @@ ActionProcessor::ActionProcessor(CBaseEntity* entity, Action<void>* action) : m_
 	START_PROCESSOR(OnCommandString, commandString);
 }
 
-ActionProcessor::ActionProcessor(Action<void>* action) : ActionProcessor(static_cast<CBaseEntity*>(action->GetActor()), action)
-{
-}
-
-bool ConfigureHooks()
+const bool ActionProcessor::ConfigureHooks()
 {
 	g_CachedOffsets = &GetOffsetsManager()->GetRequestedOffsets();
 
@@ -168,50 +173,4 @@ bool ConfigureHooks()
 	RECONFIGURE_MANUALHOOK(OnCommandApproachEntity);
 
 	return !GetOffsetsManager()->HaveFailedRequest();
-}
-
-OffsetManager* GetOffsetsManager()
-{
-	static OffsetManager offsmgr(CONFIG_FILE_NAME);
-	return &offsmgr;
-}
-
-template<typename T>
-void CheckActionResult(Action<void>* action, T& result)
-{
-	if (!result.IsRequestingChange())
-		return;
-
-	if (ext_actions_debug.GetBool())
-	{
-		cell_t actor = gamehelpers->EntityToBCompatRef((CBaseEntity*)action->GetActor());
-		const char* classname = gamehelpers->GetEntityClassname((CBaseEntity*)action->GetActor());
-
-		if(result.IsDone())
-		{
-			if (action->GetActionBuriedUnderMe())
-				LOG("%i(%s): %s is done because '%s'. Continue suspended action %s.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN", action->GetActionBuriedUnderMe()->GetName());
-			else
-				LOG("%i(%s): %s is done because '%s'.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
-		}
-		else if (result.m_type == SUSPEND_FOR)
-		{
-			LOG("%i(%s): %s suspended for %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
-		}
-		else
-		{
-			LOG("%i(%s): %s changed to %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
-		}
-	}
-
-	if (!result.IsDone())
-		ExecuteContextualProcessor(static_cast<CBaseEntity*>(action->GetActor()), result.m_action);
-
-	if (result.m_type != SUSPEND_FOR)
-		g_pActionsManager->Remove(action);
-}
-
-void ExecuteProcessor(CBaseEntity* entity, Action<void>* action)
-{
-	ActionProcessor processor(entity, action);
 }
