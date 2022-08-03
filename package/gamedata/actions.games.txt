@@ -1,0 +1,802 @@
+"Games"
+{
+	"#default"
+	{
+		"Offsets"
+		{
+			"Destructor"
+			{
+				"linux" "1"
+				"windows" "0"
+			}
+		}
+	}
+	
+	"left4dead"
+	{
+		"Offsets"
+		{
+			"ShouldPickUp"
+			{
+				"linux" "2"
+				"windows" "1"
+			}
+			"ShouldHurry"
+			{
+				"linux" "3"
+				"windows" "2"
+			}
+			"IsHindrance"
+			{
+				"linux" "4"
+				"windows" "3" 
+			}
+			"SelectTargetPoint"
+			{
+				"linux" "5"
+				"windows" "4"
+			}
+			"IsPositionAllowed"
+			{
+				"linux" "6"
+				"windows" "5"
+			}
+			"QueryCurrentPath"
+			{
+				"linux" "7"
+				"windows" "6"
+			}
+			"SelectMoreDangerousThreat"
+			{
+				"linux" "8"
+				"windows" "7"
+			}
+			"IIntention::Reset"
+			{
+			    "linux" "36"
+			    "windows" "35"
+			}
+			"OnStart"
+			{
+			    "linux" "39"
+			    "windows" "38"
+			}
+			"Update"
+			{
+			    "linux" "40"
+			    "windows" "39"
+			}
+			"OnEnd"
+			{
+			    "linux" "41"
+			    "windows" "40"
+			}
+			"OnSuspend"
+			{
+			    "linux" "42"
+			    "windows" "41"
+			}
+			"OnResume"
+			{
+			    "linux" "43"
+			    "windows" "42"
+			}
+			"InitialContainedAction"
+			{
+			    "linux" "44"
+			    "windows" "43"
+			}
+			"OnLeaveGround"
+			{
+			    "linux" "45"
+			    "windows" "44"
+			}
+			"OnLandOnGround"
+			{
+			    "linux" "46"
+			    "windows" "45"
+			}
+			"OnContact"
+			{
+			    "linux" "47"
+			    "windows" "46"
+			}
+			"OnMoveToSuccess"
+			{
+			    "linux" "48"
+			    "windows" "47"
+			}
+			"OnMoveToFailure"
+			{
+			    "linux" "49"
+			    "windows" "48"
+			}
+			"OnStuck"
+			{
+			    "linux" "50"
+			    "windows" "49"
+			}
+			"OnUnStuck"
+			{
+			    "linux" "51"
+			    "windows" "50"
+			}
+			"OnPostureChanged"
+			{
+			    "linux" "52"
+			    "windows" "51"
+			}
+			"OnAnimationActivityComplete"
+			{
+			    "linux" "53"
+			    "windows" "52"
+			}
+			"OnAnimationActivityInterrupted"
+			{
+			    "linux" "54"
+			    "windows" "53"
+			}
+			"OnAnimationEvent"
+			{
+			    "linux" "55"
+			    "windows" "54"
+			}
+			"OnIgnite"
+			{
+			    "linux" "56"
+			    "windows" "55"
+			}
+			"OnInjured"
+			{
+			    "linux" "57"
+			    "windows" "56"
+			}
+			"OnKilled"
+			{
+			    "linux" "58"
+			    "windows" "57"
+			}
+			"OnOtherKilled"
+			{
+			    "linux" "59"
+			    "windows" "58"
+			}
+			"OnSight"
+			{
+			    "linux" "60"
+			    "windows" "59"
+			}
+			"OnLostSight"
+			{
+			    "linux" "61"
+			    "windows" "60"
+			}
+			"OnThreatChanged"
+			{
+			    "linux" "62"
+			    "windows" "61"
+			}
+			"OnSound"
+			{
+			    "linux" "63"
+			    "windows" "62"
+			}
+			"OnSpokeConcept"
+			{
+			    "linux" "64"
+			    "windows" "63"
+			}
+			"OnNavAreaChanged"
+			{
+			    "linux" "65"
+			    "windows" "64"
+			}
+			"OnModelChanged"
+			{
+			    "linux" "66"
+			    "windows" "65"
+			}
+			"OnPickUp"
+			{
+			    "linux" "67"
+			    "windows" "66"
+			}
+			"OnDrop"
+			{
+			    "linux" "68"
+			    "windows" "67"
+			}
+			"OnShoved"
+			{
+			    "linux" "69"
+			    "windows" "68"
+			}
+			"OnBlinded"
+			{
+			    "linux" "70"
+			    "windows" "69"
+			}
+			"OnCommandAttack"
+			{
+			    "linux" "71"
+			    "windows" "70"
+			}
+			"OnCommandApproachVector"
+			{
+			    "linux" "72"
+			    "windows" "72"
+			}
+			"OnCommandApproachEntity"
+			{
+			    "linux" "73"
+			    "windows" "71"
+			}
+			"OnCommandRetreat"
+			{
+			    "linux" "74"
+			    "windows" "73"
+			}
+			"OnCommandPause"
+			{
+			    "linux" "75"
+			    "windows" "74"
+			}
+			"OnCommandResume"
+			{
+			    "linux" "76"
+			    "windows" "75"
+			}
+			"IsAbleToBlockMovementOf"
+			{
+			    "linux" "77"
+			    "windows" "76"
+			}
+		}
+
+		"Addresses"
+		{
+			"BoomerIntention::Reset"
+			{
+				"signature" "BoomerIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+			
+			"HunterIntention::Reset"
+			{
+				"signature" "HunterIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+			
+			"SmokerIntention::Reset"
+			{
+				"signature" "SmokerIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+			
+			"TankIntention::Reset"
+			{
+				"signature" "TankIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+			
+			"InfectedIntention::Reset"
+			{
+				"signature" "InfectedIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+			
+			"SurvivorIntention::Reset"
+			{	
+				"signature" "SurvivorIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+			
+			"WitchIntention::Reset"
+			{
+				"signature" "WitchIntention::Reset"
+				
+				"linux"
+				{
+					"offset" "8"
+				}
+			}
+		}
+		
+		"Signatures"
+		{
+			"BoomerIntention::Reset"
+			{
+				"linux" "@_ZTV15BoomerIntention"
+				"windows" "\xB0\xC9\x2A\x2A\x00\x12\x2A\x2A\x70\xE1\x2A\x2A\xE0\xF3"
+			}
+			
+			"HunterIntention::Reset"
+			{
+				"linux" "@_ZTV15HunterIntention"
+				"windows" "\x00\x56\x2A\x2A\x00\x12\x2A\x2A\x70\xE1\x2A\x2A\xE0\xF3"
+			}
+			
+			"SmokerIntention::Reset"
+			{
+				"linux" "@_ZTV15SmokerIntention"
+				"windows" "\x20\x18\x2A\x2A\x00\x12\x2A\x2A\x70\xE1\x2A\x2A\xE0\xF3"
+			}
+
+			"InfectedIntention::Reset"
+			{
+				"linux" "@_ZTV17InfectedIntention"
+				"windows" "\xA0\xB3\x2A\x2A\x00\x12\x2A\x2A\x70\xE1"
+			}
+			
+			"TankIntention::Reset"
+			{	
+				"linux" "@_ZTV13TankIntention"
+				"windows" "\xF0\x6B\x2A\x2A\x00\x12\x2A\x2A\x70\xE1\x2A\x2A\xE0\xF3"
+			}
+			
+			"WitchIntention::Reset"
+			{	
+				"linux" "@_ZTV14WitchIntention"
+				"windows" "\xA0\x42\x2A\x2A\x00\x12\x2A\x2A\x70\xE1"
+			}
+			
+			"SurvivorIntention::Reset"
+			{	
+				"linux" "@_ZTV17SurvivorIntention"
+				"windows" "\x80\x13\x2A\x2A\x00\x12\x2A\x2A\x10\x12\x2A\x2A\xE0\xF3\x2A\x2A\x20\xF4"
+			}
+		}
+	}
+	
+	"left4dead2"
+	{
+		"Offsets"
+		{
+			"IIntention::Reset"
+			{
+				"linux" "41"
+				"windows" "40"
+			}
+			"ShouldPickUp"
+			{
+				"linux" "2"
+				"windows" "1"
+			}
+			"ShouldHurry"
+			{
+				"linux" "3"
+				"windows" "2"
+			}
+			"IsHindrance"
+			{
+				"linux" "4"
+				"windows" "3"
+			}
+			"SelectTargetPoint"
+			{
+				"linux" "5"
+				"windows" "4"
+			}
+			"IsPositionAllowed"
+			{
+				"linux" "6"
+				"windows" "5"
+			}
+			"QueryCurrentPath"
+			{
+				"linux" "7"
+				"windows" "6"
+			}
+			"SelectMoreDangerousThreat"
+			{
+				"linux" "8"
+				"windows" "7"
+			}
+			"OnStart"
+			{
+				"linux" "44"
+				"windows" "43"
+			}
+			"Update"
+			{
+				"linux" "45"
+				"windows" "44"
+			}
+			"OnEnd"
+			{
+				"linux" "46"
+				"windows" "45"
+			}
+			"OnSuspend"
+			{
+				"linux" "47"
+				"windows" "46"
+			}
+			"OnResume"
+			{
+				"linux" "48"
+				"windows" "47"
+			}
+			"OnInitialContainedAction"
+			{
+				"linux" "49"
+				"windows" "48"
+			}
+			"OnLeaveGround"
+			{
+				"linux" "50"
+				"windows" "49"
+			}
+			"OnLandOnGround"
+			{
+				"linux" "51"
+				"windows" "50"
+			}
+			"OnContact"
+			{
+				"linux" "52"
+				"windows" "51"
+			}
+			"OnMoveToSuccess"
+			{
+				"linux" "53"
+				"windows" "52"
+			}
+			"OnMoveToFailure"
+			{
+				"linux" "54"
+				"windows" "53"
+			}
+			"OnStuck"
+			{
+				"linux" "55"
+				"windows" "54"
+			}
+			"OnUnStuck"
+			{
+				"linux" "56"
+				"windows" "55"
+			}
+			"OnPostureChanged"
+			{
+				"linux" "57"
+				"windows" "56"
+			}
+			"OnAnimationActivityComplete"
+			{
+				"linux" "58"
+				"windows" "57"
+			}
+			"OnAnimationActivityInterrupted"
+			{
+				"linux" "59"
+				"windows" "58"
+			}
+			"OnAnimationEvent"
+			{
+				"linux" "60"
+				"windows" "59"
+			}
+			"OnIgnite"
+			{
+				"linux" "61"
+				"windows" "60"
+			}
+			"OnInjured"
+			{
+				"linux" "62"
+				"windows" "61"
+			}
+			"OnKilled"
+			{
+				"linux" "63"
+				"windows" "62"
+			}
+			"OnOtherKilled"
+			{
+				"linux" "64"
+				"windows" "63"
+			}
+			"OnSight"
+			{
+				"linux" "65"
+				"windows" "64"
+			}
+			"OnLostSight"
+			{
+				"linux" "66"
+				"windows" "65"
+			}
+			"OnThreatChanged"
+			{
+				"linux" "67"
+				"windows" "66"
+			}
+			"OnSound"
+			{
+				"linux" "68"
+				"windows" "67"
+			}
+			"OnSpokeConcept"
+			{
+				"linux" "69"
+				"windows" "68"
+			}
+			"OnNavAreaChanged"
+			{
+				"linux" "70"
+				"windows" "69"
+			}
+			"OnModelChanged"
+			{
+				"linux" "71"
+				"windows" "70"
+			}
+			"OnPickUp"
+			{
+				"linux" "72"
+				"windows" "71"
+			}
+			"OnDrop"
+			{
+				"linux" "73"
+				"windows" "72"
+			}
+			"OnShoved"
+			{
+				"linux" "74"
+				"windows" "73"
+			}
+			"OnBlinded"
+			{
+				"linux" "75"
+				"windows" "74"
+			}
+			"OnEnteredSpit"
+			{
+				"linux" "76"
+				"windows" "75"
+			}
+			"OnHitByVomitJar"
+			{
+				"linux" "77"
+				"windows" "76"
+			}
+			"OnCommandAttack"
+			{
+				"linux" "78"
+				"windows" "77"
+			}
+			"OnCommandAssault"
+			{
+				"linux" "79"
+				"windows" "78"
+			}
+			"OnCommandApproachVector"
+			{
+				"linux" "80"
+				"windows" "80"
+			}
+			"OnCommandApproachEntity"
+			{
+				"linux" "81"
+				"windows" "79"
+			}
+			"OnCommandRetreat"
+			{
+				"linux" "82"
+				"windows" "81"
+			}
+			"OnCommandPause"
+			{
+				"linux" "83"
+				"windows" "82"
+			}
+			"OnCommandResume"
+			{
+				"linux" "84"
+				"windows" "83"
+			}
+			"OnCommandString"
+			{
+				"linux" "85"
+				"windows" "84"
+			}
+			"IsAbleToBlockMovementOf"
+			{
+				"linux" "86"
+				"windows" "85"
+			}
+		}
+		
+		"Addresses"
+		{
+			"BoomerIntention::Reset"
+			{
+				"signature" "BoomerIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"ChargerIntention::Reset"
+			{
+				"signature" "ChargerIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"HunterIntention::Reset"
+			{
+				"signature" "HunterIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"JockeyIntention::Reset"
+			{
+				"signature" "JockeyIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"SmokerIntention::Reset"
+			{
+				"signature" "SmokerIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"SpitterIntention::Reset"
+			{
+				"signature" "SpitterIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"TankIntention::Reset"
+			{
+				"signature" "TankIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"InfectedIntention::Reset"
+			{
+				"signature" "InfectedIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"SurvivorIntention::Reset"
+			{	
+				"signature" "SurvivorIntention::Reset"
+				
+				"linux"
+				{
+					"read" "27"
+				}
+			}
+			
+			"WitchIntention::Reset"
+			{
+				"signature" "WitchIntention::Reset"
+				
+				"linux"
+				{
+					"read" "132"
+				}
+			}
+		}
+		
+		"Signatures"
+		{
+			"BoomerIntention::Reset"
+			{
+				"linux" "@_ZN15BoomerIntentionC2EP8INextBot"
+				"windows" "\x20\x30\x2A\x2A\x00\x2D\x2A\x2A\x40\x76"
+			}
+	
+			"ChargerIntention::Reset"
+			{
+				"linux" "@_ZN16ChargerIntentionC2EP8INextBot"
+				"windows" "\xD0\xDF\x2A\x2A\xB0\xDC\x2A\x2A\x40\x76"
+			}
+			
+			"HunterIntention::Reset"
+			{
+				"linux" "@_ZN15HunterIntentionC2EP8INextBot"
+				"windows" "\x90\x92\x2A\x2A\x70\x8F\x2A\x2A\x40"
+			}
+			
+			"JockeyIntention::Reset"
+			{
+				"linux" "@_ZN15JockeyIntentionC2EP8INextBot"
+				"windows" "\x2A\x2A\x2A\x2A\x20\x40\x2A\x2A\x40\x76\x2A\x2A\x2A\x2A\x2A\x2A\x50\x5E\x2A\x2A\x90\x5E\x2A\x2A\xD0"
+			}
+			
+			"SmokerIntention::Reset"
+			{
+				"linux" "@_ZN15SmokerIntentionC2EP8INextBot"
+				"windows" "\x20\x06\x2A\x2A\x00\x03\x2A\x2A\x40\x76\x2A\x2A\xC0\xBE"
+			}
+			
+			"SpitterIntention::Reset"
+			{
+				"linux" "@_ZN16SpitterIntentionC2EP8INextBot"
+				"windows" "\xA0\xC0\x2A\x2A\x80\xBD\x2A\x2A\x40\x76\x2A\x2A\xC0\xBE"
+			}
+			
+			"TankIntention::Reset"
+			{
+				"linux" "@_ZN13TankIntentionC2EP8INextBot"
+				"windows" "\x10\x6E\x2A\x2A\xF0\x6A\x2A\x2A\x40\x76"
+			}
+			
+			"InfectedIntention::Reset"
+			{
+				"linux" "@_ZN17InfectedIntentionC2EP8INextBot"
+				"windows" "\x20\x31\x2A\x2A\xE0\x2F\x2A\x2A\xF0\x2F"
+			}
+			
+			"SurvivorIntention::Reset"
+			{	
+				"linux" "@_ZN17SurvivorIntentionC2EP8INextBot"
+				"windows" "\xE0\xE7\x2A\x2A\x30\xE6\x2A\x2A\x40\xE6\x2A\x2A\xC0\xBE"
+			}
+			
+			"WitchIntention::Reset"
+			{	
+				"linux" "@_ZN5Witch16CreateComponentsEv"
+				"windows" "\xA0\x78\x2A\x2A\xE0\x2F\x2A\x2A\xF0\x2F"
+			}
+		}
+	}
+}
