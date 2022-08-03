@@ -1,6 +1,7 @@
 .vscode/
 cmake/
 build/
+trigger_build.txt
 *.cmake
 *.obj
 *.recipe
