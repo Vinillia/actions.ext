@@ -23,8 +23,8 @@ jobs:
           - l4d2
           - l4d
         os:
-          - ubuntu-latest
           - windows-latest
+        #  - ubuntu-latest
     env:
       METAMOD: ${{ github.workspace }}/metamod
       SOURCEMOD: ${{ github.workspace }}/sourcemod
