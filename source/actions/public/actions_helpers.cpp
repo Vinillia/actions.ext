@@ -1,6 +1,7 @@
 #include "utils.h"
 #include "extension.h"
 #include "actions_helpers.h"
+#include "actions_processor.h"
 #include "actions_procs.h"
 #include "actions_cquery.h"
 
