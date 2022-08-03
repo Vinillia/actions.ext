@@ -108,6 +108,6 @@ jobs:
         - name: Upload output files
           uses: actions/upload-artifact@v2
           with:
-            name: release-${{ matrix.os }}
+            name: release-${{ matrix.os }}-${{ matrix.sdk }}
             path: ${{github.workspace}}/actions-sdk/actions-ext/package/**
   
