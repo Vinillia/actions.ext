@@ -13,13 +13,15 @@ on:
 
 env:
   BUILD_TYPE: Release
-  SDK_NAME: l4d2
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        sdk:
+          - l4d2
+          - l4d
         os:
           - ubuntu-latest
           - windows-latest
@@ -31,7 +33,7 @@ jobs:
     steps:
         - uses: actions/checkout@v2
           with:
-            ref: '${{env.SDK_NAME}}'
+            ref: '${{matrix.sdk}}-sdk'
             path: actions-ext
             
         - name: Acquire SourceMod
@@ -52,7 +54,7 @@ jobs:
           with:
               repository: alliedmodders/hl2sdk
               path: 'gamesdk'
-              ref: '${{env.SDK_NAME}}'
+              ref: '${{matrix.sdk}}'
           
         - name: Install Linux dependencies
           if: runner.os == 'Linux'
