@@ -19,10 +19,10 @@ jobs:
       matrix:
         sdk:
           - l4d2
-          - l4d
+          #- l4d
         os:
           - windows-latest
-          - ubuntu-latest
+          #- ubuntu-latest
     env:
       METAMOD: ${{ github.workspace }}/metamod
       SOURCEMOD: ${{ github.workspace }}/sourcemod
