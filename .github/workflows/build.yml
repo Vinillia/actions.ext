@@ -33,13 +33,15 @@ jobs:
     steps:
         - uses: actions/checkout@v2
           with:
-            ref: '${{matrix.sdk}}-sdk'
+            ref: 'dev-v2.7'
             path: actions-ext
+            clean: 'false'
             
         - uses: actions/checkout@v2
           with:
-            ref: 'dev-v2.7'
+            ref: '${{matrix.sdk}}-sdk'
             path: actions-ext
+            clean: 'false'
             
         - name: Acquire SourceMod
           uses: actions/checkout@v2
