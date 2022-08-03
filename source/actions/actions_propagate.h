@@ -163,4 +163,4 @@ private:
 extern ActionsPropagate* g_pActionsPropagatePre;
 extern ActionsPropagate* g_pActionsPropagatePost;
 
-#endif _INCLUDE_ACTIONS_PROPAGATE_H
+#endif // _INCLUDE_ACTIONS_PROPAGATE_H
