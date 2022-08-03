@@ -21,7 +21,7 @@ jobs:
       matrix:
         sdk:
           - l4d2
-          - l4d
+          #- l4d
         os:
           - windows-latest
         #  - ubuntu-latest
@@ -33,12 +33,12 @@ jobs:
     steps:
         - uses: actions/checkout@v2
           with:
-            ref: 'dev-v2.7'
+            ref: '${{matrix.sdk}}-sdk'
             path: actions-ext
-
+            
         - uses: actions/checkout@v2
           with:
-            ref: '${{matrix.sdk}}-sdk'
+            ref: 'dev-v2.7'
             path: actions-ext
             
         - name: Acquire SourceMod
