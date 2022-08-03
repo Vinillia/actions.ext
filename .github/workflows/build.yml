@@ -23,10 +23,10 @@ jobs:
       matrix:
         sdk:
           - l4d2
-          #- l4d
+          - l4d
         os:
           - windows-latest
-          #- ubuntu-latest
+          - ubuntu-latest
     env:
       METAMOD: ${{ github.workspace }}/metamod
       SOURCEMOD: ${{ github.workspace }}/sourcemod
@@ -108,6 +108,6 @@ jobs:
         - name: Upload output files
           uses: actions/upload-artifact@v2
           with:
-            name: release-linux-${{ matrix.os }}
+            name: release-${{ matrix.os }}
             path: ${{github.workspace}}/actions-sdk/actions-ext/package/**
   
