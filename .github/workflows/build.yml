@@ -91,7 +91,17 @@ jobs:
           working-directory: actions-sdk
           if: runner.os == 'Linux'
           run: cmake --build build -j 6
-          
+        
+        - name: Copy output to package
+          working-directory: actions-sdk
+          if: runner.os == 'Linux'
+          run: cp /build/*.so /actions-ext/package/extensions/.
+
+        - name: Copy output to package
+          working-directory: actions-sdk
+          if: runner.os == 'Windows'
+          run: copy /build/Release/*.dll /actions-ext/package/extensions/.
+
         - name: Upload output files (Linux)
           if: runner.os == 'Linux'
           uses: actions/upload-artifact@v2
