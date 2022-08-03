@@ -5,9 +5,13 @@ on:
   push:
     paths:
       - source/**
+      - package/**
+      - trigger_build.txt
   pull_request:    
     paths:
       - source/**
+      - package/**
+      - trigger_build.txt
 
 env:
   BUILD_TYPE: Release
