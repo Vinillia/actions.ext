@@ -93,17 +93,16 @@ jobs:
           run: cmake --build build -j 6
         
         - name: Copy output to package
-          working-directory: actions-ext
           if: runner.os == 'Linux'
-          run: cp ${{github.workspace}}/build/*.so ${{github.workspace}}/actions-ext/package/extensions/.
+          run: cp ${{github.workspace}}/actions-ext/build/*.so ${{github.workspace}}/actions-ext/actions-ext/package/extensions/.
 
         - name: Copy output to package
           if: runner.os == 'Windows'
-          run: copy ${{github.workspace}}/build/Release/*.dll ${{github.workspace}}/actions-ext/package/extensions/.
+          run: copy ${{github.workspace}}/actions-ext/build/Release/*.dll ${{github.workspace}}/actions-ext/actions-ext/package/extensions/.
 
         - name: Upload output files
           uses: actions/upload-artifact@v2
           with:
             name: release-${{ matrix.os }}-${{ matrix.game }}
-            path: ${{github.workspace}}/actions-ext/package/**
+            path: ${{github.workspace}}/actions-ext/actions-ext/package/**
   
