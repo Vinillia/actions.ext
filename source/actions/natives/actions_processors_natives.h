@@ -160,7 +160,7 @@ cell_t NAT_ActionPriorityType(IPluginContext* pContext, const cell_t* params)
 sp_nativeinfo_t g_ActionProcessorNatives[] =
 {
 	{ "BehaviorAction.OnStart.set", 								NAT_ActionHandler<false, 'O', 'n', 'S', 't', 'a', 'r', 't'> },
-	{ "BehaviorAction.OnUpdate.set", 								NAT_ActionHandler<false, 'O', 'n', 'U', 'p', 'd', 'a', 't', 'e'> },
+	{ "BehaviorAction.OnUpdate.set", 								NAT_ActionHandler<false, 'U', 'p', 'd', 'a', 't', 'e'> },
 	{ "BehaviorAction.OnEnd.set", 									NAT_ActionHandler<false, 'O', 'n', 'E', 'n', 'd'> },
 	{ "BehaviorAction.OnSuspend.set", 								NAT_ActionHandler<false, 'O', 'n', 'S', 'u', 's', 'p', 'e', 'n', 'd'> },
 	{ "BehaviorAction.OnResume.set", 								NAT_ActionHandler<false, 'O', 'n', 'R', 'e', 's', 'u', 'm', 'e'> },
@@ -211,7 +211,7 @@ sp_nativeinfo_t g_ActionProcessorNatives[] =
 	{ "BehaviorAction.SelectMoreDangerousThreat.set", 				NAT_ActionHandler<false, 'S', 'e', 'l', 'e', 'c', 't', 'M', 'o', 'r', 'e', 'D', 'a', 'n', 'g', 'e', 'r', 'o', 'u', 's', 'T', 'h', 'r', 'e', 'a', 't'> },
 	
 	{ "BehaviorAction.OnStartPost.set", 							NAT_ActionHandler<true, 'O', 'n', 'S', 't', 'a', 'r', 't'> },
-	{ "BehaviorAction.OnUpdatePost.set", 							NAT_ActionHandler<true, 'O', 'n', 'U', 'p', 'd', 'a', 't', 'e'> },
+	{ "BehaviorAction.OnUpdatePost.set", 							NAT_ActionHandler<true, 'U', 'p', 'd', 'a', 't', 'e'> },
 	{ "BehaviorAction.OnEndPost.set", 								NAT_ActionHandler<true, 'O', 'n', 'E', 'n', 'd'> },
 	{ "BehaviorAction.OnSuspendPost.set", 							NAT_ActionHandler<true, 'O', 'n', 'S', 'u', 's', 'p', 'e', 'n', 'd'> },
 	{ "BehaviorAction.OnResumePost.set", 							NAT_ActionHandler<true, 'O', 'n', 'R', 'e', 's', 'u', 'm', 'e'> },
