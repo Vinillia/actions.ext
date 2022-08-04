@@ -8,11 +8,11 @@ endif()
 
 include("cmake/sourcemod.cmake")
 
-include_directories("actions-ext/source/actions/")
-include_directories("actions-ext/source/actions/natives")
-include_directories("actions-ext/source/actions/public")
-include_directories("actions-ext/source/")
-include_directories("actions-ext/source/public")
+include_directories("source/actions/")
+include_directories("source/actions/natives")
+include_directories("source/actions/public")
+include_directories("source/")
+include_directories("source/public")
 
 include_directories("source/actions/sdk/public")
 include_directories("source/actions/sdk")
