@@ -317,7 +317,84 @@ methodmap BehaviorAction
  	* @return				Number of bytes written?
  	*/
 	public native int GetName( char[] destination, int maxlength = ACTION_NAME_LENGTH );
-	
+
+	/**
+ 	* @brief Continue executing this action 
+ 	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action Continue();
+
+	/**
+ 	* @brief Change to new action
+ 	*
+ 	* @param action			Action to change to 
+ 	* @param reason			Reason for a changing
+	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action ChangeTo(BehaviorAction action, const char* reason = NULL_STRING);
+
+	/**
+ 	* @brief Suspend the current action for the new action 
+	*
+ 	* @param action			Action what will suspend us 
+ 	* @param reason			Reason for a suspending
+	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action SuspendFor(BehaviorAction action, const char* reason = NULL_STRING);
+
+	/**
+ 	* @brief Finish current action
+	*
+ 	* @param reason			Reason why we finished
+ 	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action Done(const char* reason = NULL_STRING);
+
+	/**
+ 	* @brief Continue executing this action 
+ 	*
+ 	* @param priority 		Priority to use this result
+	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action TryContinue(EventResultPriorityType priority = RESULT_TRY);
+
+	/**
+ 	* @brief Change to new action
+ 	*
+ 	* @param action			Action to change to 
+ 	* @param priority 		Priority to use this result
+ 	* @param reason			Reason for a changing
+	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action TryChangeTo(BehaviorAction action, EventResultPriorityType priority = RESULT_TRY, const char* reason = NULL_STRING);
+
+	/**
+ 	* @brief Suspend the current action for the new action 
+	*
+ 	* @param action			Action what will suspend us 
+ 	* @param priority 		Priority to use this result
+ 	* @param reason			Reason for a suspending
+	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action TrySuspendFor(BehaviorAction action, EventResultPriorityType priority = RESULT_TRY, const char* reason = NULL_STRING);
+
+	/**
+ 	* @brief Finish current action
+	*
+ 	* @param priority 		Priority to use this result
+ 	* @param reason			Reason why we finished
+ 	*
+	* @error				Invalid action passed
+ 	*/
+	public native Action TryDone(EventResultPriorityType priority = RESULT_TRY, const char* reason = NULL_STRING);
+
 	/**
  	* @brief Simple wrapper to get action data 
  	*
