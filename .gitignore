@@ -1,7 +1,5 @@
 .vscode/
-cmake/
 build/
-*.cmake
 *.obj
 *.recipe
 *.tlog
