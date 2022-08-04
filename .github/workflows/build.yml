@@ -20,7 +20,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        sdk:
+        game:
           - l4d2
           - l4d
         os:
@@ -34,7 +34,7 @@ jobs:
     steps:
         - uses: actions/checkout@v2
           with:
-            ref: '${{matrix.sdk}}-sdk'
+            ref: '${{matrix.game}}'
             path: actions-ext
             
         - name: Acquire SourceMod
@@ -57,7 +57,7 @@ jobs:
           with:
               repository: alliedmodders/hl2sdk
               path: 'gamesdk'
-              ref: '${{matrix.sdk}}'
+              ref: '${{matrix.game}}'
           
         - name: Install Linux dependencies
           if: runner.os == 'Linux'
@@ -104,6 +104,6 @@ jobs:
         - name: Upload output files
           uses: actions/upload-artifact@v2
           with:
-            name: release-${{ matrix.os }}-${{ matrix.sdk }}
+            name: release-${{ matrix.os }}-${{ matrix.game }}
             path: ${{github.workspace}}/actions-ext/package/**
   
