@@ -94,15 +94,17 @@ jobs:
         
         - name: Copy output to package
           if: runner.os == 'Linux'
-          run: cp ${{github.workspace}}/actions-ext/build/*.so ${{github.workspace}}/actions-ext/actions-ext/package/extensions/.
+          working-directory: actions-ext
+          run: cp ${{github.workspace}}/actions-ext/build/*.so ${{github.workspace}}/actions-ext/package/extensions/.
 
         - name: Copy output to package
           if: runner.os == 'Windows'
-          run: copy ${{github.workspace}}/actions-ext/build/Release/*.dll ${{github.workspace}}/actions-ext/actions-ext/package/extensions/.
+          working-directory: actions-ext
+          run: copy ${{github.workspace}}/actions-ext/build/Release/*.dll ${{github.workspace}}/actions-ext/package/extensions/.
 
         - name: Upload output files
           uses: actions/upload-artifact@v2
           with:
             name: release-${{ matrix.os }}-${{ matrix.game }}
-            path: ${{github.workspace}}/actions-ext/actions-ext/package/**
+            path: ${{github.workspace}}/actions-ext/package/**
   
