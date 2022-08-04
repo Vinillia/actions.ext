@@ -333,7 +333,7 @@ methodmap BehaviorAction
 	*
 	* @error				Invalid action passed
  	*/
-	public native Action ChangeTo(BehaviorAction action, const char* reason = NULL_STRING);
+	public native Action ChangeTo(BehaviorAction action, const char[] reason = NULL_STRING);
 
 	/**
  	* @brief Suspend the current action for the new action 
@@ -343,7 +343,7 @@ methodmap BehaviorAction
 	*
 	* @error				Invalid action passed
  	*/
-	public native Action SuspendFor(BehaviorAction action, const char* reason = NULL_STRING);
+	public native Action SuspendFor(BehaviorAction action, const char[] reason = NULL_STRING);
 
 	/**
  	* @brief Finish current action
@@ -352,7 +352,7 @@ methodmap BehaviorAction
  	*
 	* @error				Invalid action passed
  	*/
-	public native Action Done(const char* reason = NULL_STRING);
+	public native Action Done(const char[] reason = NULL_STRING);
 
 	/**
  	* @brief Continue executing this action 
@@ -372,7 +372,7 @@ methodmap BehaviorAction
 	*
 	* @error				Invalid action passed
  	*/
-	public native Action TryChangeTo(BehaviorAction action, EventResultPriorityType priority = RESULT_TRY, const char* reason = NULL_STRING);
+	public native Action TryChangeTo(BehaviorAction action, EventResultPriorityType priority = RESULT_TRY, const char[] reason = NULL_STRING);
 
 	/**
  	* @brief Suspend the current action for the new action 
@@ -383,17 +383,17 @@ methodmap BehaviorAction
 	*
 	* @error				Invalid action passed
  	*/
-	public native Action TrySuspendFor(BehaviorAction action, EventResultPriorityType priority = RESULT_TRY, const char* reason = NULL_STRING);
+	public native Action TrySuspendFor(BehaviorAction action, EventResultPriorityType priority = RESULT_TRY, const char[] reason = NULL_STRING);
 
 	/**
- 	* @brief Finish current action
+ 	* @brief Finish current action 
 	*
  	* @param priority 		Priority to use this result
  	* @param reason			Reason why we finished
  	*
 	* @error				Invalid action passed
  	*/
-	public native Action TryDone(EventResultPriorityType priority = RESULT_TRY, const char* reason = NULL_STRING);
+	public native Action TryDone(EventResultPriorityType priority = RESULT_TRY, const char[] reason = NULL_STRING);
 
 	/**
  	* @brief Simple wrapper to get action data 
