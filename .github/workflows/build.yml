@@ -6,10 +6,8 @@ on:
       - source/**
       - package/**
       - trigger_build.txt
-  pull_request:    
+  pull_request:
     paths:
-      - source/**
-      - package/**
       - trigger_build.txt
 
 env:
