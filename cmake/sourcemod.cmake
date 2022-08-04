@@ -32,15 +32,15 @@ function(add_extension ext_name engine)
         message(FATAL_ERROR "Missing arguments for add_extension")
     endif()
 	
-	add_library(${ext_name} SHARED ${ARGN} "${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/public/extension.cpp")
+	add_library(${ext_name} SHARED ${ARGN} "${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp")
 	target_compile_definitions(${ext_name} PUBLIC SOURCE_ENGINE=${engine})
 
 	target_sources(${ext_name} PUBLIC
-	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/public/extension.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/public/offset_manager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_propagate.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_manager.cpp
-	${CMAKE_CURRENT_SOURCE_DIR}/actions-ext/source/actions/public/actions_helpers.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/public/extension.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/public/offset_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_propagate.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_manager.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/public/actions_helpers.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/sdk/public/actions_cquery.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/source/actions/sdk/public/actions_processor.cpp
 	${SM_PATH}/public/smsdk_ext.cpp)
