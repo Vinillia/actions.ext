@@ -35,12 +35,7 @@ jobs:
         - uses: actions/checkout@v2
           with:
             ref: '${{matrix.sdk}}-sdk'
-            path: actions-sdk
-            
-        - uses: actions/checkout@v2
-          with:
-            ref: 'dev-v2.7'
-            path: actions-sdk/actions-ext
+            path: actions-ext
             
         - name: Acquire SourceMod
           uses: actions/checkout@v2
@@ -78,37 +73,37 @@ jobs:
           run: cmake -E make_directory ${{github.workspace}}/build
           
         - name: Configure CMake (Windows)
-          working-directory: actions-sdk
+          working-directory: actions-ext
           if: runner.os == 'Windows'
           run: cmake -S . -B build -A Win32 --no-warn-unused-cli
               
         - name: Configure CMake (Linux)
-          working-directory: actions-sdk
+          working-directory: actions-ext
           if: runner.os == 'Linux'
           run: cmake -S . -B build --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=${{env.BUILD_TYPE}} -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang
               
         - name: Build (Windows)
-          working-directory: actions-sdk
+          working-directory: actions-ext
           if: runner.os == 'Windows'
           run: cmake --build build --config ${{env.BUILD_TYPE}} -j 6
            
         - name: Build (Linux)
-          working-directory: actions-sdk
+          working-directory: actions-ext
           if: runner.os == 'Linux'
           run: cmake --build build -j 6
         
         - name: Copy output to package
-          working-directory: actions-sdk
+          working-directory: actions-ext
           if: runner.os == 'Linux'
-          run: cp ${{github.workspace}}/actions-sdk/build/*.so ${{github.workspace}}/actions-sdk/actions-ext/package/extensions/.
+          run: cp ${{github.workspace}}/build/*.so ${{github.workspace}}/actions-ext/package/extensions/.
 
         - name: Copy output to package
           if: runner.os == 'Windows'
-          run: copy ${{github.workspace}}/actions-sdk/build/Release/*.dll ${{github.workspace}}/actions-sdk/actions-ext/package/extensions/.
+          run: copy ${{github.workspace}}/build/Release/*.dll ${{github.workspace}}/actions-ext/package/extensions/.
 
         - name: Upload output files
           uses: actions/upload-artifact@v2
           with:
             name: release-${{ matrix.os }}-${{ matrix.sdk }}
-            path: ${{github.workspace}}/actions-sdk/actions-ext/package/**
+            path: ${{github.workspace}}/actions-ext/package/**
   
