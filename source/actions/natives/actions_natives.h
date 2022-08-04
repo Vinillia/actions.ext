@@ -231,6 +231,222 @@ cell_t NAT_GetEntityAction(IPluginContext* pContext, const cell_t* params)
 	return 0;
 }
 
+cell_t NAT_BehaviorActionContinue(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	ActionResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());
+
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	result->m_type = CONTINUE;
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionChangeTo(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	ActionResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());	
+	
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[3], &reason);
+
+	result->m_type = CHANGE_TO;
+	result->m_action = (Action<void>*)(params[2]);
+	result->m_reason = reason;
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionSuspendFor(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	ActionResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());	
+
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[3], &reason);
+
+	result->m_type = SUSPEND_FOR;
+	result->m_action = (Action<void>*)(params[2]);
+	result->m_reason = reason;
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionDone(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	ActionResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());
+
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[2], &reason);
+
+	result->m_type = DONE;
+	result->m_reason = reason;
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionTryContinue(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	EventDesiredResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());
+
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	result->m_type = CONTINUE;
+	result->m_priority = (EventResultPriorityType)params[2];
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionTryChangeTo(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	EventDesiredResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());	
+	
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[4], &reason);
+
+	result->m_type = CHANGE_TO;
+	result->m_action = (Action<void>*)(params[2]);
+	result->m_reason = reason;
+	result->m_priority = (EventResultPriorityType)params[3];
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionTrySuspendFor(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	EventDesiredResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());	
+
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[4], &reason);
+
+	result->m_type = SUSPEND_FOR;
+	result->m_action = (Action<void>*)(params[2]);
+	result->m_reason = reason;
+	result->m_priority = (EventResultPriorityType)params[3];
+
+	return Pl_Changed;
+}
+
+cell_t NAT_BehaviorActionTryDone(IPluginContext* pContext, const cell_t* params)
+{
+	Action<void>* action = (Action<void>*)params[1];
+
+	if (!g_pActionsManager->IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	EventDesiredResult<void>* const result = static_cast<decltype(result)>(g_pActionsManager->GetRuntimeResult());
+
+	if (result == NULL)
+	{
+		pContext->ReportError("You are not in callback");
+		return 0;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[3], &reason);
+
+	result->m_type = DONE;
+	result->m_reason = reason;
+	result->m_priority = (EventResultPriorityType)params[2];
+
+	return Pl_Changed;
+}
+
 sp_nativeinfo_t g_ActionNatives[] =
 {
 	{ "ActionsManager.Allocate", NAT_ActionsAllocate },
@@ -240,6 +456,15 @@ sp_nativeinfo_t g_ActionNatives[] =
 
 	{ "BehaviorAction.StorePendingEventResult", NAT_StorePendingEventResult },
 	{ "BehaviorAction.GetName", NAT_GetActionName },
+
+	{ "BehaviorAction.Continue", NAT_BehaviorActionContinue },
+	{ "BehaviorAction.ChangeTo", NAT_BehaviorActionChangeTo },
+	{ "BehaviorAction.SuspendFor", NAT_BehaviorActionSuspendFor },
+	{ "BehaviorAction.Done", NAT_BehaviorActionDone },
+	{ "BehaviorAction.TryContinue", NAT_BehaviorActionTryContinue },
+	{ "BehaviorAction.TryChangeTo", NAT_BehaviorActionTryChangeTo },
+	{ "BehaviorAction.TrySuspendFor", NAT_BehaviorActionTrySuspendFor },
+	{ "BehaviorAction.TryDone", NAT_BehaviorActionTryDone },
 
 	{ "BehaviorAction.Parent.get", NAT_GetActionParent },
 	{ "BehaviorAction.Child.get", NAT_GetActionChild },
