@@ -8,3 +8,4 @@ elysian
 realm
 wish
 glory to mankind
+200 ping
