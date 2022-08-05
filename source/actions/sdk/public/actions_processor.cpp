@@ -117,10 +117,6 @@ void ActionProcessor::StartProcessors()
 	START_PROCESSOR(OnCommandPause, commandPause);
 	START_PROCESSOR(OnCommandResume, commandResume);
 	START_PROCESSOR(IsAbleToBlockMovementOf, abletoBlock);
-	START_PROCESSOR(OnCommandAssault, commandAssault);
-	START_PROCESSOR(OnEnteredSpit, enteredSpit);
-	START_PROCESSOR(OnHitByVomitJar, hitVomitjar);
-	START_PROCESSOR(OnCommandString, commandString);
 }
 
 const bool ActionProcessor::ConfigureHooks()
@@ -165,10 +161,6 @@ const bool ActionProcessor::ConfigureHooks()
 	RECONFIGURE_MANUALHOOK(OnCommandRetreat);
 	RECONFIGURE_MANUALHOOK(OnCommandPause);
 	RECONFIGURE_MANUALHOOK(OnCommandResume);
-	RECONFIGURE_MANUALHOOK(OnEnteredSpit);
-	RECONFIGURE_MANUALHOOK(OnHitByVomitJar);
-	RECONFIGURE_MANUALHOOK(OnCommandAssault);
-	RECONFIGURE_MANUALHOOK(OnCommandString);
 	RECONFIGURE_MANUALHOOK(IsAbleToBlockMovementOf);
 	RECONFIGURE_MANUALHOOK(OnCommandApproachEntity);
 
