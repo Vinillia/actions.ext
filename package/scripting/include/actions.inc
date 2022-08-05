@@ -1046,6 +1046,16 @@ public void __ext_actions_SetNTVOptional()
 	MarkNativeAsOptional("ActionsManager.Deallocate");
 	MarkNativeAsOptional("ActionsManager.Iterator");
 	MarkNativeAsOptional("ActionsManager.GetAction");
+
+	MarkNativeAsOptional("BehaviorAction.Continue");
+	MarkNativeAsOptional("BehaviorAction.ChangeTo");
+	MarkNativeAsOptional("BehaviorAction.SuspendFor");
+	MarkNativeAsOptional("BehaviorAction.Done");
+	MarkNativeAsOptional("BehaviorAction.TryContinue");
+	MarkNativeAsOptional("BehaviorAction.TryChangeTo");
+	MarkNativeAsOptional("BehaviorAction.TrySuspendFor");
+	MarkNativeAsOptional("BehaviorAction.TryDone");
+	
 	MarkNativeAsOptional("BehaviorAction.StorePendingEventResult");
 	MarkNativeAsOptional("BehaviorAction.GetName");
 	MarkNativeAsOptional("BehaviorAction.Parent.get");
