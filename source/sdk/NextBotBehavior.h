@@ -549,8 +549,8 @@ public:
 	virtual EventDesiredResult< Actor > OnDrop(Actor* me, CBaseEntity* item) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnShoved(Actor* me, CBaseEntity* pusher) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnBlinded(Actor* me, CBaseEntity* blinder) { return TryContinue(); }
-	virtual EventDesiredResult< Actor > OnHitByVomitJar(Actor* me, CBaseEntity* owner) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnEnteredSpit(Actor* me) { return TryContinue(); }
+	virtual EventDesiredResult< Actor > OnHitByVomitJar(Actor* me, CBaseEntity* owner) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandAttack(Actor* me, CBaseEntity* victim) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandAssault(Actor* me) { return TryContinue(); }
 	virtual EventDesiredResult< Actor > OnCommandApproach(Actor* me, const Vector& pos, float range) { return TryContinue(); }
