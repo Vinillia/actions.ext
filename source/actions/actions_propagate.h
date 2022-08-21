@@ -56,19 +56,19 @@ public:
 
 		for (auto listener : callbacks)
 		{
-			if constexpr (std::is_same<type, float>::value)
+			if constexpr (std::is_same_v<type, float>)
 			{
 				listener->PushFloat((float)arg);
 			}
-			else if constexpr (std::is_same<type, char*>::value)
+			else if constexpr (std::is_same_v<type, char*> || std::is_same_v<type, const char*>)
 			{
 				listener->PushString((char*)arg);
 			}
-			else if constexpr (std::is_same<type, Vector>::value)
+			else if constexpr (std::is_same_v<type, Vector>)
 			{
 				listener->PushArray((cell_t*)&arg, sizeof(Vector));
 			}
-			else if constexpr (std::is_same<type, CBaseEntity*>::value)
+			else if constexpr (std::is_same_v<type, CBaseEntity*>)
 			{
 				cell_t entity = -1;
 
@@ -77,7 +77,7 @@ public:
 
 				listener->PushCell(entity);
 			}
-			else if constexpr (std::is_same<type, int>::value || std::is_pointer<T>::value || std::is_enum<T>::value)
+			else if constexpr (std::is_same_v<type, int> || std::is_pointer_v<T> || std::is_enum_v<T>)
 			{
 				listener->PushCell((cell_t)arg);
 			}
@@ -86,13 +86,11 @@ public:
 				/* TO DO: */ 
 				/* EDIT: TO DO WHAT? */
 				listener->PushCell((cell_t)arg);
-				//typedef typename T::something_made_up X;
-				//bool x = decltype(arg)::nothing; 
 				//static_assert(false);
 			}
 		}
 	}
-
+	
 	template<typename returnType, typename ...Args>
 	ResultType ProcessHandler(int32_t vtableidx, Action* action, returnType* result, Args&&... args)
 	{
