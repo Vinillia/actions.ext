@@ -317,6 +317,7 @@ methodmap BehaviorAction
  	* @return				Number of bytes written?
  	*/
 	public native int GetName( char[] destination, int maxlength = ACTION_NAME_LENGTH );
+
 	/**
  	* @brief Continue executing this action 
  	*

@@ -65,6 +65,10 @@ protected:
 	DEFINE_PROCESSOR(46, commandPause, EventDesiredResult<void>, CBaseEntity*, float);
 	DEFINE_PROCESSOR(47, commandResume, EventDesiredResult<void>, CBaseEntity*);
 	DEFINE_PROCESSOR(48, abletoBlock, bool, const INextBot*);
+	DEFINE_PROCESSOR(49, enteredSpit, EventDesiredResult<void>, CBaseEntity*);
+	DEFINE_PROCESSOR(50, hitVomitjar, EventDesiredResult<void>, CBaseEntity*, CBaseEntity*);
+	DEFINE_PROCESSOR(51, commandAssault, EventDesiredResult<void>, CBaseEntity*);
+	DEFINE_PROCESSOR(52, commandString, EventDesiredResult<void>, CBaseEntity*, const char*);
 };
 
 #endif // _INCLUDE_ACTIONS_PROCS_H

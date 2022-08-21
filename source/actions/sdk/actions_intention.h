@@ -60,4 +60,7 @@ void CreateHooks()
 	HookIntention("InfectedIntention::Reset");
 	HookIntention("WitchIntention::Reset");
 	HookIntention("SmokerIntention::Reset");
+	HookIntention("ChargerIntention::Reset");
+	HookIntention("JockeyIntention::Reset");
+	HookIntention("SpitterIntention::Reset");
 }

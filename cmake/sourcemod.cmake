@@ -5,8 +5,8 @@ set(MM_PATH $ENV{METAMOD})
 set(SM_PATH $ENV{SOURCEMOD})
 
 if ("${SDK_PATH}" STREQUAL "")
-	message("Failed to get SDK, use L4D1SDK instead...")
-	set(SDK_PATH $ENV{L4D1SDK})
+	message("Failed to get SDK, use L4D2SDK instead...")
+	set(SDK_PATH $ENV{L4D2SDK})
 endif()
 
 include_directories("${SDK_PATH}/public")
@@ -94,8 +94,8 @@ function(add_extension ext_name engine)
 		${SDK_PATH}/lib/linux/tier1_i486.a
 		${SDK_PATH}/lib/linux/tier2_i486.a
 		${SDK_PATH}/lib/linux/tier3_i486.a
-		${SDK_PATH}/lib/linux/libtier0.so
-		${SDK_PATH}/lib/linux/libvstdlib.so)
+		${SDK_PATH}/lib/linux/libtier0_srv.so
+		${SDK_PATH}/lib/linux/libvstdlib_srv.so)
 
 		#target_compile_options(${ext_name} PUBLIC -static-libstdc++ -stdlib=libstdc++)
         target_link_options(${ext_name} PUBLIC -static-libstdc++ -static-libgcc)

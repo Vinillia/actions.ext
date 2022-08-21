@@ -48,6 +48,8 @@ public:
 	// these methods are used by derived classes to define how events propagate
 	virtual INextBotEventResponder* FirstContainedResponder(void) const { return 0; }
 	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const { return 0; }
+
+	virtual const char* GetDebugString() const { return ""; }
 	//
 	// Events.  All events must be 'extended' by calling the derived class explicitly to ensure propagation.
 	// Each event must implement its propagation in this interface class.
@@ -88,15 +90,44 @@ public:
 
 	virtual void OnShoved(CBaseEntity* pusher);									// when something is removed from our inventory
 	virtual void OnBlinded(CBaseEntity* blinder);									// when something is removed from our inventory
+	virtual void OnEnteredSpit();									
+	virtual void OnHitByVomitJar(CBaseEntity* shover);								
 
 	virtual void OnCommandAttack(CBaseEntity* victim);	// attack the given entity
+	virtual void OnCommandAssault(void);	
 
 	virtual void OnCommandApproach(const Vector& pos, float range = 0.0f);	// move to within range of the given position
 	virtual void OnCommandApproach(CBaseEntity* goal);	// follow the given leader
 	virtual void OnCommandRetreat(CBaseEntity* threat, float range = 0.0f);	// retreat from the threat at least range units away (0 == infinite)
 	virtual void OnCommandPause(float duration = 0.0f);	// pause for the given duration (0 == forever)
 	virtual void OnCommandResume(void);					// resume after a pause
+
+	virtual void OnCommandString(const char* command);	// for debugging: respond to an arbitrary string representing a generalized command
 };
+
+inline void INextBotEventResponder::OnCommandAssault()
+{
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		sub->OnCommandAssault();
+	}
+}
+
+inline void INextBotEventResponder::OnEnteredSpit()
+{
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		sub->OnEnteredSpit();
+	}
+}
+
+inline void INextBotEventResponder::OnHitByVomitJar(CBaseEntity* shover)
+{
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		sub->OnHitByVomitJar(shover);
+	}
+}
 
 inline void INextBotEventResponder::OnThreatChanged(CBaseEntity* subject)
 {
@@ -351,6 +382,14 @@ inline void INextBotEventResponder::OnCommandResume(void)
 	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
 	{
 		sub->OnCommandResume();
+	}
+}
+
+inline void INextBotEventResponder::OnCommandString(const char* command)
+{
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		sub->OnCommandString(command);
 	}
 }
 
