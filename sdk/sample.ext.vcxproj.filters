@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="actions">
+      <UniqueIdentifier>{8b2e62a8-c7eb-44a2-b912-6a626e50ae87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sourcemod">
+      <UniqueIdentifier>{ed27aef6-1695-40bd-bb33-8f1c5e4681c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sourcemod\libudis">
+      <UniqueIdentifier>{1853f7b1-28e5-42e2-bae6-e51ba55f93f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sourcemod\CDetour">
+      <UniqueIdentifier>{e88312d0-39f8-44ac-b5fa-42cc35bf0ad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sourcemod\asm">
+      <UniqueIdentifier>{971709e4-48a0-4a4c-8b49-8d07348b7403}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk">
+      <UniqueIdentifier>{9458bb1a-0287-47c7-b53c-309e1c6e5c4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="actions\hook">
+      <UniqueIdentifier>{3faf186c-8c07-4151-b922-5341af33a4d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\nextbot">
+      <UniqueIdentifier>{a6119976-044c-422a-b079-d849729648f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="actions\natives">
+      <UniqueIdentifier>{f66e72c5-6710-4c8a-a153-283cd551a90c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\extension.cpp">
+      <Filter>sourcemod</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\smsdk_ext.cpp">
+      <Filter>sourcemod</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\asm\asm.c">
+      <Filter>sourcemod\asm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\decode.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\itab.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-att.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-intel.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\udis86.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\CDetour\detours.cpp">
+      <Filter>sourcemod\CDetour</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_manager.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_processor.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\hook.cpp">
+      <Filter>actions\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_propagation.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_pubvars.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\NextBotInterface.cpp">
+      <Filter>sdk\nextbot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_component.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\NextBotComponentInterface.cpp">
+      <Filter>sdk\nextbot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\NextBotManager.cpp">
+      <Filter>sdk\nextbot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_custom_legacy.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\extension.h">
+      <Filter>sourcemod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\smsdk_config.h">
+      <Filter>sourcemod</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actionsdefs.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_manager.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_processor.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\hook.h">
+      <Filter>actions\hook</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotBehavior.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotComponentInterface.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotContextualQueryInterface.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotDebug.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotEventResponderInterface.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotIntentionInterface.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotInterface.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\NextBotManager.h">
+      <Filter>sdk\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_propagation.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_pubvars.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_natives.h">
+      <Filter>actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_legacy.h">
+      <Filter>actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_legacy_listeners.h">
+      <Filter>actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_vtableswap.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_custom_legacy.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_commands.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_component.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
