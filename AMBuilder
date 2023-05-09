@@ -1,0 +1,65 @@
+# vim: set sts=2 ts=8 sw=2 tw=99 et ft=python:
+import os, sys
+
+projectName = 'actions'
+
+# smsdk_ext.cpp will be automatically added later
+sourceFiles = [
+  'source/actions_custom_legacy.cpp',
+  'source/actions_component.cpp',
+  'source/actions_manager.cpp',
+  'source/actions_processor.cpp',
+  'source/actions_propagation.cpp',
+  'source/actions_pubvars.cpp',
+  'source/hook.cpp',
+  'source/extension.cpp',
+  'source/sdk/NextBotComponentInterface.cpp',
+  'source/sdk/NextBotInterface.cpp',
+  'source/sdk/NextBotManager.cpp',
+  os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c'),
+  os.path.join(Extension.sm_root, 'public', 'CDetour', 'detours.cpp'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'decode.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'itab.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-att.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-intel.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn.c'),
+  os.path.join(Extension.sm_root, 'public', 'libudis86', 'udis86.c'),
+]
+
+includeFiles = [
+  os.path.join(builder.sourcePath, 'source', 'sdk'),
+  os.path.join(builder.sourcePath, 'source'),
+]
+
+###############
+# Make sure to edit PackageScript, which copies your files to their appropriate locations
+# Simple extensions do not need to modify past this point.
+
+project = Extension.HL2Project(builder, projectName + '.ext')
+
+if os.path.isfile(os.path.join(builder.currentSourcePath, 'sdk', 'smsdk_ext.cpp')):
+  # Use the copy included in the project
+  project.sources += [os.path.join('sdk', 'smsdk_ext.cpp')]
+else:
+  # Use the copy included with SM 1.6 and newer
+  project.sources += [os.path.join(Extension.sm_root, 'public', 'smsdk_ext.cpp')]
+
+project.sources += sourceFiles
+
+for sdk_name in Extension.sdks:
+  sdk = Extension.sdks[sdk_name]
+  
+  binary = Extension.HL2Config(project, projectName + '.ext.' + sdk.ext, sdk)
+  compiler = binary.compiler
+  compiler.cxxincludes += includeFiles
+  
+  if compiler.vendor == 'msvc':
+    compiler.defines += [ '_CRT_NO_VA_START_VALIDATION' ]
+    compiler.cxxflags.append('/std:c++17')
+    compiler.linkflags.append('legacy_stdio_definitions.lib')
+  elif compiler.vendor == 'clang':
+    compiler.cxxflags += [ '-Wno-reinterpret-base-class', '-Wno-infinite-recursion', '-Wno-implicit-const-int-float-conversion', '-std=c++17', '-Wno-register', '-Wno-varargs', '-fexceptions' ]
+    compiler.defines += [ 'HAVE_STRING_H', '_GLIBCXX_USE_CXX11_ABI=0' ]
+    compiler.linkflags += [ '-static-libstdc++' ]
+	
+Extension.extensions = builder.Add(project)
