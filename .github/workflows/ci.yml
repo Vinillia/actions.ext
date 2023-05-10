@@ -1,0 +1,89 @@
+name: build-project
+
+on:
+  push:
+    paths:
+      - pushbuild.txt
+  pull_request:
+    paths:
+      - pushbuild.txt
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        game:
+          - l4d2
+
+        os:
+          - windows-latest
+          - ubuntu-latest
+
+    steps:
+        - uses: actions/checkout@v3
+          with:
+            ref: 'l4d2-3.0'
+            path: actions-ext
+            
+        - name: Acquire SourceMod
+          uses: actions/checkout@v3
+          with:
+              repository: alliedmodders/sourcemod
+              submodules: recursive
+              path: 'sourcemod'
+              ref: '1.11-dev'
+          
+        - name: Acquire MetaMod:Source
+          uses: actions/checkout@v3
+          with:
+              repository: alliedmodders/metamod-source
+              path: 'metamod'
+              ref: '1.11-dev'
+        
+        - name: Acquire SDK
+          uses: actions/checkout@v3
+          with:
+              repository: alliedmodders/hl2sdk
+              path: 'gamesdk'
+              ref: '${{matrix.game}}'
+          
+        - name: Install Linux dependencies
+          if: runner.os == 'Linux'
+          run: |
+            sudo dpkg --add-architecture i386
+            sudo apt-get update
+            sudo apt-get install -y --install-recommends \
+            gcc-multilib g++-multilib libstdc++6 lib32stdc++6 \
+            libc6-dev libc6-dev-i386 linux-libc-dev \
+            linux-libc-dev:i386 lib32z1-dev clang
+           
+        - name: Select clang compiler
+          if: startsWith(runner.os, 'Linux')
+          run: |
+            echo "CC=clang" >> $GITHUB_ENV
+            echo "CXX=clang++" >> $GITHUB_ENV
+
+        - name: Prepare Python
+          uses: actions/setup-python@v2
+    
+        - name: Install AMBuild
+          run: |
+            python -m pip install wheel
+            pip install git+https://github.com/alliedmodders/ambuild
+
+        - name: Compile extension
+          working-directory: actions-ext
+          run: |
+            mkdir build
+            cd build
+            python ../configure.py --enable-optimize --sdks=l4d2 --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/metamod"
+            ambuild
+              
+        - name: Archive package (Linux)
+          if: runner.os == 'Linux'
+          uses: actions/upload-artifact@v2
+          with:
+              name: actions-${{ matrix.os }}
+              path: actions-ext/build/package
+  
