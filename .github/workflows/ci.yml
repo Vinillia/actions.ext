@@ -48,7 +48,6 @@ jobs:
               path: 'hl2sdk-${{ matrix.game }}'
               ref: '${{ matrix.game }}'
 
-        - uses: actions/checkout@v2
         - name: Set HL2SDKL4D2
           run: echo "HL2SDKL4D2=${{ github.workspace }}/hl2sdk-${{ matrix.game }}" >> $GITHUB_ENV
 
