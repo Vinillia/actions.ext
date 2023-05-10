@@ -75,6 +75,9 @@ jobs:
             python -m pip install wheel
             pip install git+https://github.com/alliedmodders/ambuild
 
+        - uses: ilammy/msvc-dev-cmd@v1
+          with:
+           arch: 'x86'
         - name: Compile extension
           working-directory: actions-ext
           run: |
