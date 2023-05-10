@@ -67,6 +67,20 @@ jobs:
             echo "CC=clang" >> $GITHUB_ENV
             echo "CXX=clang++" >> $GITHUB_ENV
 
+        - name: Find Visual C++ compilers and make all environment variables global (W)
+          if: runner.os == 'Windows'
+          shell: cmd
+          run: |
+              :: See https://github.com/microsoft/vswhere/wiki/Find-VC
+              for /f "usebackq delims=*" %%i in (`vswhere -latest -property installationPath`) do (
+                call "%%i"\Common7\Tools\vsdevcmd.bat -arch=x86 -host_arch=x64
+              )
+    
+              :: Loop over all environment variables and make them global.
+              for /f "delims== tokens=1,2" %%a in ('set') do (
+                echo>>"%GITHUB_ENV%" %%a=%%b
+              )
+
         - name: Prepare Python
           uses: actions/setup-python@v2
     
@@ -75,9 +89,6 @@ jobs:
             python -m pip install wheel
             pip install git+https://github.com/alliedmodders/ambuild
 
-        - uses: ilammy/msvc-dev-cmd@v1
-          with:
-           arch: 'x86'
         - name: Compile extension
           working-directory: actions-ext
           run: |
