@@ -45,8 +45,8 @@ jobs:
           uses: actions/checkout@v3
           with:
               repository: alliedmodders/hl2sdk
-              path: 'gamesdk'
-              ref: '${{matrix.game}}'
+              path: 'hl2sdk-${{ matrix.game }}'
+              ref: '${{ matrix.game }}'
           
         - name: Install Linux dependencies
           if: runner.os == 'Linux'
@@ -77,11 +77,10 @@ jobs:
           run: |
             mkdir build
             cd build
-            python ../configure.py --enable-optimize --sdks=l4d2 --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/metamod"
+            python ../configure.py --enable-optimize --sdks=l4d2 --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/metamod --mms-path="${{ github.workspace }}/hl2sdk-${{ matrix.game }}"
             ambuild
               
-        - name: Archive package (Linux)
-          if: runner.os == 'Linux'
+        - name: Archive package
           uses: actions/upload-artifact@v2
           with:
               name: actions-${{ matrix.os }}
