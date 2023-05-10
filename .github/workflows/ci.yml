@@ -77,7 +77,7 @@ jobs:
           run: |
             mkdir build
             cd build
-            python ../configure.py --enable-optimize --sdks=l4d2 --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/metamod --mms-path="${{ github.workspace }}/hl2sdk-${{ matrix.game }}"
+            python ../configure.py --enable-optimize --sdks=l4d2 --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/metamod" --hl2sdk-root="${{ github.workspace }}/hl2sdk-${{ matrix.game }}"
             ambuild
               
         - name: Archive package
