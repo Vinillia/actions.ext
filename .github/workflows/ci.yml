@@ -102,5 +102,5 @@ jobs:
           uses: actions/upload-artifact@v2
           with:
               name: actions-${{ matrix.os }}
-              path: actions-ext/build/
+              path: actions-ext/
   

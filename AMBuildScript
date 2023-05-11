@@ -226,11 +226,12 @@ class ExtensionConfig(object):
     ]
     cxx.cflags += [
       '/W3',
+      '/P',
     ]
     cxx.cxxflags += [
       '/EHsc',
       '/TP',
-      '/P'
+      '/P',
     ]
     cxx.linkflags += [
       '/MACHINE:X86',
