@@ -98,8 +98,9 @@ jobs:
             ambuild
               
         - name: Archive package
+          if: always()
           uses: actions/upload-artifact@v2
           with:
               name: actions-${{ matrix.os }}
-              path: actions-ext/build/package
+              path: actions-ext/build/
   

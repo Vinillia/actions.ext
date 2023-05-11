@@ -230,6 +230,7 @@ class ExtensionConfig(object):
     cxx.cxxflags += [
       '/EHsc',
       '/TP',
+      '/P'
     ]
     cxx.linkflags += [
       '/MACHINE:X86',
