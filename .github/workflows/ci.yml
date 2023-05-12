@@ -94,6 +94,7 @@ jobs:
           with:
               arch: 'x86'
               vsversion: '2022'
+              toolset: '15'
         - name: Compile extension
           working-directory: actions-ext
           run: |
