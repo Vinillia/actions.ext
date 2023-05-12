@@ -85,7 +85,7 @@ jobs:
 
         - uses: TheMrMilchmann/setup-msvc-dev@v2
           with:
-            arch: x85
+            arch: x86
         - name: Archive package
           uses: actions/upload-artifact@v3
           with:
