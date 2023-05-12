@@ -58,8 +58,7 @@ namespace compile
 	template<const std::string_view&... strs>
 	struct concat_t
 	{
-		// https://stackoverflow.com/questions/38955940/how-to-concatenate-static-strings-at-compile-time
-		static constexpr auto impl() noexcept
+		static constexpr auto _concat() noexcept
 		{
 			constexpr std::size_t len = (strs.size() + ... + 0);
 			std::array<char, len + 1> arr{};
@@ -72,9 +71,7 @@ namespace compile
 			return arr;
 		}
 
-		// Give the joined string static storage
-		static constexpr auto arr = impl();
-		// View as a std::string_view
+		static constexpr auto arr = _concat();
 		static constexpr std::string_view value{ arr.data(), arr.size() - 1 };
 	};
 
