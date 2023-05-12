@@ -37,6 +37,11 @@ enum BehaviorAction
 	INVALID_ACTION
 };
 
+enum ActionComponent
+{
+	INVALID_COMPONENT
+};
+
 methodmap ActionResult
 {
 	/**
@@ -115,6 +120,9 @@ methodmap ActionDesiredResult < ActionResult
  * @noreturn
  */
 typedef ActionsIteratorCallback = function void (BehaviorAction action);
+
+typedef ActionComponentInitialAction = function BehaviorAction(ActionComponent component, int entity);
+typedef ActionComponentFn = function void(ActionComponent component, int entity);
 
 /**
  * @brief Called whenever action is created
@@ -240,6 +248,32 @@ methodmap ActionsManager
  	* @noreturn	
  	*/
 	public static native void SetActionUserDataIdentity(BehaviorAction action, const char[] key, any data);
+
+
+	public static native ActionComponent CreateComponent(int entity, ActionComponentInitialAction fnInitialAction = INVALID_FUNCTION, ActionComponentFn fnUpdate = INVALID_FUNCTION, ActionComponentFn fnUpkeep = INVALID_FUNCTION, ActionComponentFn fnReset = INVALID_FUNCTION, const char[] name = NULL_STRING);
+}
+
+methodmap ActionComponent
+{
+	public ActionComponent(any component)
+	{
+		return view_as<ActionComponent>(component);
+	}
+
+	property ActionComponentFn Update
+	{
+		public native set(ActionComponentFn fn);
+	}
+
+	property ActionComponentFn Upkeep
+	{
+		public native set(ActionComponentFn fn);
+	}
+
+	property ActionComponentFn Reset
+	{
+		public native set(ActionComponentFn fn);
+	}
 }
 
 methodmap BehaviorAction < BehaviorActionListeners
