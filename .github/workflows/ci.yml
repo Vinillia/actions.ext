@@ -79,6 +79,7 @@ jobs:
           with:
             arch: 'x86'
             vsversion: '2022'
+            toolset: '17.5.33306.270'
         - name: Compile extension
           working-directory: actions-ext
           run: |
