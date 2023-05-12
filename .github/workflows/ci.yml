@@ -44,7 +44,7 @@ jobs:
         - name: Acquire SDK
           uses: actions/checkout@v3
           with:
-              repository: alliedmodders/hl2sdk
+              repository: 'alliedmodders/hl2sdk'
               path: 'hl2sdk-${{ matrix.game }}'
               ref: '${{ matrix.game }}'
 
@@ -75,9 +75,10 @@ jobs:
             python -m pip install wheel
             pip install git+https://github.com/alliedmodders/ambuild
 
-        - uses: TheMrMilchmann/setup-msvc-dev@v2
+        - uses: ilammy/msvc-dev-cmd@v1.12.1
           with:
-            arch: x86
+            arch: 'x86'
+            vsversion: '2022'
         - name: Compile extension
           working-directory: actions-ext
           run: |
