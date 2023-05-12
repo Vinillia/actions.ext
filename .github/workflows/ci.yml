@@ -17,7 +17,7 @@ jobs:
           - l4d2
 
         os:
-          - windows-2022
+          - windows-latest
           - ubuntu-latest
 
     steps:
