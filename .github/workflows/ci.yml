@@ -83,9 +83,10 @@ jobs:
             python ../configure.py --enable-optimize --sdks=l4d2 --sm-path="${{ github.workspace }}/sourcemod" --mms-path="${{ github.workspace }}/metamod"
             ambuild
 
-        - uses: TheMrMilchmann/setup-msvc-dev@v2
+        - uses: ilammy/msvc-dev-cmd@v1
           with:
             arch: x86
+            vsversion: 2022
         - name: Archive package
           uses: actions/upload-artifact@v3
           with:
