@@ -11,7 +11,8 @@
 
 #define AUTO_SWAP_GUARD() AutoswapGuard guard(this)
 
-ActionProcessor* g_pActionProcessor = new ActionProcessor();
+ActionProcessor g_ActionProcessor;
+ActionProcessor* g_pActionProcessor = &g_ActionProcessor;
 CDetour* g_pDestructorLock = nullptr;
 
 class AutoswapGuard
@@ -102,8 +103,17 @@ DETOUR_DECL_MEMBER0(ActionProcessor__Destructor, void)
 #endif
 {
 	nb_action_ptr action = (nb_action_ptr)this;
-	g_actionsManager.Remove(action);
+	if (action == (nb_action_ptr)g_pActionProcessor)
+	{
+#ifdef _WIN32
+		DETOUR_MEMBER_CALL(ActionProcessor__Destructor)(flag);
+#else
+		DETOUR_MEMBER_CALL(ActionProcessor__Destructor)();
+#endif
+		return;
+	}
 
+	g_actionsManager.Remove(action);
 	//action->nb_action::~nb_action();
 	delete action;
 }

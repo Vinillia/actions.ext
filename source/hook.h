@@ -1,9 +1,14 @@
-#pragma once
-
 #ifndef _INCLUDE_HOOK_H
 #define _INCLUDE_HOOK_H
 
-class INextBot* GetEntityNextbotPointer(class CBaseEntity* entity);
+#include <list>
+
+class INextBot;
+
+using ActionTree = std::list<nb_action_ptr>;
+
+INextBot* GetEntityNextbotPointer(CBaseEntity* entity);
+bool GetEntityActions(CBaseEntity* entity, ActionTree& tree);
 
 bool CreateActionsHook();
 void DestroyActionsHook();

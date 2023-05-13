@@ -1,97 +1,60 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _INCLUDE_ACTIONS_COMMANDS_H
 #define _INCLUDE_ACTIONS_COMMANDS_H
 
 #include <iplayerinfo.h>
-
-enum
-{
-    DUMP_FLAG_CLIENTS = 0x01,
-    DUMP_FLAG_INFECTED = 0x02,
-    DUMP_FLAG_WITCHES = 0x04,
-    DUMP_FLAG_ALL = 0xFFFFFFFF
-};
+#include "hook.h"
 
 inline bool ClassMatchesComplex(cell_t entity, const char* match);
+inline bool ClassMatchesComplex(CBaseEntity* entity, const char* match);
 
 CON_COMMAND(ext_actions_dump, "Dump entities actions")
 {
     Msg("DUPMING ACTIONS START");
     Msg("/----------------------------------/");
 
-    std::vector<nb_action_ptr> actions;
-    int flags = DUMP_FLAG_ALL;
+    ActionTree tree;
 
-    if (args.ArgC() > 1)
-        flags = atoi(args[1]);
-
-    auto dump = [&](cell_t entity) -> void
+    auto dump = [&tree](CBaseEntity* entity, const char* name) -> void
     {
-        actions.clear();
+        tree.clear();
+        if (!GetEntityActions(entity, tree))
+            return;
 
-        if (entity <= playerhelpers->GetMaxClients())
+        Msg("%s has %i actions:", name, tree.size());
+        int i = 0;
+        for (auto action : tree)
         {
-            IGamePlayer* player = playerhelpers->GetGamePlayer(entity);
-
-            if (!player || !player->IsInGame() || !player->IsFakeClient())
-                return;
-
-            g_actionsManager.GetEntityActions(gamehelpers->ReferenceToEntity(entity), actions);
-
-            if (!actions.size())
-                return;
-
-            Msg("BOT %s has %i actions:", player->GetName(), actions.size());
-
-            for (size_t i = 0; i < actions.size(); i++)
-            {
-                Msg("%i. %s %s %s ( %X ) ", i + 1, actions.at(i)->GetName(), actions.at(i)->m_isStarted ? "STARTED" : "NOT STARTED",
-                    actions.at(i)->IsSuspended() ? "SUSPENDED" : "",
-                    actions.at(i));
-            }
+            Msg("%i. %s %s %s ( 0x%X ) ", ++i, action->GetName(), action->m_isStarted ? "STARTED" : "NOT STARTED",
+                action->IsSuspended() ? "SUSPENDED" : "",
+                action);
         }
-        else
-        {
-            CBaseEntity* pEntity = gamehelpers->ReferenceToEntity(entity);
-
-            if (!pEntity)
-                return;
-
-            g_actionsManager.GetEntityActions(pEntity, actions);
-
-            if (!actions.size())
-                return;
-
-            Msg("ENTITY %s(%i) has %i actions:", gamehelpers->GetEntityClassname(pEntity), entity, actions.size());
-
-            for (size_t i = 0; i < actions.size(); i++)
-            {
-                Msg("%i. %s %s %s ( %X ) ", i + 1, actions.at(i)->GetName(), actions.at(i)->m_isStarted ? "STARTED" : "NOT STARTED",
-                    actions.at(i)->IsSuspended() ? "SUSPENDED" : "",
-                    actions.at(i));
-            }
-        }
-
-        Msg("/----------------------------------/");
     };
 
     int clients = playerhelpers->GetMaxClients();
-    for (cell_t entity = 1; entity <= 2048; entity++)
+    for (cell_t i = 1; i <= clients; i++)
     {
-        if (entity <= clients)
-        {
-            if (flags & DUMP_FLAG_CLIENTS)
-                dump(entity);
-        }
-        else
-        {
-            if (flags & DUMP_FLAG_WITCHES && ClassMatchesComplex(entity, "witch"))
-                dump(entity);
+        IGamePlayer* player = playerhelpers->GetGamePlayer(i);
 
-            if (flags & DUMP_FLAG_INFECTED && ClassMatchesComplex(entity, "infected"))
-                dump(entity);
-        }
+        if (!player->IsInGame() || !player->IsFakeClient())
+            continue;
+
+        CBaseEntity* entity = gamehelpers->ReferenceToEntity(i);
+
+        if (entity != nullptr)
+            dump(entity, player->GetName());
+    }
+
+    for (cell_t i = clients + 1; i <= 2048; i++)
+    {
+        CBaseEntity* entity = gamehelpers->ReferenceToEntity(i);
+
+        if (entity == nullptr)
+            continue;
+
+        const char* name = gamehelpers->GetEntityClassname(entity);
+        dump(entity, name);
     }
 
     Msg("DUPMING ACTIONS END");
@@ -99,12 +62,17 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
 
 inline bool ClassMatchesComplex(cell_t entity, const char* match)
 {
-    CBaseEntity* pEntity = gamehelpers->ReferenceToEntity(entity);
+	CBaseEntity* pEntity = gamehelpers->ReferenceToEntity(entity);
 
-    if (!pEntity)
-        return false;
+	if (!pEntity)
+		return false;
 
-    return strcmp(gamehelpers->GetEntityClassname(pEntity), match) == 0;
+	return ClassMatchesComplex(entity, match);
+}
+
+inline bool ClassMatchesComplex(CBaseEntity* entity, const char* match)
+{
+    return strcmp(gamehelpers->GetEntityClassname(entity), match) == 0;
 }
 
 #endif // _INCLUDE_ACTIONS_COMMANDS_H

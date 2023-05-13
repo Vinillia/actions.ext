@@ -23,8 +23,6 @@ CGlobalVars* gpGlobals = nullptr;
 ICvar* icvar = nullptr;
 // IBinTools* bintools = nullptr;
 
-extern ActionProcessor* g_pActionProcessor;
-
 extern void InitVirtualMap();
 extern class NextBotManager& TheNextBots(void* pfn = nullptr);
 
@@ -32,23 +30,21 @@ ConVar ext_actions_debug("ext_actions_debug", "0", 0, "1 - Enable debug, 0 - Dis
 
 bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
+	m_isNextBotDebugSupported = false;
+
 	if (!gameconfs->LoadGameConfigFile("actions.games", &m_pConfig, error, maxlen))
 		return false;
 
-	sharesys->RegisterLibrary(myself, "actionslib");
-
-	m_isNextBotDebugSupported = false;
-	
-	void* pfn = nullptr;
-	if (m_pConfig->GetMemSig("TheNextBots", &pfn))
+	void* pTheNextBots = nullptr;
+	if (m_pConfig->GetMemSig("TheNextBots", &pTheNextBots))
 	{
 		m_isNextBotDebugSupported = true;
-		TheNextBots(pfn);
+		TheNextBots(pTheNextBots);
 	}
 
 	InitVirtualMap();
 	g_publicsManager.InitializePublicVariables();
-	
+
 	CDetourManager::Init(g_pSM->GetScriptingEngine(), m_pConfig);
 
 	sharesys->AddNatives(myself, g_actionsNatives);
@@ -56,7 +52,7 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	RegisterLegacyNatives();
 
 	plsys->AddPluginsListener(this);
-
+	sharesys->RegisterLibrary(myself, "actionslib");
 	return true;
 }
 
@@ -80,25 +76,19 @@ bool SDKActions::SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bo
 	return true;
 };
 
-bool SDKActions::SDK_OnMetamodUnload(char* error, size_t maxlen)
+void SDKActions::SDK_OnUnload()
 {
 	forwards->ReleaseForward(m_fwdOnActionCreated);
 	forwards->ReleaseForward(m_fwdOnActionDestroyed);
 	plsys->RemovePluginsListener(this);
-	DestroyActionsHook();
 	StopActionProcessing();
-
+	
 	ActionComponent::UnRegisterComponents();
-	return true;
-}
-
-void SDKActions::SDK_OnUnload()
-{
+	
 	if (m_pConfig)
 		gameconfs->CloseGameConfigFile(m_pConfig);
-
-	if (g_pActionProcessor)
-		delete g_pActionProcessor;
+	
+	DestroyActionsHook();
 }
 
 bool SDKActions::QueryRunning(char* error, size_t maxlength)

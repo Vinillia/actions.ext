@@ -723,6 +723,8 @@ sp_nativeinfo_t g_actionsNatives[] =
 	{ "__action_setlistener",						NAT_actions_setlistener },
 	{ "__action_removelistener",					NAT_actions_removelistener },
 
+	// TO DO: Add hierarchy find
+	//{ "ActionsManager.FindActionHierarchy",			NULL },
 	{ "ActionsManager.CreateComponent",				NAT_acitons_CreateComponent },
 	{ "ActionsManager.SetActionUserDataIdentity",	NAT_actions_SetActionUserDataIdentity },
 	{ "ActionsManager.GetActionUserDataIdentity",	NAT_actions_GetActionUserDataIdentity },

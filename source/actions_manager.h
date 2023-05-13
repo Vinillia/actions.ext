@@ -117,12 +117,11 @@ public:
 	inline ActionResult<CBaseEntity>* GetActionRuntimeResult();
 	inline EventDesiredResult<CBaseEntity>* GetActionRuntimeDesiredResult();
 
-	inline void SetRuntimeActor(CBaseEntity* actor) noexcept;
-	inline CBaseEntity* GetRuntimeActor() const noexcept;
+	inline void SetActionActor(nb_action_ptr action, CBaseEntity* actor) noexcept;
+	inline CBaseEntity* GetActionActor(nb_action_ptr action) const noexcept;
 
 	bool GetEntityActions(CBaseEntity* entity, std::vector<nb_action_ptr>& actions);
 	cell_t GetActionActorEntIndex(nb_action_ptr action);
-	CBaseEntity* GetActionActor(nb_action_ptr action);
 
 	inline bool IsValidAction(nb_action_ptr action);
 	inline bool IsPending(nb_action_ptr action);
@@ -131,14 +130,10 @@ protected:
 	virtual void OnActionCreated(nb_action_ptr action);
 	virtual void OnActionDestroyed(nb_action_ptr action);
 
-	bool AddEntityAction(CBaseEntity* entity, nb_action_ptr const action);
-	bool RemoveEntityAction(CBaseEntity* entity, nb_action_ptr const action);
-	bool RemoveEntityActions(CBaseEntity* entity);
-
 private:
 	ActionsContanier m_actions;
 	std::unordered_set<nb_action_ptr> m_actionsPending;
-	std::unordered_map<CBaseEntity*, std::unordered_set<nb_action_ptr>> m_entityActions;
+	std::unordered_map<nb_action_ptr, CBaseEntity*> m_actionActor;
 
 	std::unordered_map<nb_action_ptr, UserDataMap> m_actionsUserData;
 	std::unordered_map<nb_action_ptr, UserDataIdentityMap> m_actionsIndentityUserData;
@@ -262,14 +257,19 @@ inline EventDesiredResult<CBaseEntity>* ActionsManager::GetActionRuntimeDesiredR
 	}
 }
 
-inline void ActionsManager::SetRuntimeActor(CBaseEntity* actor) noexcept
+inline void ActionsManager::SetActionActor(nb_action_ptr action, CBaseEntity* actor) noexcept
 {
-	m_pRuntimeActor = actor;
+	m_actionActor[action] = actor;
 }
 
-inline CBaseEntity* ActionsManager::GetRuntimeActor() const noexcept
+inline CBaseEntity* ActionsManager::GetActionActor(nb_action_ptr action) const noexcept
 {
-	return m_pRuntimeActor;
+	auto r = m_actionActor.find(action);
+
+	if (r == m_actionActor.cend())
+		return nullptr;
+
+	return r->second;
 }
 
 extern ActionsManager g_actionsManager;

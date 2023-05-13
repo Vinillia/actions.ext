@@ -2,6 +2,7 @@
 #include "actionsdefs.h"
 #include "actions_manager.h"
 #include "actions_component.h"
+#include "hook.h"
 
 #include <NextBotInterface.h>
 #include <NextBotComponentInterface.h>
@@ -9,6 +10,8 @@
 #include <NextBotIntentionInterface.h>
 
 #include <unordered_map>
+
+#define FOR_EACH_COMPONENT(bot,i) for( INextBotComponent* i = bot->m_componentList; i != nullptr; i = i->m_nextComponent )
 
 class NextBotIntention : public IIntention
 {
@@ -41,7 +44,8 @@ public:
 
 std::unordered_map<CBaseEntity*, INextBot*> g_entitiesNextbot;
 CDetour* g_pNextBotDetour = nullptr;
-extern CDetour* g_pDestructorLock;
+
+NextBotIntention* GetNextBotIntention(INextBotComponent* component);
 
 DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 {
@@ -49,35 +53,36 @@ DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 
 	DETOUR_MEMBER_CALL(INextBot__Reset)();
 
-	auto component = bot->m_componentList;
-	while (component)
+	FOR_EACH_COMPONENT(bot, component)
 	{
-		IIntention* intention = dynamic_cast<IIntention*>(component);
+		NextBotIntention* intention = GetNextBotIntention(component);
 
-		if (intention)
+		if (!intention)
+			continue;
+
+		nb_action_ptr action = intention->GetAction();
+
+		if (bot->GetEntity())
 		{
-			NextBotIntention* i = static_cast<NextBotIntention*>(intention);
-			
-			if (bot->GetEntity())
-				g_entitiesNextbot[(CBaseEntity*)bot->GetEntity()] = bot;
-
-			if (i->GetAction())
-			{
-				g_actionsManager.SetRuntimeActor(i->entity);
-				g_actionsManager.Add(i->GetAction());
-			}
-
-			if (bot->MySurvivorBotPointer())
-			{
-				g_actionsManager.SetRuntimeActor(i->entity);
-				nb_action_ptr action = ((SurvivorBotIntention*)(i))->GetSubAction();
-
-				if (action)
-					g_actionsManager.Add(action);
-			}
+			g_entitiesNextbot[intention->entity] = bot;
 		}
 
-		component = component->m_nextComponent;
+		if (action)
+		{
+			g_actionsManager.SetActionActor(action, intention->entity);
+			g_actionsManager.Add(action);
+		}
+
+		if (bot->MySurvivorBotPointer())
+		{
+			nb_action_ptr subaction = ((SurvivorBotIntention*)(intention))->GetSubAction();
+
+			if (subaction)
+			{
+				g_actionsManager.SetActionActor(subaction, intention->entity);
+				g_actionsManager.Add(subaction);
+			}
+		}
 	}
 }
 
@@ -101,12 +106,16 @@ void DestroyActionsHook()
 		g_pNextBotDetour->Destroy();
 		g_pNextBotDetour = nullptr;
 	}
+}
 
-	if (g_pDestructorLock)
-	{
-		g_pDestructorLock->Destroy();
-		g_pDestructorLock = nullptr;
-	}
+NextBotIntention* GetNextBotIntention(INextBotComponent* component)
+{
+	IIntention* intention = dynamic_cast<IIntention*>(component);
+
+	if (!intention)
+		return nullptr;
+
+	return static_cast<NextBotIntention*>(intention);
 }
 
 INextBot* GetEntityNextbotPointer(CBaseEntity* entity)
@@ -117,4 +126,47 @@ INextBot* GetEntityNextbotPointer(CBaseEntity* entity)
 		return nullptr;
 
 	return r->second;
+}
+
+bool GetEntityActions(CBaseEntity* entity, ActionTree& tree)
+{
+	INextBot* nextbot = GetEntityNextbotPointer(entity);
+
+	if (nextbot == nullptr)
+		return false;
+
+	auto emplace_back = [&tree](nb_action_ptr head)
+	{
+		tree.emplace_back(head);
+
+		for (nb_action_ptr child = head->m_child; child != nullptr; child = child->m_child)
+		{
+			tree.emplace_back(child);
+		}
+	};
+
+	FOR_EACH_COMPONENT(nextbot, comp)
+	{
+		NextBotIntention* intention = GetNextBotIntention(comp);
+
+		if (intention == nullptr)
+			continue;
+
+		nb_action_ptr head = intention->GetAction();
+
+		if (head == nullptr)
+			continue;
+
+		emplace_back(head);
+
+		if (nextbot->MySurvivorBotPointer())
+		{
+			head = ((SurvivorBotIntention*)(intention))->GetSubAction();
+
+			if (head)
+				emplace_back(head);
+		}
+	}
+
+	return true;
 }

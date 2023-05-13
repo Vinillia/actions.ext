@@ -56,7 +56,7 @@ public: // SDKExtension
 public: // SDKExtension MetaMod
 #if defined SMEXT_CONF_METAMOD
 	virtual bool SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bool late);
-	virtual bool SDK_OnMetamodUnload(char* error, size_t maxlen) override;
+	// virtual bool SDK_OnMetamodUnload(char* error, size_t maxlen) override;
 	// virtual bool SDK_OnMetamodPauseChange(bool paused, char* error, size_t maxlen) override;
 #endif
 
