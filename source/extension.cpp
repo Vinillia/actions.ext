@@ -19,18 +19,21 @@
 SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
 
+ConVar ext_actions_debug("ext_actions_debug", "0", FCVAR_NONE, "1 - Enable debug, 0 - Disable debug");
+ConVar ext_actions_debug_memory("ext_actions_debug_memory", "0", FCVAR_NONE, "Log component creation/deletion");
+
 CGlobalVars* gpGlobals = nullptr; 
 ICvar* icvar = nullptr;
-// IBinTools* bintools = nullptr;
+
+IActionComponentDispatch g_componentDispatch;
 
 extern void InitVirtualMap();
 extern class NextBotManager& TheNextBots(void* pfn = nullptr);
 
-ConVar ext_actions_debug("ext_actions_debug", "0", 0, "1 - Enable debug, 0 - Disable debug");
-
 bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
 	m_isNextBotDebugSupported = false;
+	m_htActionComponent = 0;
 
 	if (!gameconfs->LoadGameConfigFile("actions.games", &m_pConfig, error, maxlen))
 		return false;
@@ -40,6 +43,13 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	{
 		m_isNextBotDebugSupported = true;
 		TheNextBots(pTheNextBots);
+	}
+	
+	HandleError err;
+	if (!CreateHandleTypes(&err))
+	{
+		V_snprintf(error, maxlen, "Failed to create handle type (error: %i)", err);
+		return false;
 	}
 
 	InitVirtualMap();
@@ -64,7 +74,6 @@ void SDKActions::SDK_OnAllLoaded()
 	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
 
 	CreateActionsHook();
-	//SM_GET_LATE_IFACE(BINTOOLS, bintools);
 }
 
 bool SDKActions::SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bool late) 
@@ -78,22 +87,27 @@ bool SDKActions::SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bo
 
 void SDKActions::SDK_OnUnload()
 {
+	if (m_pConfig)
+		gameconfs->CloseGameConfigFile(m_pConfig);
+
+	if (m_htActionComponent)
+		g_pHandleSys->RemoveType(m_htActionComponent, myself->GetIdentity());
+
 	forwards->ReleaseForward(m_fwdOnActionCreated);
 	forwards->ReleaseForward(m_fwdOnActionDestroyed);
 	plsys->RemovePluginsListener(this);
+
+	/* 
+	* Handle sys can handle this 
+	* ActionComponent::UnRegisterComponents();
+	*/
+
 	StopActionProcessing();
-	
-	ActionComponent::UnRegisterComponents();
-	
-	if (m_pConfig)
-		gameconfs->CloseGameConfigFile(m_pConfig);
-	
 	DestroyActionsHook();
 }
 
 bool SDKActions::QueryRunning(char* error, size_t maxlength)
 {
-	// SM_CHECK_IFACE(BINTOOLS, bintools);
 	return true;
 }
 
@@ -104,7 +118,11 @@ void SDKActions::OnPluginLoaded(IPlugin* plugin)
 
 void SDKActions::OnPluginUnloaded(IPlugin* plugin)
 {
-	ActionComponent::OnPluginUnloaded(plugin->GetBaseContext());
+	/*
+	* Handle sys can handle this
+	* ActionComponent::OnPluginUnloaded(plugin->GetBaseContext());
+	*/
+
 	g_actionsManager.ClearUserDataIdentity(plugin->GetBaseContext());
 	g_actionsPropagationPre.RemoveListener(plugin->GetBaseContext());
 	g_actionsPropagationPost.RemoveListener(plugin->GetBaseContext());
@@ -112,6 +130,9 @@ void SDKActions::OnPluginUnloaded(IPlugin* plugin)
 
 void SDKActions::OnActionCreated(nb_action_ptr action)
 {
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f:%i: NEW ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
+
 	m_fwdOnActionCreated->PushCell((cell_t)action);
 	m_fwdOnActionCreated->PushCell(g_actionsManager.GetActionActorEntIndex(action));
 	m_fwdOnActionCreated->PushString(action->GetName());
@@ -120,6 +141,9 @@ void SDKActions::OnActionCreated(nb_action_ptr action)
 
 void SDKActions::OnActionDestroyed(nb_action_ptr action)
 {
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
+
 	g_actionsPropagationPre.RemoveActionListeners(action);
 	g_actionsPropagationPost.RemoveActionListeners(action);
 
@@ -132,6 +156,30 @@ void SDKActions::OnActionDestroyed(nb_action_ptr action)
 bool SDKActions::RegisterConCommandBase(ConCommandBase* command)
 {
 	return META_REGCVAR(command);
+}
+
+bool SDKActions::CreateHandleTypes(HandleError* err)
+{
+	TypeAccess tacc;
+	handlesys->InitAccessDefaults(&tacc, nullptr);
+	
+	tacc.access[HTypeAccess_Create] = true;
+	tacc.access[HTypeAccess_Inherit] = true;
+
+	m_htActionComponent = g_pHandleSys->CreateType("ActionComponent", &g_componentDispatch, 0, &tacc, NULL, myself->GetIdentity(), err);
+	return m_htActionComponent != 0;
+}
+
+void IActionComponentDispatch::OnHandleDestroy(HandleType_t type, void* object)
+{
+	ActionComponent* component = (ActionComponent*)object;
+	component->OnHandleDestroy(type);
+}
+
+bool IActionComponentDispatch::GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize)
+{
+	ActionComponent* component = (ActionComponent*)object;
+	return component->GetHandleApproxSize(type, pSize);
 }
 
 #ifdef _WIN32

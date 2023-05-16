@@ -15,6 +15,7 @@
 
 std::list<ActionComponent*> g_actionComponents;
 ConVar* NextBotDebugHistory = nullptr;
+extern ConVar ext_actions_debug_memory;
 
 ActionBehavior::ActionBehavior(nb_action_ptr initialAction, const char* name, INextBot* nextbot) : Behavior<CBaseEntity>(initialAction, name)
 {
@@ -55,7 +56,7 @@ const char* ActionBehavior::GetName() const
 
 ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, SourcePawn::IPluginFunction* plfinitial, const char* name) : IIntention(me)
 {
-	g_actionComponents.push_back(this);
+	// g_actionComponents.push_back(this);
 	m_plfnInitial = plfinitial;
 	m_plfnReset = nullptr;
 	m_plfnUpdate = nullptr;
@@ -63,17 +64,30 @@ ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, 
 	m_subehavior = nullptr;
 	m_name = name ? name : "ActionComponent";
 
+	m_handleError = HandleError_None;
+	m_nHandle = g_pHandleSys->CreateHandle(g_sdkActions.GetComponentHT(),
+		this,
+		ctx->GetIdentity(),
+		myself->GetIdentity(),
+		&m_handleError);
+
 	m_ctx = ctx;
 	m_entity = (CBaseEntity*)me->GetEntity();
 	m_behavior = new ActionBehavior(InitialAction(), m_name, me);
 
 	if (m_behavior->m_action)
 		g_actionsManager.Add(m_behavior->m_action);
+
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f: NEW COMPONENT 0x%X", gpGlobals->curtime, this);
 }
 
 ActionComponent::~ActionComponent()
 {
-	g_actionComponents.remove(this);
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f: DELETE COMPONENT 0x%X", gpGlobals->curtime, this);
+
+	// g_actionComponents.remove(this);
 	delete m_behavior;
 }
 
@@ -93,8 +107,8 @@ void ActionComponent::Upkeep(void)
 
 void ActionComponent::Update(void)
 {
-	NotifyUpdate();
 	m_behavior->Update(m_entity, GetUpdateInterval());
+	NotifyUpdate();
 }
 
 void ActionComponent::OnPluginUnloaded(IPluginContext* ctx)
@@ -111,7 +125,6 @@ void ActionComponent::OnPluginUnloaded(IPluginContext* ctx)
 			component->UnRegister();
 			iter++;
 			delete component;
-			// iter = g_actionComponents.erase(iter);
 		}
 		else
 		{
@@ -172,11 +185,17 @@ void ActionComponent::UnRegister()
 
 inline nb_action_ptr ActionComponent::InitialAction()
 {
+	if (HasHandleError())
+	{
+		delete this;
+		return nullptr;
+	}
+
 	nb_action_ptr initialAction = nullptr;
 
 	if (m_plfnInitial)
 	{
-		m_plfnInitial->PushCell((cell_t)this);
+		m_plfnInitial->PushCell(GetHandle());
 		m_plfnInitial->PushCell(gamehelpers->EntityToBCompatRef(m_entity));
 		m_plfnInitial->Execute((cell_t*)&initialAction);
 	}
@@ -191,7 +210,7 @@ inline void ActionComponent::NotifyReset()
 {
 	if (m_plfnReset)
 	{
-		m_plfnReset->PushCell((cell_t)this);
+		m_plfnReset->PushCell(GetHandle());
 		m_plfnReset->PushCell(gamehelpers->EntityToBCompatRef(m_entity));
 		m_plfnReset->Execute(nullptr);
 	}
@@ -201,7 +220,7 @@ inline void ActionComponent::NotifyUpdate()
 {
 	if (m_plfnUpdate)
 	{
-		m_plfnUpdate->PushCell((cell_t)this);
+		m_plfnUpdate->PushCell(GetHandle());
 		m_plfnUpdate->PushCell(gamehelpers->EntityToBCompatRef(m_entity));
 		m_plfnUpdate->Execute(nullptr);
 	}
@@ -211,7 +230,7 @@ inline void ActionComponent::NotifyUpkeep()
 {
 	if (m_plfnUpkeep)
 	{
-		m_plfnUpkeep->PushCell((cell_t)this);
+		m_plfnUpkeep->PushCell(GetHandle());
 		m_plfnUpkeep->PushCell(gamehelpers->EntityToBCompatRef(m_entity));
 		m_plfnUpkeep->Execute(nullptr);
 	}
@@ -234,9 +253,28 @@ void ActionComponent::UnRegisterComponents()
 
 bool ActionComponent::IsValidComponent(ActionComponent* comp) noexcept
 {
+	/*
+	* Handle system will save us 
 	auto r = std::find(g_actionComponents.cbegin(), g_actionComponents.cend(), comp);
 	return r != g_actionComponents.cend();
+	*/
+
+	return true;
 }
+
+
+void ActionComponent::OnHandleDestroy(HandleType_t type)
+{
+	UnRegister();
+	delete this;
+}
+
+bool ActionComponent::GetHandleApproxSize(HandleType_t type, unsigned int* pSize)
+{
+	*pSize = sizeof(ActionComponent);
+	return true;
+}
+
 
 void ActionDebugMsg(Behavior<CBaseEntity>* behavior, Action<CBaseEntity>* action, CBaseEntity* actor, std::string_view method)
 {

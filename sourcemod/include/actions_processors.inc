@@ -8,7 +8,8 @@ methodmap ActionProcessor
 {
 };
 
-native bool __action_setlistener(any action, ActionProcessor method, Function fn, bool post);
+native bool __action_setlistener(any action, ActionProcessor processor, Function fn, bool post);
+native bool __action_removelistener(any action, ActionProcessor processor, Function fn, bool post);
 
 public ActionProcessor __action_processor_OnStart;
 public ActionProcessor __action_processor_Update;

@@ -113,15 +113,32 @@ methodmap ActionDesiredResult < ActionResult
 }
 
 /**
- * @brief Callback called for every entity action.
+ * @brief Called for every action
  *
- * @param action		Action address
+ * @param action 	Self explanatory
  *
  * @noreturn
  */
 typedef ActionsIteratorCallback = function void (BehaviorAction action);
 
+/**
+ * @brief Called for requesting initial action as first action of component/behavior
+ *
+ * @param component		Action component handle
+ * @param entity		Entity index
+ * 
+ * @return				Initial action
+ */
 typedef ActionComponentInitialAction = function BehaviorAction(ActionComponent component, int entity);
+
+/**
+ * @brief Base action component callback definition
+ *
+ * @param component		Action component handle
+ * @param entity		Entity index
+ *
+ * @noreturn
+ */
 typedef ActionComponentFn = function void(ActionComponent component, int entity);
 
 /**
@@ -248,28 +265,68 @@ methodmap ActionsManager
  	* @noreturn	
  	*/
 	public static native void SetActionUserDataIdentity(BehaviorAction action, const char[] key, any data);
-
-
-	public static native ActionComponent CreateComponent(int entity, ActionComponentInitialAction fnInitialAction = INVALID_FUNCTION, ActionComponentFn fnUpdate = INVALID_FUNCTION, ActionComponentFn fnUpkeep = INVALID_FUNCTION, ActionComponentFn fnReset = INVALID_FUNCTION, const char[] name = NULL_STRING);
 }
 
-methodmap ActionComponent
+methodmap ActionComponent < Handle
 {
-	public ActionComponent(any component)
-	{
-		return view_as<ActionComponent>(component);
-	}
+	/**
+ 	* @brief Creates ActionComponent derived from IIntention/INextBotComponent 
+	* @remark Used as holder for behavior 
+	*
+ 	* @param entity				Who owns the component
+ 	* @param fnInitialAction  	Callback to initiate action
+ 	* @param fnUpdate  			Heavyweight algorithms, invoked less often
+ 	* @param fnUpkeep  			Lightweight maintenance, invoked frequently
+	* @param fnReset			Whenver reset was requested
+ 	*
+ 	* @return 					New handle to component 
+ 	*/
+	public native ActionComponent(int entity, ActionComponentInitialAction fnInitialAction = INVALID_FUNCTION, ActionComponentFn fnUpdate = INVALID_FUNCTION, ActionComponentFn fnUpkeep = INVALID_FUNCTION, ActionComponentFn fnReset = INVALID_FUNCTION, const char[] name = NULL_STRING);
 
+	/**
+ 	* @brief Gets behavior name
+	*
+	* @param buffer 			Buffer to store name
+	* @param maxlength			Max buffer length
+	* 
+ 	* @return 					Number of written bytes
+ 	*/
+	public native int GetName(char[] buffer, int maxlength);
+
+	/**
+ 	* @brief Sets behavior name
+	*
+	* @param name 				New behavior name
+	* 
+ 	* @noreturn
+ 	*/
+	public native void SetName(char[] name);
+
+	/**
+ 	* @brief Update callback setter
+	* 
+ 	* @noreturn
+ 	*/
 	property ActionComponentFn Update
 	{
 		public native set(ActionComponentFn fn);
 	}
 
+	/**
+ 	* @brief Upkeep callback setter
+	* 
+ 	* @noreturn
+ 	*/
 	property ActionComponentFn Upkeep
 	{
 		public native set(ActionComponentFn fn);
 	}
 
+	/**
+ 	* @brief Reset callback setter
+	* 
+ 	* @noreturn
+ 	*/
 	property ActionComponentFn Reset
 	{
 		public native set(ActionComponentFn fn);
@@ -370,6 +427,16 @@ methodmap BehaviorAction < BehaviorActionListeners
 	* @error				Invalid action passed or invalid runtime result
  	*/
 	public native Action TryDone(EventResultPriorityType priority = RESULT_TRY, const char[] reason = NULL_STRING);
+
+	/**
+ 	* @brief Sustain current action 
+	*
+ 	* @param priority 		Priority to use this result
+ 	* @param reason			Reason why we sustain
+ 	*
+	* @error				Invalid action passed or invalid runtime result
+ 	*/
+	public native Action TryToSustain(EventResultPriorityType priority = RESULT_TRY, const char[] reason = NULL_STRING);
 	
 	/**
  	* @brief Gets action user data 
@@ -587,6 +654,13 @@ public Extension __ext_actions =
 #if !defined REQUIRE_EXTENSIONS
 public void __ext_actions_SetNTVOptional()
 {
+	MarkNativeAsOptional("ActionComponent.ActionComponent");
+	MarkNativeAsOptional("ActionComponent.Update");
+	MarkNativeAsOptional("ActionComponent.Upkeep");
+	MarkNativeAsOptional("ActionComponent.Reset");
+	MarkNativeAsOptional("ActionComponent.GetName");
+	MarkNativeAsOptional("ActionComponent.SetName");
+
 	MarkNativeAsOptional("ActionResult.GetReason");
 	MarkNativeAsOptional("ActionResult.SetReason");
 
@@ -619,6 +693,7 @@ public void __ext_actions_SetNTVOptional()
 	MarkNativeAsOptional("BehaviorAction.TryChangeTo");
 	MarkNativeAsOptional("BehaviorAction.TrySuspendFor");
 	MarkNativeAsOptional("BehaviorAction.TryDone");
+	MarkNativeAsOptional("BehaviorAction.TryToSustain");
 	
 	MarkNativeAsOptional("BehaviorAction.StorePendingEventResult");
 	MarkNativeAsOptional("BehaviorAction.GetName");
@@ -635,6 +710,8 @@ public void __ext_actions_SetNTVOptional()
 	MarkNativeAsOptional("BehaviorAction.IsStarted.set");
 
 	MarkNativeAsOptional("__action_setlistener");
+	MarkNativeAsOptional("__action_removelistener");
+	
 	__ext_actions_SetNTVOptionalLegacy();
 }
 #endif 

@@ -10,6 +10,7 @@
 #include <NextBotIntentionInterface.h>
 
 #include <unordered_map>
+#include <functional>
 
 #define FOR_EACH_COMPONENT(bot,i) for( INextBotComponent* i = bot->m_componentList; i != nullptr; i = i->m_nextComponent )
 
@@ -135,14 +136,15 @@ bool GetEntityActions(CBaseEntity* entity, ActionTree& tree)
 	if (nextbot == nullptr)
 		return false;
 
-	auto emplace_back = [&tree](nb_action_ptr head)
+	std::function<void(nb_action_ptr)> emplace_back = [&emplace_back, &tree](nb_action_ptr head)
 	{
 		tree.emplace_back(head);
 
-		for (nb_action_ptr child = head->m_child; child != nullptr; child = child->m_child)
-		{
-			tree.emplace_back(child);
-		}
+		if (head->GetActionBuriedUnderMe())
+			emplace_back(head->GetActionBuriedUnderMe());
+
+		if (head->GetActiveChildAction())
+			emplace_back(head->GetActiveChildAction());
 	};
 
 	FOR_EACH_COMPONENT(nextbot, comp)

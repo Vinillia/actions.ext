@@ -32,18 +32,17 @@
 #ifndef _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 #define _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 
-/**
- * @file extension.h
- * @brief Sample extension code header.
- */
-
 #include "smsdk_ext.h"
 #include "actionsdefs.h"
 
-/**
- * @brief Sample implementation of the SDK Extension.
- * Note: Uncomment one of the pre-defined virtual functions in order to use it.
- */
+class IActionComponentDispatch : public IHandleTypeDispatch 
+{
+protected:
+	virtual void OnHandleDestroy(HandleType_t type, void* object) override;
+	virtual bool GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize) override;
+};
+
+
 class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor
 {
 public: // SDKExtension
@@ -71,11 +70,16 @@ public: // ActionsManager
 	virtual void OnActionCreated(nb_action_ptr action);
 	virtual void OnActionDestroyed(nb_action_ptr action);
 
+	bool CreateHandleTypes(HandleError* err);
+
+	inline HandleType_t GetComponentHT() const noexcept { return m_htActionComponent; };
 	inline bool IsNextBotDebugSupported() const noexcept { return m_isNextBotDebugSupported; }
 
 private:
 	IGameConfig* m_pConfig = nullptr;
 	bool m_isNextBotDebugSupported;
+
+	HandleType_t m_htActionComponent;
 
 	IForward* m_fwdOnActionCreated;
 	IForward* m_fwdOnActionDestroyed;

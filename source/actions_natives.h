@@ -495,6 +495,34 @@ cell_t NAT_actions_TryDone(IPluginContext* pContext, const cell_t* params)
 	return Pl_Changed;
 }
 
+cell_t NAT_actions_TryToSustain(IPluginContext* pContext, const cell_t* params)
+{
+	nb_action_ptr action = (nb_action_ptr)params[1];
+
+	if (!g_actionsManager.IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	EventDesiredResult<CBaseEntity>* runtimeResult = g_actionsManager.GetActionRuntimeDesiredResult();
+
+	if (!runtimeResult)
+	{
+		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		return -1;
+	}
+
+	char* reason;
+	pContext->LocalToStringNULL(params[3], &reason);
+
+	runtimeResult->m_type = SUSTAIN;
+	runtimeResult->m_reason = reason;
+	runtimeResult->m_priority = (EventResultPriorityType)params[2];
+
+	return Pl_Changed;
+}
+
 cell_t NAT_actions_StorePendingEventResult(IPluginContext* pContext, const cell_t* params)
 {
 	return 0;
@@ -611,23 +639,45 @@ cell_t NAT_acitons_CreateComponent(IPluginContext* pContext, const cell_t* param
  
 	ActionComponent* component = new ActionComponent(nextbot, pContext, fnInitial, compName);
 
+	if (component->HasHandleError())
+	{
+		pContext->ReportError("Failed to create handle (error %i)", component->GetHandleError());
+		return 0;
+	}
+
 	component->SetUpdateCallback(fnUpdate);
 	component->SetUpkeepCallback(fnUpkeep);
 	component->SetResetCallback(fnReset);
 
-	return (cell_t)component;
+	return component->GetHandle();
 }
 
 cell_t NAT_acitons_ComponentUpdateCallback(IPluginContext* pContext, const cell_t* params)
 {
-	ActionComponent* component = (ActionComponent*)(params[1]);
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleError err;
+	HandleSecurity sec;
+
+	sec.pOwner = nullptr;
+	sec.pIdentity = myself->GetIdentity();
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return pContext->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
 	IPluginFunction* fn = pContext->GetFunctionById(params[2]);
 
+	/*
+	* Handle sys can handle this
 	if (!ActionComponent::IsValidComponent(component))
 	{
 		pContext->ReportError("Invalid action component %X", component);
 		return 0;
 	}
+	*/
 
 	if (fn == nullptr)
 	{
@@ -641,14 +691,30 @@ cell_t NAT_acitons_ComponentUpdateCallback(IPluginContext* pContext, const cell_
 
 cell_t NAT_acitons_ComponentUpkeepCallback(IPluginContext* pContext, const cell_t* params)
 {
-	ActionComponent* component = (ActionComponent*)(params[1]);
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleError err;
+	HandleSecurity sec;
+
+	sec.pOwner = nullptr;
+	sec.pIdentity = myself->GetIdentity();
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return pContext->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
 	IPluginFunction* fn = pContext->GetFunctionById(params[2]);
 
+	/*
+	* Handle sys can handle this
 	if (!ActionComponent::IsValidComponent(component))
 	{
 		pContext->ReportError("Invalid action component %X", component);
 		return 0;
 	}
+	*/
 
 	if (fn == nullptr)
 	{
@@ -662,14 +728,30 @@ cell_t NAT_acitons_ComponentUpkeepCallback(IPluginContext* pContext, const cell_
 
 cell_t NAT_acitons_ComponentResetCallback(IPluginContext* pContext, const cell_t* params)
 {
-	ActionComponent* component = (ActionComponent*)(params[1]);
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleError err;
+	HandleSecurity sec;
+
+	sec.pOwner = nullptr;
+	sec.pIdentity = myself->GetIdentity();
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return pContext->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
 	IPluginFunction* fn = pContext->GetFunctionById(params[2]);
 
+	/*
+	* Handle sys can handle this
 	if (!ActionComponent::IsValidComponent(component))
 	{
 		pContext->ReportError("Invalid action component %X", component);
 		return 0;
 	}
+	*/
 
 	if (fn == nullptr)
 	{
@@ -683,13 +765,28 @@ cell_t NAT_acitons_ComponentResetCallback(IPluginContext* pContext, const cell_t
 
 cell_t NAT_acitons_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 {
-	ActionComponent* component = (ActionComponent*)(params[1]);
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleError err;
+	HandleSecurity sec;
 
+	sec.pOwner = nullptr;
+	sec.pIdentity = myself->GetIdentity();
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return ctx->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
+	/*
+	* Handle sys can handle this
 	if (!ActionComponent::IsValidComponent(component))
 	{
 		ctx->ReportError("Invalid action component %X", component);
 		return 0;
 	}
+	*/
 
 	const char* name = component->GetName();
 
@@ -704,16 +801,31 @@ cell_t NAT_acitons_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 
 cell_t NAT_acitons_ComponentSetName(IPluginContext* ctx, const cell_t* params)
 {
-	ActionComponent* component = (ActionComponent*)(params[1]);
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleError err;
+	HandleSecurity sec;
 
+	sec.pOwner = nullptr;
+	sec.pIdentity = myself->GetIdentity();
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return ctx->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
+	/*
+	* Handle sys can handle this
 	if (!ActionComponent::IsValidComponent(component))
 	{
 		ctx->ReportError("Invalid action component %X", component);
 		return 0;
 	}
+	*/
 
 	char* name;
-	ctx->LocalToString(params[1], &name);
+	ctx->LocalToString(params[2], &name);
 	component->SetName(name);
 	return 0;
 }
@@ -723,14 +835,12 @@ sp_nativeinfo_t g_actionsNatives[] =
 	{ "__action_setlistener",						NAT_actions_setlistener },
 	{ "__action_removelistener",					NAT_actions_removelistener },
 
-	// TO DO: Add hierarchy find
-	//{ "ActionsManager.FindActionHierarchy",			NULL },
-	{ "ActionsManager.CreateComponent",				NAT_acitons_CreateComponent },
 	{ "ActionsManager.SetActionUserDataIdentity",	NAT_actions_SetActionUserDataIdentity },
 	{ "ActionsManager.GetActionUserDataIdentity",	NAT_actions_GetActionUserDataIdentity },
 	{ "ActionsManager.SetActionUserData",			NAT_actions_SetActionUserData },
 	{ "ActionsManager.GetActionUserData",			NAT_actions_GetActionUserData },
 
+	{ "ActionComponent.ActionComponent",			NAT_acitons_CreateComponent },
 	{ "ActionComponent.GetName",					NAT_acitons_ComponentGetName },
 	{ "ActionComponent.SetName",					NAT_acitons_ComponentSetName },
 	{ "ActionComponent.Update.set",					NAT_acitons_ComponentUpdateCallback },
@@ -748,6 +858,7 @@ sp_nativeinfo_t g_actionsNatives[] =
 	{ "BehaviorAction.TryChangeTo",					NAT_actions_TryChangeTo },
 	{ "BehaviorAction.TrySuspendFor",				NAT_actions_TrySuspendFor },
 	{ "BehaviorAction.TryDone",						NAT_actions_TryDone },
+	{ "BehaviorAction.TryToSustain",				NAT_actions_TryToSustain },
 
 	{ "BehaviorAction.Parent.get",					NAT_actions_GetParent },
 	{ "BehaviorAction.Child.get",					NAT_actions_GetChild },

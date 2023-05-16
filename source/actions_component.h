@@ -15,6 +15,7 @@ namespace SourcePawn
 class ActionBehavior : protected Behavior<CBaseEntity>
 {
 	friend class ActionComponent;
+
 public:
 	ActionBehavior(nb_action_ptr initialAction, const char* name, INextBot* bot);
 
@@ -30,6 +31,8 @@ public:
 class ActionComponent : private IIntention
 {
 	friend class SDKActions;
+	friend class IActionComponentDispatch;
+
 public:										
 	ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, SourcePawn::IPluginFunction* plfinitial = nullptr, const char* name = nullptr);
 	virtual ~ActionComponent();
@@ -49,10 +52,17 @@ private:
 
 	static void OnPluginUnloaded(SourcePawn::IPluginContext* ctx);
 
+	void OnHandleDestroy(HandleType_t type);
+	bool GetHandleApproxSize(HandleType_t type, unsigned int* pSize);
+
 public:
 	inline void SetResetCallback(SourcePawn::IPluginFunction* plfnReset) noexcept;
 	inline void SetUpkeepCallback(SourcePawn::IPluginFunction* plfnUpkeep) noexcept;
 	inline void SetUpdateCallback(SourcePawn::IPluginFunction* plfnUpdate) noexcept;
+
+	inline bool HasHandleError() const noexcept;
+	inline SourceMod::HandleType_t GetHandle() const noexcept;
+	inline SourceMod::HandleError GetHandleError() const noexcept;
 
 	void SetName(const char* name);
 	const char* GetName() const;
@@ -67,6 +77,8 @@ private:
 	ActionBehavior* m_subehavior;
 	const char* m_name;
 
+	SourceMod::HandleError m_handleError;
+	SourceMod::HandleType_t m_nHandle;
 	SourcePawn::IPluginContext* m_ctx;
 
 	SourcePawn::IPluginFunction* m_plfnInitial;
@@ -74,6 +86,21 @@ private:
 	SourcePawn::IPluginFunction* m_plfnUpdate;
 	SourcePawn::IPluginFunction* m_plfnUpkeep;
 };
+
+inline bool ActionComponent::HasHandleError() const noexcept
+{
+	return m_handleError != HandleError_None;
+}
+
+inline SourceMod::HandleType_t ActionComponent::GetHandle() const noexcept
+{
+	return m_nHandle;
+}
+
+inline SourceMod::HandleError ActionComponent::GetHandleError() const noexcept
+{
+	return m_handleError;
+}
 
 inline void ActionComponent::SetResetCallback(SourcePawn::IPluginFunction* plfnReset) noexcept
 {
