@@ -655,11 +655,8 @@ cell_t NAT_acitons_CreateComponent(IPluginContext* pContext, const cell_t* param
 cell_t NAT_acitons_ComponentUpdateCallback(IPluginContext* pContext, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleSecurity sec(nullptr, myself->GetIdentity());
 	HandleError err;
-	HandleSecurity sec;
-
-	sec.pOwner = nullptr;
-	sec.pIdentity = myself->GetIdentity();
 
 	ActionComponent* component = nullptr;
 	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
@@ -692,11 +689,8 @@ cell_t NAT_acitons_ComponentUpdateCallback(IPluginContext* pContext, const cell_
 cell_t NAT_acitons_ComponentUpkeepCallback(IPluginContext* pContext, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleSecurity sec(nullptr, myself->GetIdentity());
 	HandleError err;
-	HandleSecurity sec;
-
-	sec.pOwner = nullptr;
-	sec.pIdentity = myself->GetIdentity();
 
 	ActionComponent* component = nullptr;
 	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
@@ -729,11 +723,8 @@ cell_t NAT_acitons_ComponentUpkeepCallback(IPluginContext* pContext, const cell_
 cell_t NAT_acitons_ComponentResetCallback(IPluginContext* pContext, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleSecurity sec(nullptr, myself->GetIdentity());
 	HandleError err;
-	HandleSecurity sec;
-
-	sec.pOwner = nullptr;
-	sec.pIdentity = myself->GetIdentity();
 
 	ActionComponent* component = nullptr;
 	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
@@ -765,12 +756,9 @@ cell_t NAT_acitons_ComponentResetCallback(IPluginContext* pContext, const cell_t
 
 cell_t NAT_acitons_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 {
-	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	Handle_t hndl = static_cast<Handle_t>(params[1]); 
+	HandleSecurity sec(nullptr, myself->GetIdentity());
 	HandleError err;
-	HandleSecurity sec;
-
-	sec.pOwner = nullptr;
-	sec.pIdentity = myself->GetIdentity();
 
 	ActionComponent* component = nullptr;
 	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
@@ -805,7 +793,7 @@ cell_t NAT_acitons_ComponentSetName(IPluginContext* ctx, const cell_t* params)
 	HandleError err;
 	HandleSecurity sec;
 
-	sec.pOwner = nullptr;
+	sec.pOwner = ctx->GetIdentity();
 	sec.pIdentity = myself->GetIdentity();
 
 	ActionComponent* component = nullptr;

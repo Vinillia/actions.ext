@@ -4,6 +4,8 @@
 #include "actions_component.h"
 #include "hook.h"
 
+#include "sourcehook.h"
+
 #include <NextBotInterface.h>
 #include <NextBotComponentInterface.h>
 #include <NextBotBehavior.h>
@@ -14,39 +16,33 @@
 
 #define FOR_EACH_COMPONENT(bot,i) for( INextBotComponent* i = bot->m_componentList; i != nullptr; i = i->m_nextComponent )
 
-class NextBotIntention : public IIntention
-{
-public:
-	CBaseEntity* entity;
-	nb_behavior_ptr behavior;
-
-	inline nb_action_ptr GetAction()
-	{
-		if (behavior == nullptr)
-			return nullptr;
-
-		return (nb_action_ptr)(behavior->FirstContainedResponder());
-	}
-};
-
-class SurvivorBotIntention : public NextBotIntention
-{
-public:
-	nb_behavior_ptr subehavior;
-
-	inline nb_action_ptr GetSubAction()
-	{
-		if (subehavior == nullptr)
-			return nullptr;
-
-		return (nb_action_ptr)(subehavior->FirstContainedResponder());
-	}
-};
-
 std::unordered_map<CBaseEntity*, INextBot*> g_entitiesNextbot;
-CDetour* g_pNextBotDetour = nullptr;
+std::vector<IIntention*> g_vecHookedIntentions(32);
+CDetour* g_pNextBotResetDetour = nullptr;
 
-NextBotIntention* GetNextBotIntention(INextBotComponent* component);
+SH_DECL_HOOK0_void(IIntention, Reset, SH_NOATTRIB, 0);
+
+inline nb_action_ptr NextBotIntention::GetAction()
+{
+	if (behavior == nullptr)
+		return nullptr;
+
+	return (nb_action_ptr)(behavior->FirstContainedResponder());
+}
+
+inline nb_action_ptr SurvivorBotIntention::GetSubAction()
+{
+	if (subehavior == nullptr)
+		return nullptr;
+
+	return (nb_action_ptr)(subehavior->FirstContainedResponder());
+}
+
+void IIntention__ResetPost()
+{
+	IIntention* intention = META_IFACEPTR(IIntention);
+	CatchIntention(intention->GetBot(), (NextBotIntention*)intention);
+}
 
 DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 {
@@ -61,39 +57,68 @@ DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 		if (!intention)
 			continue;
 
-		nb_action_ptr action = intention->GetAction();
+		CatchIntention(bot, intention);
+		HookIntention(intention);
+	}
+}
 
-		if (bot->GetEntity())
+void CatchIntention(INextBot* bot, NextBotIntention* intention)
+{
+	nb_action_ptr action = intention->GetAction();
+
+	if (bot->GetEntity())
+	{
+		g_entitiesNextbot[intention->entity] = bot;
+	}
+
+	if (action)
+	{
+		g_actionsManager.SetActionActor(action, intention->entity);
+		g_actionsManager.Add(action);
+	}
+
+	if (bot->MySurvivorBotPointer())
+	{
+		nb_action_ptr subaction = ((SurvivorBotIntention*)(intention))->GetSubAction();
+
+		if (subaction)
 		{
-			g_entitiesNextbot[intention->entity] = bot;
-		}
-
-		if (action)
-		{
-			g_actionsManager.SetActionActor(action, intention->entity);
-			g_actionsManager.Add(action);
-		}
-
-		if (bot->MySurvivorBotPointer())
-		{
-			nb_action_ptr subaction = ((SurvivorBotIntention*)(intention))->GetSubAction();
-
-			if (subaction)
-			{
-				g_actionsManager.SetActionActor(subaction, intention->entity);
-				g_actionsManager.Add(subaction);
-			}
+			g_actionsManager.SetActionActor(subaction, intention->entity);
+			g_actionsManager.Add(subaction);
 		}
 	}
 }
 
+void UnhookIntentions()
+{
+	for (auto intention : g_vecHookedIntentions)
+	{
+		SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
+	}
+
+	g_vecHookedIntentions.clear();
+}
+
+void HookIntention(IIntention* intention)
+{
+	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
+	g_vecHookedIntentions.push_back(intention);
+}
+
+void UnHookIntention(IIntention* intention)
+{
+	SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
+	g_vecHookedIntentions.erase(std::find(g_vecHookedIntentions.begin(), g_vecHookedIntentions.end(), intention));
+}
+
+
 bool CreateActionsHook()
 {
-	g_pNextBotDetour = DETOUR_CREATE_MEMBER(INextBot__Reset, "INextBot::Reset");
+	g_pNextBotResetDetour = DETOUR_CREATE_MEMBER(INextBot__Reset, "INextBot::Reset");
 
-	if (g_pNextBotDetour)
+	if (g_pNextBotResetDetour)
 	{
-		g_pNextBotDetour->EnableDetour();
+		g_pNextBotResetDetour->EnableDetour();
 		return true;
 	}
 
@@ -102,11 +127,13 @@ bool CreateActionsHook()
 
 void DestroyActionsHook()
 {
-	if (g_pNextBotDetour)
+	if (g_pNextBotResetDetour)
 	{
-		g_pNextBotDetour->Destroy();
-		g_pNextBotDetour = nullptr;
+		g_pNextBotResetDetour->Destroy();
+		g_pNextBotResetDetour = nullptr;
 	}
+
+	UnhookIntentions();
 }
 
 NextBotIntention* GetNextBotIntention(INextBotComponent* component)

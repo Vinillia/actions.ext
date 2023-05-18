@@ -4,6 +4,7 @@
 #include "actions_manager.h"
 
 #include <list>
+#include <unordered_map>
 
 #include "actions_custom_legacy.h"
 #include "NextBotManager.h"
@@ -13,13 +14,24 @@
 
 #include "hook.h"
 
-std::list<ActionComponent*> g_actionComponents;
-ConVar* NextBotDebugHistory = nullptr;
+extern ConVar* developer;
+extern ConVar* NextBotDebugHistory;
 extern ConVar ext_actions_debug_memory;
+
+std::unordered_map<INextBot*, std::list<ActionComponent*>> g_nextbotComponents;
 
 ActionBehavior::ActionBehavior(nb_action_ptr initialAction, const char* name, INextBot* nextbot) : Behavior<CBaseEntity>(initialAction, name)
 {
 	m_nextbot = nextbot;
+
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f: NEW BEHAVIOR %s ( 0x%X )", gpGlobals->curtime, GetName(), this);
+}
+
+ActionBehavior::~ActionBehavior()
+{
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f: DELETE BEHAVIOR %s ( 0x%X )", gpGlobals->curtime, GetName(), this);
 }
 
 void ActionBehavior::Update(CBaseEntity* me, float interval)
@@ -56,7 +68,8 @@ const char* ActionBehavior::GetName() const
 
 ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, SourcePawn::IPluginFunction* plfinitial, const char* name) : IIntention(me)
 {
-	// g_actionComponents.push_back(this);
+	g_nextbotComponents[me].push_back(this);
+
 	m_plfnInitial = plfinitial;
 	m_plfnReset = nullptr;
 	m_plfnUpdate = nullptr;
@@ -73,30 +86,48 @@ ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, 
 
 	m_ctx = ctx;
 	m_entity = (CBaseEntity*)me->GetEntity();
-	m_behavior = new ActionBehavior(InitialAction(), m_name, me);
-
-	if (m_behavior->m_action)
-		g_actionsManager.Add(m_behavior->m_action);
+	m_behavior = CreateBehavior(me, m_name);
 
 	if (ext_actions_debug_memory.GetBool())
-		Msg("%.3f: NEW COMPONENT 0x%X", gpGlobals->curtime, this);
+		Msg("%.3f: NEW COMPONENT %s ( 0x%X )", gpGlobals->curtime, GetName(), this);
 }
 
 ActionComponent::~ActionComponent()
 {
 	if (ext_actions_debug_memory.GetBool())
-		Msg("%.3f: DELETE COMPONENT 0x%X", gpGlobals->curtime, this);
+		Msg("%.3f: DELETE COMPONENT %s ( 0x%X )", gpGlobals->curtime, GetName(), this);
 
-	// g_actionComponents.remove(this);
-	delete m_behavior;
+	if (m_nHandle)
+	{
+		HandleType_t handle = m_nHandle; 
+		HandleSecurity sec(m_ctx->GetIdentity(), nullptr);
+
+		m_nHandle = 0;
+		m_handleError = handlesys->FreeHandle(handle, &sec);
+		if (m_handleError != HandleError_None)
+		{
+			Msg("Failed to free action component handle (error %i)", m_handleError);
+		}
+		else
+		{
+			Msg("Freed handle (%s)", GetName());
+		}
+	}
+
+	UnRegister();
+
+	if (m_behavior != nullptr)
+		delete m_behavior;
 }
 
 void ActionComponent::Reset(void)
 {
-	INextBot* bot = m_behavior->m_nextbot;
-	delete m_behavior; 
-	m_behavior = new ActionBehavior(InitialAction(), m_name, bot);
+	INextBot* bot = GetBot();
 
+	if (m_behavior != nullptr)
+		delete m_behavior;
+
+	m_behavior = CreateBehavior(bot, m_name);
 	NotifyReset();
 }
 
@@ -109,28 +140,6 @@ void ActionComponent::Update(void)
 {
 	m_behavior->Update(m_entity, GetUpdateInterval());
 	NotifyUpdate();
-}
-
-void ActionComponent::OnPluginUnloaded(IPluginContext* ctx)
-{
-	for (auto iter = g_actionComponents.begin(); iter != g_actionComponents.end();)
-	{
-		auto component = *iter;
-
-		if (component == nullptr)
-			break;
-
-		if (component->m_ctx == ctx)
-		{
-			component->UnRegister();
-			iter++;
-			delete component;
-		}
-		else
-		{
-			iter++;
-		}
-	}
 }
 
 void ActionComponent::SetName(const char* name)
@@ -153,6 +162,12 @@ void ActionComponent::UnRegister()
 
 	INextBotComponent* component = bot->m_componentList;
 	INextBotComponent* prevComponent = nullptr;
+
+	if (component->m_nextComponent == nullptr)
+	{
+		bot->m_componentList = nullptr;
+		return;
+	}
 
 	while (component)
 	{
@@ -183,7 +198,18 @@ void ActionComponent::UnRegister()
 	}
 }
 
-inline nb_action_ptr ActionComponent::InitialAction()
+inline ActionBehavior* ActionComponent::CreateBehavior(INextBot* bot, const char* name)
+{
+	nb_action_ptr action = CreateAction();
+	ActionBehavior* behavior = new ActionBehavior(action, name, bot);
+
+	if (action)
+		g_actionsManager.Add(action);
+
+	return behavior;
+}
+
+inline nb_action_ptr ActionComponent::CreateAction()
 {
 	if (HasHandleError())
 	{
@@ -191,19 +217,19 @@ inline nb_action_ptr ActionComponent::InitialAction()
 		return nullptr;
 	}
 
-	nb_action_ptr initialAction = nullptr;
+	nb_action_ptr action = nullptr;
 
 	if (m_plfnInitial)
 	{
 		m_plfnInitial->PushCell(GetHandle());
 		m_plfnInitial->PushCell(gamehelpers->EntityToBCompatRef(m_entity));
-		m_plfnInitial->Execute((cell_t*)&initialAction);
+		m_plfnInitial->Execute((cell_t*)&action);
 	}
 
-	if (initialAction == nullptr)
-		initialAction = reinterpret_cast<nb_action_ptr>(new ActionCustomLegacy("ActionComponent"));
+	if (action == nullptr)
+		action = reinterpret_cast<nb_action_ptr>(new ActionCustomLegacy("ActionComponent"));
 
-	return initialAction;
+	return action;
 }
 
 inline void ActionComponent::NotifyReset()
@@ -236,37 +262,29 @@ inline void ActionComponent::NotifyUpkeep()
 	}
 }
 
-void ActionComponent::UnRegisterComponents()
+void ActionComponent::DestroyComponents(CBaseEntity* entity)
 {
-	for (auto iter = g_actionComponents.begin(); iter != g_actionComponents.end();)
+	INextBot* bot = GetEntityNextbotPointer(entity);
+
+	if (bot == nullptr)
 	{
-		auto component = *iter;
-
-		if (component == nullptr)
-			break;
-
-		component->UnRegister();
-		iter++;
-		delete component;
+		Msg("DestroyComponents: Failed to get entity nextbot ptr");
+		return;
 	}
+
+	auto& components = g_nextbotComponents[bot];
+	for (auto it = components.begin(); it != components.end(); it++)
+	{
+		delete *it;
+	}
+
+	components.clear();
 }
-
-bool ActionComponent::IsValidComponent(ActionComponent* comp) noexcept
-{
-	/*
-	* Handle system will save us 
-	auto r = std::find(g_actionComponents.cbegin(), g_actionComponents.cend(), comp);
-	return r != g_actionComponents.cend();
-	*/
-
-	return true;
-}
-
 
 void ActionComponent::OnHandleDestroy(HandleType_t type)
 {
-	UnRegister();
-	delete this;
+	if (m_nHandle)
+		delete this;
 }
 
 bool ActionComponent::GetHandleApproxSize(HandleType_t type, unsigned int* pSize)
@@ -274,7 +292,6 @@ bool ActionComponent::GetHandleApproxSize(HandleType_t type, unsigned int* pSize
 	*pSize = sizeof(ActionComponent);
 	return true;
 }
-
 
 void ActionDebugMsg(Behavior<CBaseEntity>* behavior, Action<CBaseEntity>* action, CBaseEntity* actor, std::string_view method)
 {

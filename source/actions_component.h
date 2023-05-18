@@ -19,6 +19,7 @@ class ActionBehavior : protected Behavior<CBaseEntity>
 public:
 	ActionBehavior(nb_action_ptr initialAction, const char* name, INextBot* bot);
 
+	virtual ~ActionBehavior() override;
 	void Update(CBaseEntity* me, float interval);
 	void Resume(CBaseEntity* me);
 	void SetName(const char* name);
@@ -35,7 +36,7 @@ class ActionComponent : private IIntention
 
 public:										
 	ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, SourcePawn::IPluginFunction* plfinitial = nullptr, const char* name = nullptr);
-	virtual ~ActionComponent();
+	virtual ~ActionComponent() override;
 
 private:
 	virtual void Reset(void) override;
@@ -44,13 +45,12 @@ private:
 	virtual INextBotEventResponder* FirstContainedResponder(void) const override { return (Behavior<CBaseEntity>*)m_behavior; }
 	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const override { return NULL; }
 
-	inline nb_action_ptr InitialAction();
+	nb_action_ptr CreateAction();
+	ActionBehavior* CreateBehavior(INextBot* bot, const char* name);
 
 	void NotifyReset();
 	void NotifyUpdate();
 	void NotifyUpkeep();
-
-	static void OnPluginUnloaded(SourcePawn::IPluginContext* ctx);
 
 	void OnHandleDestroy(HandleType_t type);
 	bool GetHandleApproxSize(HandleType_t type, unsigned int* pSize);
@@ -68,7 +68,7 @@ public:
 	const char* GetName() const;
 	void UnRegister();
 
-	static void UnRegisterComponents();
+	static void DestroyComponents(CBaseEntity* entity);
 	static bool IsValidComponent(ActionComponent* component) noexcept;
 
 private:			

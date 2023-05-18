@@ -43,14 +43,14 @@ protected:
 };
 
 
-class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor
+class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor, public IClientListener
 {
 public: // SDKExtension
 	virtual bool SDK_OnLoad(char* error, size_t maxlen, bool late) override;
 	virtual void SDK_OnUnload() override;
 	virtual void SDK_OnAllLoaded() override;
 	// virtual void SDK_OnPauseChange(bool paused) override;
-	virtual bool QueryRunning(char* error, size_t maxlen) override;
+	// virtual bool QueryRunning(char* error, size_t maxlen) override;
 
 public: // SDKExtension MetaMod
 #if defined SMEXT_CONF_METAMOD
@@ -70,13 +70,17 @@ public: // ActionsManager
 	virtual void OnActionCreated(nb_action_ptr action);
 	virtual void OnActionDestroyed(nb_action_ptr action);
 
+public: // IClientListener
+	virtual void OnClientDisconnecting(int client) override;
+
+public:
 	bool CreateHandleTypes(HandleError* err);
 
 	inline HandleType_t GetComponentHT() const noexcept { return m_htActionComponent; };
 	inline bool IsNextBotDebugSupported() const noexcept { return m_isNextBotDebugSupported; }
 
 private:
-	IGameConfig* m_pConfig = nullptr;
+	IGameConfig* m_pConfig;
 	bool m_isNextBotDebugSupported;
 
 	HandleType_t m_htActionComponent;

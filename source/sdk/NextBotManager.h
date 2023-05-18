@@ -31,6 +31,7 @@ public:
 
 	friend class INextBot;
 
+public:
 	CUtlLinkedList< INextBot * > m_botList;				// list of all active NextBots
 
 private:

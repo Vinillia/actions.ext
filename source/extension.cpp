@@ -22,6 +22,9 @@ SMEXT_LINK(&g_sdkActions);
 ConVar ext_actions_debug("ext_actions_debug", "0", FCVAR_NONE, "1 - Enable debug, 0 - Disable debug");
 ConVar ext_actions_debug_memory("ext_actions_debug_memory", "0", FCVAR_NONE, "Log component creation/deletion");
 
+ConVar* developer = nullptr;
+ConVar* NextBotDebugHistory = nullptr;
+
 CGlobalVars* gpGlobals = nullptr; 
 ICvar* icvar = nullptr;
 
@@ -62,6 +65,8 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	RegisterLegacyNatives();
 
 	plsys->AddPluginsListener(this);
+	playerhelpers->AddClientListener(this);
+
 	sharesys->RegisterLibrary(myself, "actionslib");
 	return true;
 }
@@ -69,6 +74,7 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 void SDKActions::SDK_OnAllLoaded()
 {
 	NextBotDebugHistory = icvar->FindVar("nb_debug_history");
+	developer = icvar->FindVar("developer");
 
 	m_fwdOnActionCreated = forwards->CreateForward("OnActionCreated", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
 	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
@@ -96,6 +102,7 @@ void SDKActions::SDK_OnUnload()
 	forwards->ReleaseForward(m_fwdOnActionCreated);
 	forwards->ReleaseForward(m_fwdOnActionDestroyed);
 	plsys->RemovePluginsListener(this);
+	playerhelpers->RemoveClientListener(this);
 
 	/* 
 	* Handle sys can handle this 
@@ -104,11 +111,6 @@ void SDKActions::SDK_OnUnload()
 
 	StopActionProcessing();
 	DestroyActionsHook();
-}
-
-bool SDKActions::QueryRunning(char* error, size_t maxlength)
-{
-	return true;
 }
 
 void SDKActions::OnPluginLoaded(IPlugin* plugin)
@@ -160,14 +162,26 @@ bool SDKActions::RegisterConCommandBase(ConCommandBase* command)
 
 bool SDKActions::CreateHandleTypes(HandleError* err)
 {
-	TypeAccess tacc;
-	handlesys->InitAccessDefaults(&tacc, nullptr);
-	
-	tacc.access[HTypeAccess_Create] = true;
-	tacc.access[HTypeAccess_Inherit] = true;
+	//	tacc.access[HTypeAccess_Create] = true;
+	//	tacc.access[HTypeAccess_Inherit] = true;
 
-	m_htActionComponent = g_pHandleSys->CreateType("ActionComponent", &g_componentDispatch, 0, &tacc, NULL, myself->GetIdentity(), err);
+	m_htActionComponent = g_pHandleSys->CreateType("ActionComponent", &g_componentDispatch, 0, NULL, NULL, myself->GetIdentity(), err);
 	return m_htActionComponent != 0;
+}
+
+void SDKActions::OnClientDisconnecting(int client)
+{
+	IGamePlayer* player = playerhelpers->GetGamePlayer(client);
+
+	if (!player->IsFakeClient())
+		return;
+
+	CBaseEntity* entity = gamehelpers->ReferenceToEntity(client);
+
+	if (entity == nullptr)
+		return;
+
+	ActionComponent::DestroyComponents(entity);
 }
 
 void IActionComponentDispatch::OnHandleDestroy(HandleType_t type, void* object)

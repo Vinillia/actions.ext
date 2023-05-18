@@ -7,6 +7,9 @@
 
 #include <stdarg.h>
 
+extern ConVar* NextBotDebugHistory;
+extern ConVar* developer;
+
 void INextBot::RegisterComponent(INextBotComponent* comp)
 {
 	comp->m_nextComponent = m_componentList;
@@ -36,19 +39,6 @@ bool INextBot::IsDebugging(unsigned int type) const
 	return false;
 }
 
-//const char* INextBot::GetDebugIdentifier(void) const
-//{
-//	const int nameSize = 256;
-//	static char name[nameSize];
-//
-//	const char* classname = gamehelpers->GetEntityClassname((CBaseEntity*)this->GetEntity());
-//	int entindex = gamehelpers->EntityToReference((CBaseEntity*)this->GetEntity());
-//
-//	Q_snprintf(name, nameSize, "%s(#%d)", classname, entindex);
-//
-//	return name;
-//}
-
 void INextBot::ResetDebugHistory(void)
 {
 	if (!g_sdkActions.IsNextBotDebugSupported())
@@ -64,11 +54,8 @@ void INextBot::ResetDebugHistory(void)
 
 void INextBot::DebugConColorMsg(NextBotDebugType debugType, const Color& color, const char* fmt, ...)
 {
-	if (!g_sdkActions.IsNextBotDebugSupported())
+	if (!g_sdkActions.IsNextBotDebugSupported() || NextBotDebugHistory == nullptr || developer == nullptr)
 		return;
-
-	static ConVar* developer = icvar->FindVar("developer");
-	static ConVar* NextBotDebugHistory = icvar->FindVar("nb_debug_history");
 
 	bool isDataFormatted = false;
 
