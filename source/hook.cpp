@@ -2,6 +2,7 @@
 #include "actionsdefs.h"
 #include "actions_manager.h"
 #include "actions_component.h"
+#include "actions_processor.h"
 #include "hook.h"
 
 #include "sourcehook.h"
@@ -36,6 +37,12 @@ inline nb_action_ptr SurvivorBotIntention::GetSubAction()
 		return nullptr;
 
 	return (nb_action_ptr)(subehavior->FirstContainedResponder());
+}
+
+void IIntention__ResetPre()
+{
+	IIntention* intention = META_IFACEPTR(IIntention);
+	UncatchCatchIntention(intention->GetBot(), (NextBotIntention*)intention);
 }
 
 void IIntention__ResetPost()
@@ -89,10 +96,36 @@ void CatchIntention(INextBot* bot, NextBotIntention* intention)
 	}
 }
 
+void UncatchCatchIntention(INextBot* bot, NextBotIntention* intention)
+{
+	nb_action_ptr action = intention->GetAction();
+
+	if (bot->GetEntity())
+	{
+		g_entitiesNextbot[intention->entity] = nullptr;
+	}
+
+	if (action)
+	{
+		StopActionProcessing(action);
+	}
+
+	if (bot->MySurvivorBotPointer())
+	{
+		nb_action_ptr subaction = ((SurvivorBotIntention*)(intention))->GetSubAction();
+
+		if (subaction)
+		{
+			StopActionProcessing(subaction);
+		}
+	}
+}
+
 void UnhookIntentions()
 {
 	for (auto intention : g_vecHookedIntentions)
 	{
+		SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
 		SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
 	}
 
@@ -101,16 +134,17 @@ void UnhookIntentions()
 
 void HookIntention(IIntention* intention)
 {
+	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
 	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
 	g_vecHookedIntentions.push_back(intention);
 }
 
 void UnHookIntention(IIntention* intention)
 {
+	SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
 	SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
 	g_vecHookedIntentions.erase(std::find(g_vecHookedIntentions.begin(), g_vecHookedIntentions.end(), intention));
 }
-
 
 bool CreateActionsHook()
 {

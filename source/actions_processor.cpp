@@ -139,7 +139,7 @@ bool BeginActionProcessing(nb_action_ptr action)
 	auto r = g_virtualMap.findForAdd(action);
 	if (r.found())
 	{
-		Warning("BeginActionProcessing called two times!");
+		// Warning("BeginActionProcessing called two times!");
 		return false;
 	}
 
@@ -155,7 +155,7 @@ bool StopActionProcessing(nb_action_ptr action)
 
 	if (!r.found())
 	{
-		Warning("StopActionProcessing failed to find action!");
+		// Warning("StopActionProcessing failed to find action!");
 		return false;
 	}
 

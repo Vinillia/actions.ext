@@ -281,7 +281,11 @@ methodmap ActionComponent < Handle
  	*
  	* @return 					New handle to component 
  	*/
-	public native ActionComponent(int entity, ActionComponentInitialAction fnInitialAction = INVALID_FUNCTION, ActionComponentFn fnUpdate = INVALID_FUNCTION, ActionComponentFn fnUpkeep = INVALID_FUNCTION, ActionComponentFn fnReset = INVALID_FUNCTION, const char[] name = NULL_STRING);
+	public native ActionComponent(int entity, ActionComponentInitialAction fnInitialAction = INVALID_FUNCTION, 
+												ActionComponentFn fnUpdate = INVALID_FUNCTION, 
+												ActionComponentFn fnUpkeep = INVALID_FUNCTION, 
+												ActionComponentFn fnReset = INVALID_FUNCTION, 
+												const char[] name = NULL_STRING);
 
 	/**
  	* @brief Gets behavior name

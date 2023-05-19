@@ -45,7 +45,9 @@ public:
 void HookIntention(IIntention* intention);
 void UnHookIntention(IIntention* intention);
 void UnhookIntentions();
+
 void CatchIntention(INextBot* bot, NextBotIntention* intention);
+void UncatchCatchIntention(INextBot* bot, NextBotIntention* intention);
 
 NextBotIntention* GetNextBotIntention(INextBotComponent* component);
 INextBot* GetEntityNextbotPointer(CBaseEntity* entity);
