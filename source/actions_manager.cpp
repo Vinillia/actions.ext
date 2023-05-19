@@ -18,12 +18,18 @@ ActionsManager::~ActionsManager()
 
 void ActionsManager::Add(nb_action_ptr const action)
 {
+	if (m_actions.find(action).found())
+		return;
+
 	m_actions.add(action);
 	OnActionCreated(action);
 }
 
 void ActionsManager::Remove(nb_action_ptr const action)
 {
+	if (!m_actions.find(action).found())
+		return;
+
 	OnActionDestroyed(action);
 	m_actions.removeIfExists(action);
 }

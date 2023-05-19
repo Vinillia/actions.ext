@@ -69,7 +69,6 @@ public:
 	void UnRegister();
 
 	static void DestroyComponents(CBaseEntity* entity);
-	static bool IsValidComponent(ActionComponent* component) noexcept;
 
 private:			
 	CBaseEntity* m_entity;

@@ -100,14 +100,9 @@ void UncatchCatchIntention(INextBot* bot, NextBotIntention* intention)
 {
 	nb_action_ptr action = intention->GetAction();
 
-	if (bot->GetEntity())
-	{
-		g_entitiesNextbot[intention->entity] = nullptr;
-	}
-
 	if (action)
 	{
-		StopActionProcessing(action);
+		g_actionsManager.Remove(action);
 	}
 
 	if (bot->MySurvivorBotPointer())
@@ -116,7 +111,7 @@ void UncatchCatchIntention(INextBot* bot, NextBotIntention* intention)
 
 		if (subaction)
 		{
-			StopActionProcessing(subaction);
+			g_actionsManager.Remove(subaction);
 		}
 	}
 }
@@ -136,6 +131,7 @@ void HookIntention(IIntention* intention)
 {
 	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
 	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
+
 	g_vecHookedIntentions.push_back(intention);
 }
 
