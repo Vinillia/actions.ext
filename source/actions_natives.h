@@ -613,7 +613,7 @@ cell_t NAT_actions_SetActionUserDataIdentity(IPluginContext* pContext, const cel
 	return 0;
 }
 
-cell_t NAT_acitons_CreateComponent(IPluginContext* pContext, const cell_t* params)
+cell_t NAT_actions_CreateComponent(IPluginContext* pContext, const cell_t* params)
 {
 	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[1]);
 	IPluginFunction* fnInitial = pContext->GetFunctionById(params[2]);
@@ -652,7 +652,7 @@ cell_t NAT_acitons_CreateComponent(IPluginContext* pContext, const cell_t* param
 	return component->GetHandle();
 }
 
-cell_t NAT_acitons_ComponentUpdateCallback(IPluginContext* pContext, const cell_t* params)
+cell_t NAT_actions_ComponentUpdateCallback(IPluginContext* pContext, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
 	HandleSecurity sec(nullptr, myself->GetIdentity());
@@ -686,7 +686,7 @@ cell_t NAT_acitons_ComponentUpdateCallback(IPluginContext* pContext, const cell_
 	return 0;
 }
 
-cell_t NAT_acitons_ComponentUpkeepCallback(IPluginContext* pContext, const cell_t* params)
+cell_t NAT_actions_ComponentUpkeepCallback(IPluginContext* pContext, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
 	HandleSecurity sec(nullptr, myself->GetIdentity());
@@ -720,7 +720,7 @@ cell_t NAT_acitons_ComponentUpkeepCallback(IPluginContext* pContext, const cell_
 	return 0;
 }
 
-cell_t NAT_acitons_ComponentResetCallback(IPluginContext* pContext, const cell_t* params)
+cell_t NAT_actions_ComponentResetCallback(IPluginContext* pContext, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
 	HandleSecurity sec(nullptr, myself->GetIdentity());
@@ -754,7 +754,7 @@ cell_t NAT_acitons_ComponentResetCallback(IPluginContext* pContext, const cell_t
 	return 0;
 }
 
-cell_t NAT_acitons_ComponentGetName(IPluginContext* ctx, const cell_t* params)
+cell_t NAT_actions_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]); 
 	HandleSecurity sec(nullptr, myself->GetIdentity());
@@ -787,7 +787,7 @@ cell_t NAT_acitons_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 	return ctx->StringToLocal(params[2], params[3], name);
 }
 
-cell_t NAT_acitons_ComponentSetName(IPluginContext* ctx, const cell_t* params)
+cell_t NAT_actions_ComponentSetName(IPluginContext* ctx, const cell_t* params)
 {
 	Handle_t hndl = static_cast<Handle_t>(params[1]);
 	HandleError err;
@@ -818,6 +818,25 @@ cell_t NAT_acitons_ComponentSetName(IPluginContext* ctx, const cell_t* params)
 	return 0;
 }
 
+cell_t NAT_actions_ComponentCurrentAction(IPluginContext* ctx, const cell_t* params)
+{
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleError err;
+	HandleSecurity sec;
+
+	sec.pOwner = ctx->GetIdentity();
+	sec.pIdentity = myself->GetIdentity();
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return ctx->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
+	return (cell_t)component->CurrentAction();
+}
+
 sp_nativeinfo_t g_actionsNatives[] =
 {
 	{ "__action_setlistener",						NAT_actions_setlistener },
@@ -828,12 +847,13 @@ sp_nativeinfo_t g_actionsNatives[] =
 	{ "ActionsManager.SetActionUserData",			NAT_actions_SetActionUserData },
 	{ "ActionsManager.GetActionUserData",			NAT_actions_GetActionUserData },
 
-	{ "ActionComponent.ActionComponent",			NAT_acitons_CreateComponent },
-	{ "ActionComponent.GetName",					NAT_acitons_ComponentGetName },
-	{ "ActionComponent.SetName",					NAT_acitons_ComponentSetName },
-	{ "ActionComponent.Update.set",					NAT_acitons_ComponentUpdateCallback },
-	{ "ActionComponent.Upkeep.set",					NAT_acitons_ComponentUpkeepCallback },
-	{ "ActionComponent.Reset.set",					NAT_acitons_ComponentResetCallback },
+	{ "ActionComponent.ActionComponent",			NAT_actions_CreateComponent },
+	{ "ActionComponent.GetName",					NAT_actions_ComponentGetName },
+	{ "ActionComponent.SetName",					NAT_actions_ComponentSetName },
+	{ "ActionComponent.CurrentAction.get",			NAT_actions_ComponentCurrentAction },
+	{ "ActionComponent.Update.set",					NAT_actions_ComponentUpdateCallback },
+	{ "ActionComponent.Upkeep.set",					NAT_actions_ComponentUpkeepCallback },
+	{ "ActionComponent.Reset.set",					NAT_actions_ComponentResetCallback },
 
 	{ "BehaviorAction.GetName",						NAT_actions_GetName },
 

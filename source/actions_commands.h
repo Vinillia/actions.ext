@@ -60,6 +60,15 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
     Msg("DUPMING ACTIONS END");
 }
 
+CON_COMMAND(ext_actions_nextbot_reset, "Resets nextbots")
+{
+    if (g_sdkActions.IsNextBotDebugSupported())
+    {
+        NextBotReset reset;
+        TheNextBots().ForEachBot(reset);
+    }
+}
+
 inline bool ClassMatchesComplex(cell_t entity, const char* match)
 {
 	CBaseEntity* pEntity = gamehelpers->ReferenceToEntity(entity);

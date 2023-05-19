@@ -22,10 +22,10 @@ std::unordered_map<INextBot*, std::list<ActionComponent*>> g_nextbotComponents;
 
 ActionBehavior::ActionBehavior(nb_action_ptr initialAction, const char* name, INextBot* nextbot) : Behavior<CBaseEntity>(initialAction, name)
 {
-	m_nextbot = nextbot;
-
 	if (ext_actions_debug_memory.GetBool())
 		Msg("%.3f: NEW BEHAVIOR %s ( 0x%X )", gpGlobals->curtime, GetName(), this);
+
+	m_nextbot = nextbot;
 }
 
 ActionBehavior::~ActionBehavior()
@@ -63,11 +63,17 @@ void ActionBehavior::SetName(const char* name)
 
 const char* ActionBehavior::GetName() const
 {
-	return m_name;
+	return (const char*)m_name;
 }
 
 ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, SourcePawn::IPluginFunction* plfinitial, const char* name) : IIntention(me)
 {
+	if (name == nullptr)
+		name = "ActionComponent";
+
+	if (ext_actions_debug_memory.GetBool())
+		Msg("%.3f: NEW COMPONENT %s ( 0x%X )", gpGlobals->curtime, name, this);
+
 	g_nextbotComponents[me].push_back(this);
 
 	m_plfnInitial = plfinitial;
@@ -75,7 +81,8 @@ ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, 
 	m_plfnUpdate = nullptr;
 	m_plfnUpkeep = nullptr;
 	m_subehavior = nullptr;
-	m_name = name ? name : "ActionComponent";
+
+	m_name = name;
 
 	m_handleError = HandleError_None;
 	m_nHandle = g_pHandleSys->CreateHandle(g_sdkActions.GetComponentHT(),
@@ -87,9 +94,6 @@ ActionComponent::ActionComponent(INextBot* me, SourcePawn::IPluginContext* ctx, 
 	m_ctx = ctx;
 	m_entity = (CBaseEntity*)me->GetEntity();
 	m_behavior = CreateBehavior(me, m_name);
-
-	if (ext_actions_debug_memory.GetBool())
-		Msg("%.3f: NEW COMPONENT %s ( 0x%X )", gpGlobals->curtime, GetName(), this);
 }
 
 ActionComponent::~ActionComponent()
@@ -108,16 +112,15 @@ ActionComponent::~ActionComponent()
 		{
 			Msg("Failed to free action component handle (error %i)", m_handleError);
 		}
-		else
-		{
-			Msg("Freed handle (%s)", GetName());
-		}
 	}
 
 	UnRegister();
 
 	if (m_behavior != nullptr)
+	{
 		delete m_behavior;
+		m_behavior = nullptr;
+	}
 }
 
 void ActionComponent::Reset(void)
@@ -138,14 +141,23 @@ void ActionComponent::Upkeep(void)
 
 void ActionComponent::Update(void)
 {
-	m_behavior->Update(m_entity, GetUpdateInterval());
-	NotifyUpdate();
+	ResultType result = NotifyUpdate();
+
+	if (result == Pl_Handled)
+		return;
+
+	if (m_behavior)
+		m_behavior->Update(m_entity, GetUpdateInterval());
 }
 
 void ActionComponent::SetName(const char* name)
 {
 	if (m_behavior)
+	{
 		m_behavior->SetName(name);
+	}
+
+	m_name = name;
 }
 
 const char* ActionComponent::GetName() const
@@ -204,7 +216,10 @@ inline ActionBehavior* ActionComponent::CreateBehavior(INextBot* bot, const char
 	ActionBehavior* behavior = new ActionBehavior(action, name, bot);
 
 	if (action)
+	{
+		g_actionsManager.SetActionActor(action, m_entity);
 		g_actionsManager.Add(action);
+	}
 
 	return behavior;
 }
@@ -242,14 +257,18 @@ inline void ActionComponent::NotifyReset()
 	}
 }
 
-inline void ActionComponent::NotifyUpdate()
+inline ResultType ActionComponent::NotifyUpdate()
 {
+	ResultType result = Pl_Continue;
+
 	if (m_plfnUpdate)
 	{
 		m_plfnUpdate->PushCell(GetHandle());
 		m_plfnUpdate->PushCell(gamehelpers->EntityToBCompatRef(m_entity));
-		m_plfnUpdate->Execute(nullptr);
+		m_plfnUpdate->Execute((cell_t*)&result);
 	}
+
+	return result;
 }
 
 inline void ActionComponent::NotifyUpkeep()
@@ -268,7 +287,7 @@ void ActionComponent::DestroyComponents(CBaseEntity* entity)
 
 	if (bot == nullptr)
 	{
-		Msg("DestroyComponents: Failed to get entity nextbot ptr");
+		// Msg("DestroyComponents: Failed to get entity nextbot ptr");
 		return;
 	}
 
@@ -284,7 +303,10 @@ void ActionComponent::DestroyComponents(CBaseEntity* entity)
 void ActionComponent::OnHandleDestroy(HandleType_t type)
 {
 	if (m_nHandle)
+	{
+		g_nextbotComponents[m_bot].remove(this);
 		delete this;
+	}
 }
 
 bool ActionComponent::GetHandleApproxSize(HandleType_t type, unsigned int* pSize)

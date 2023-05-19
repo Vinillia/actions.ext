@@ -48,8 +48,8 @@ private:
 	nb_action_ptr CreateAction();
 	ActionBehavior* CreateBehavior(INextBot* bot, const char* name);
 
+	ResultType NotifyUpdate();
 	void NotifyReset();
-	void NotifyUpdate();
 	void NotifyUpkeep();
 
 	void OnHandleDestroy(HandleType_t type);
@@ -60,6 +60,8 @@ public:
 	inline void SetUpkeepCallback(SourcePawn::IPluginFunction* plfnUpkeep) noexcept;
 	inline void SetUpdateCallback(SourcePawn::IPluginFunction* plfnUpdate) noexcept;
 
+	inline nb_action_ptr CurrentAction();
+
 	inline bool HasHandleError() const noexcept;
 	inline SourceMod::HandleType_t GetHandle() const noexcept;
 	inline SourceMod::HandleError GetHandleError() const noexcept;
@@ -67,6 +69,7 @@ public:
 	void SetName(const char* name);
 	const char* GetName() const;
 	void UnRegister();
+
 
 	static void DestroyComponents(CBaseEntity* entity);
 
@@ -114,6 +117,14 @@ inline void ActionComponent::SetUpkeepCallback(SourcePawn::IPluginFunction* plfn
 inline void ActionComponent::SetUpdateCallback(SourcePawn::IPluginFunction* plfnUpdate) noexcept
 {
 	m_plfnUpdate = plfnUpdate;
+}
+
+inline nb_action_ptr ActionComponent::CurrentAction()
+{
+	if (m_behavior)
+		return m_behavior->m_action;
+
+	return nullptr;
 }
 
 

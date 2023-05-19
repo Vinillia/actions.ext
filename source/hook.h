@@ -28,6 +28,18 @@ public:
 	inline nb_action_ptr GetSubAction();
 };
 
+class NextBotReset
+{
+public:
+	NextBotReset() = default;
+
+	bool operator() (INextBot* bot)
+	{
+		bot->Reset();
+		return true;
+	}
+};
+
 class ComponentCollector
 {
 public:
@@ -47,7 +59,7 @@ void UnHookIntention(IIntention* intention);
 void UnhookIntentions();
 
 void CatchIntention(INextBot* bot, NextBotIntention* intention);
-void UncatchCatchIntention(INextBot* bot, NextBotIntention* intention);
+void UnCatchIntention(INextBot* bot, NextBotIntention* intention);
 
 NextBotIntention* GetNextBotIntention(INextBotComponent* component);
 INextBot* GetEntityNextbotPointer(CBaseEntity* entity);

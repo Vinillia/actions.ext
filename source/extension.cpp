@@ -6,20 +6,23 @@
 #include "actions_propagation.h"
 #include "actions_manager.h"
 #include "actions_pubvars.h"
-#include "actions_commands.h"
 #include "actions_component.h"
 
 #include "actions_natives.h"
 #include "actions_legacy.h"
 #include "actions_legacy_listeners.h"
-#include <CDetour/detours.h>
 
+#include <CDetour/detours.h>
 #include <compat_wrappers.h>
+
+#include "NextBotManager.h"
+#include "actions_commands.h"
 
 SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
 
 ConVar ext_actions_debug("ext_actions_debug", "0", FCVAR_NONE, "1 - Enable debug, 0 - Disable debug");
+ConVar ext_actions_late_reset("ext_actions_late_reset", "0", FCVAR_NONE, "1 - Enable reset after load, 0 - Disable late load reset");
 ConVar ext_actions_debug_memory("ext_actions_debug_memory", "0", FCVAR_NONE, "Log component creation/deletion");
 
 ConVar* developer = nullptr;
@@ -31,7 +34,6 @@ ICvar* icvar = nullptr;
 IActionComponentDispatch g_componentDispatch;
 
 extern void InitVirtualMap();
-extern class NextBotManager& TheNextBots(void* pfn = nullptr);
 
 bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
@@ -80,6 +82,12 @@ void SDKActions::SDK_OnAllLoaded()
 	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
 
 	CreateActionsHook();
+
+	if (IsNextBotDebugSupported() && ext_actions_late_reset.GetBool())
+	{
+		NextBotReset reset;
+		TheNextBots().ForEachBot(reset);
+	}
 }
 
 bool SDKActions::SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bool late) 

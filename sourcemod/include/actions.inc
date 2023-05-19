@@ -121,25 +121,38 @@ methodmap ActionDesiredResult < ActionResult
  */
 typedef ActionsIteratorCallback = function void (BehaviorAction action);
 
-/**
- * @brief Called for requesting initial action as first action of component/behavior
- *
- * @param component		Action component handle
- * @param entity		Entity index
- * 
- * @return				Initial action
- */
-typedef ActionComponentInitialAction = function BehaviorAction(ActionComponent component, int entity);
+typeset ActionComponentFn
+{
+	/**
+	 * @brief Called for requesting initial action as first action of component/behavior
+	 *
+	 * @param component		Action component handle
+	 * @param entity		Entity index
+	 * 
+	 * @return				Initial action
+	 */
+	function BehaviorAction(ActionComponent component, int entity);
 
-/**
- * @brief Base action component callback definition
- *
- * @param component		Action component handle
- * @param entity		Entity index
- *
- * @noreturn
- */
-typedef ActionComponentFn = function void(ActionComponent component, int entity);
+	/**
+	 * @brief Base component callback definition
+	 *
+	 * @param component		Action component handle
+	 * @param entity		Entity index
+	 *
+	 * @noreturn
+	 */
+	function void(ActionComponent component, int entity);
+
+	/**
+	 * @brief Update component callback definition
+	 *
+	 * @param component		Action component handle
+	 * @param entity		Entity index
+	 *
+	 * @return				Plugin_Continue to ignore, Plugin_Handled to block update
+	 */
+	function Action(ActionComponent component, int entity);
+}
 
 /**
  * @brief Called whenever action is created
@@ -281,7 +294,7 @@ methodmap ActionComponent < Handle
  	*
  	* @return 					New handle to component 
  	*/
-	public native ActionComponent(int entity, ActionComponentInitialAction fnInitialAction = INVALID_FUNCTION, 
+	public native ActionComponent(int entity, ActionComponentFn fnInitialAction = INVALID_FUNCTION, 
 												ActionComponentFn fnUpdate = INVALID_FUNCTION, 
 												ActionComponentFn fnUpkeep = INVALID_FUNCTION, 
 												ActionComponentFn fnReset = INVALID_FUNCTION, 
@@ -305,6 +318,16 @@ methodmap ActionComponent < Handle
  	* @noreturn
  	*/
 	public native void SetName(char[] name);
+
+	/**
+ 	* @brief Returns current behavior action
+	* 
+ 	* @return Current action
+ 	*/
+	property BehaviorAction CurrentAction
+	{
+		public native get();
+	}
 
 	/**
  	* @brief Update callback setter

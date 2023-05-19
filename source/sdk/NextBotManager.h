@@ -31,6 +31,20 @@ public:
 
 	friend class INextBot;
 
+	template < typename Functor >
+	bool ForEachBot(Functor& func)
+	{
+		for (int i = m_botList.Head(); i != m_botList.InvalidIndex(); i = m_botList.Next(i))
+		{
+			if (!func(m_botList[i]))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 public:
 	CUtlLinkedList< INextBot * > m_botList;				// list of all active NextBots
 
@@ -83,7 +97,6 @@ inline INextBot *NextBotManager::GetSelected( void ) const
 {
 	return m_selectedBot;
 }
-
 
 extern NextBotManager& TheNextBots(void* pfn = nullptr);
 

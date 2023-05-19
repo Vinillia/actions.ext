@@ -42,7 +42,7 @@ inline nb_action_ptr SurvivorBotIntention::GetSubAction()
 void IIntention__ResetPre()
 {
 	IIntention* intention = META_IFACEPTR(IIntention);
-	UncatchCatchIntention(intention->GetBot(), (NextBotIntention*)intention);
+	UnCatchIntention(intention->GetBot(), (NextBotIntention*)intention);
 }
 
 void IIntention__ResetPost()
@@ -96,7 +96,7 @@ void CatchIntention(INextBot* bot, NextBotIntention* intention)
 	}
 }
 
-void UncatchCatchIntention(INextBot* bot, NextBotIntention* intention)
+void UnCatchIntention(INextBot* bot, NextBotIntention* intention)
 {
 	nb_action_ptr action = intention->GetAction();
 
