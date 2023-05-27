@@ -12,7 +12,7 @@ namespace SourcePawn
 	class IPluginFunction;
 }
 
-class ActionBehavior : protected Behavior<CBaseEntity>
+class ActionBehavior : public Behavior<CBaseEntity>
 {
 	friend class ActionComponent;
 
@@ -29,7 +29,7 @@ public:
 	INextBot* m_nextbot;
 };
 
-class ActionComponent : private IIntention
+class ActionComponent : public IIntention
 {
 	friend class SDKActions;
 	friend class IActionComponentDispatch;
