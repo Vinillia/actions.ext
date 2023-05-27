@@ -58,6 +58,7 @@ template < typename Actor > class Behavior;
 template < typename Actor > struct IActionResult;
 
 class CBaseEntity;
+class PathFollower;
 
 extern const Vector vec3_origin;
 extern ConVar* NextBotDebugHistory;
@@ -434,6 +435,33 @@ public:
 		return result;
 	}
 
+	virtual PathFollower* QueryCurrentPath(INextBot* me)
+	{
+		PathFollower* result = nullptr;
+
+		if (m_action)
+		{
+			Action< Actor >* action;
+			for (action = m_action; action->m_child; action = action->m_child)
+				;
+
+			while (action && result == nullptr)
+			{
+				Action< Actor >* containingAction = action->m_parent;
+
+				while (action && result == nullptr)
+				{
+					result = action->QueryCurrentPath(me);
+					action = action->GetActionBuriedUnderMe();
+				}
+
+				action = containingAction;
+			}
+		}
+
+		return result;
+	}
+
 	virtual const CKnownEntity* SelectMoreDangerousThreat(const INextBot* me, const CBaseCombatCharacter* subject, const CKnownEntity* threat1, const CKnownEntity* threat2) const	// return the more dangerous of the two threats, or NULL if we have no opinion
 	{
 		const CKnownEntity* result = NULL;
@@ -463,8 +491,6 @@ public:
 
 		return result;
 	}
-
-
 protected:
 	Action< Actor >* m_action;
 

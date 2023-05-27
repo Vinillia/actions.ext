@@ -10,6 +10,7 @@
 #include "NextBotContextualQueryInterface.h"
 
 class INextBot;
+class PathFollower;
 
 //
 // Insert this macro in your INextBot-derived class declaration to
@@ -75,19 +76,20 @@ public:
 	IIntention( INextBot *bot ) : INextBotComponent( bot ) { }
 	virtual ~IIntention() { }
 
-	virtual void Reset( void )  { INextBotComponent::Reset(); }	// reset to initial state
-	virtual void Update( void ) { }								// update internal state
+	virtual void Reset( void )  override  { INextBotComponent::Reset(); }	// reset to initial state
+	virtual void Update( void ) override  { }	 							// update internal state
 
 	// IContextualQuery propagation --------------------------------
-	virtual QueryResultType			ShouldPickUp( const INextBot *me, CBaseEntity *item ) const;		// if the desired item was available right now, should we pick it up?
-	virtual QueryResultType			ShouldHurry( const INextBot *me ) const;							// are we in a hurry?
-	virtual QueryResultType			IsHindrance( const INextBot *me, CBaseEntity *blocker ) const;		// return true if we should wait for 'blocker' that is across our path somewhere up ahead.
-	virtual Vector					SelectTargetPoint( const INextBot *me, const CBaseCombatCharacter *subject ) const;		// given a subject, return the world space position we should aim at
-	virtual QueryResultType			IsPositionAllowed( const INextBot *me, const Vector &pos ) const;	// is the a place we can be?
+	virtual QueryResultType			ShouldPickUp( const INextBot *me, CBaseEntity *item ) const override;		// if the desired item was available right now, should we pick it up?
+	virtual QueryResultType			ShouldHurry( const INextBot *me ) const override;							// are we in a hurry?
+	virtual QueryResultType			IsHindrance( const INextBot *me, CBaseEntity *blocker ) const override;		// return true if we should wait for 'blocker' that is across our path somewhere up ahead.
+	virtual Vector					SelectTargetPoint( const INextBot *me, const CBaseCombatCharacter *subject ) const override;		// given a subject, return the world space position we should aim at
+	virtual QueryResultType			IsPositionAllowed( const INextBot *me, const Vector &pos ) const override;	// is the a place we can be?
+	virtual PathFollower*			QueryCurrentPath(const INextBot* me) const override;
 	virtual const CKnownEntity *	SelectMoreDangerousThreat( const INextBot *me, 
 															   const CBaseCombatCharacter *subject,		// the subject of the danger
 															   const CKnownEntity *threat1, 
-															   const CKnownEntity *threat2 ) const;	// return the more dangerous of the two threats, or NULL if we have no opinion
+															   const CKnownEntity *threat2 ) const override;	// return the more dangerous of the two threats, or NULL if we have no opinion
 	// NOTE: As further queries are added, update the Behavior class to propagate them
 };
 
@@ -171,9 +173,41 @@ inline QueryResultType IIntention::IsPositionAllowed( const INextBot *me, const 
  */
 inline Vector IIntention::SelectTargetPoint(const INextBot* me, const CBaseCombatCharacter* subject) const
 {
-	return Vector();
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		const IContextualQuery* query = dynamic_cast<const IContextualQuery*>(sub);
+		if (query)
+		{
+			// return the response of the first responder that gives a definitive answer
+			Vector result = query->SelectTargetPoint(me, subject);
+			if (result != vec3_origin)
+			{
+				return result;
+			}
+		}
+	}
+
+	return vec3_origin;
 }
 
+inline PathFollower* IIntention::QueryCurrentPath(const INextBot* me) const
+{
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		const IContextualQuery* query = dynamic_cast<const IContextualQuery*>(sub);
+		if (query)
+		{
+			// return the response of the first responder that gives a definitive answer
+			PathFollower* result = query->QueryCurrentPath(me);
+			if (result != nullptr)
+			{
+				return result;
+			}
+		}
+	}
+
+	return nullptr;
+}
 
 //------------------------------------------------------------------------------------------------------------------------
 /**
@@ -181,6 +215,20 @@ inline Vector IIntention::SelectTargetPoint(const INextBot* me, const CBaseComba
  */
 inline const CKnownEntity* IIntention::SelectMoreDangerousThreat(const INextBot* me, const CBaseCombatCharacter* subject, const CKnownEntity* threat1, const CKnownEntity* threat2) const
 {
+	for (INextBotEventResponder* sub = FirstContainedResponder(); sub; sub = NextContainedResponder(sub))
+	{
+		const IContextualQuery* query = dynamic_cast<const IContextualQuery*>(sub);
+		if (query)
+		{
+			// return the response of the first responder that gives a definitive answer
+			const CKnownEntity* result = query->SelectMoreDangerousThreat(me, subject, threat1, threat2);
+			if (result)
+			{
+				return result;
+			}
+		}
+	}
+
 	return threat2;
 }
 
