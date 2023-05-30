@@ -15,7 +15,7 @@
 #include <any>
 #include <vector>
 #include <stack>
-#include <optional>
+#include <stdexcept>
 
 #include <NextBotBehavior.h>
 
@@ -24,21 +24,6 @@ struct ActionResult;
 
 template<typename T>
 struct EventDesiredResult;
-
-template<typename T, size_t N>
-class ReservedVector
-{
-public:
-	ReservedVector() : m_data(N) {}
-
-	std::vector<T>& operator*() { return m_data; }
-	const std::vector<T>& operator*() const { return m_data; }
-	std::vector<T>* operator->() { return &m_data; }
-	const std::vector<T>* operator->() const { return &m_data; }
-
-private:
-	std::vector<T> m_data;
-};
 
 struct ActionUserData
 {
@@ -112,7 +97,14 @@ public:
 
 	inline void PushRuntimeResult(std::any result);
 	inline void PopRuntimeResult() noexcept;
-	inline std::optional<std::reference_wrapper<std::any>> TopRuntimeResult() noexcept;
+
+	/* 
+	* error: no member named 'value' in 'std::is_copy_constructible<std::reference_wrapper<std::any>>'
+	* clang or whatever thinks std::any is not copy-constructible
+	*/
+	// inline std::optional<std::reference_wrapper<std::any>> TopRuntimeResult() noexcept;
+
+	inline std::any& TopRuntimeResult();
 
 	inline ActionResult<CBaseEntity>* GetActionRuntimeResult();
 	inline EventDesiredResult<CBaseEntity>* GetActionRuntimeDesiredResult();
@@ -120,7 +112,6 @@ public:
 	inline void SetActionActor(nb_action_ptr action, CBaseEntity* actor) noexcept;
 	inline CBaseEntity* GetActionActor(nb_action_ptr action) const noexcept;
 
-	bool GetEntityActions(CBaseEntity* entity, std::vector<nb_action_ptr>& actions);
 	cell_t GetActionActorEntIndex(nb_action_ptr action);
 
 	inline bool IsValidAction(nb_action_ptr action);
@@ -215,24 +206,24 @@ inline void ActionsManager::PopRuntimeResult() noexcept
 	m_runtimeResult.pop();
 }
 
-inline std::optional<std::reference_wrapper<std::any>> ActionsManager::TopRuntimeResult() noexcept
+inline std::any& ActionsManager::TopRuntimeResult()
 {
 	if (m_runtimeResult.empty())
-		return {};
+		throw std::runtime_error("Invalid runtime result access");
 
 	return m_runtimeResult.top();
 }
 
 inline ActionResult<CBaseEntity>* ActionsManager::GetActionRuntimeResult()
 {
-	auto result = TopRuntimeResult();
-
-	if (!result.has_value())
-		return nullptr;
-
 	try
 	{
-		return std::any_cast<ActionResult<CBaseEntity>*>(result->get());
+		auto& result = TopRuntimeResult();
+		return std::any_cast<ActionResult<CBaseEntity>*>(result);
+	}
+	catch (const std::runtime_error&)
+	{
+		return nullptr;
 	}
 	catch (...)
 	{
@@ -242,14 +233,10 @@ inline ActionResult<CBaseEntity>* ActionsManager::GetActionRuntimeResult()
 
 inline EventDesiredResult<CBaseEntity>* ActionsManager::GetActionRuntimeDesiredResult()
 {
-	auto result = TopRuntimeResult();
-
-	if (!result.has_value())
-		return nullptr;
-
 	try
 	{
-		return std::any_cast<EventDesiredResult<CBaseEntity>*>(result->get());
+		auto result = TopRuntimeResult();
+		return std::any_cast<EventDesiredResult<CBaseEntity>*>(result);
 	}
 	catch (...)
 	{
