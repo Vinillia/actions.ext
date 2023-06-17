@@ -90,6 +90,9 @@
     <ClCompile Include="..\source\actions_custom_legacy.cpp">
       <Filter>actions</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\actions_constructor.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\extension.h">
@@ -159,6 +162,15 @@
       <Filter>actions</Filter>
     </ClInclude>
     <ClInclude Include="..\source\actions_component.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_caller.h">
+      <Filter>actions\natives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_constructor.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_encoders.h">
       <Filter>actions</Filter>
     </ClInclude>
   </ItemGroup>

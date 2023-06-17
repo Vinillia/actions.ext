@@ -248,6 +248,9 @@ void ActionProcessor::OnEnd(CBaseEntity* me, Action< CBaseEntity >* nextAction)
 {
 	AUTO_SWAP_GUARD();
 
+	g_actionsManager.SetActionActor(this, nullptr);
+	g_actionsManager.SetActionActor(nextAction, me);
+
 	constexpr HashValue hash = compile::hash("&ActionProcessor::OnEnd");
 	int result;
 	Process([&, this]() { this->OnEnd(me, nextAction); return 0; }, this, hash, result, me, nextAction);

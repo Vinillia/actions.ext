@@ -2,21 +2,10 @@
 #include "actions_processor.h"
 
 #include "smsdk_ext.h"
+#include "actions_encoders.h"
 
 #define _MAKESTR(x) #x
 #define MAKESTR(x) _MAKESTR(x)
-
-/*
-#if defined COMPILER_MSVC
-	#define INSERT_METHOD_HASH(method)  g_publicsManager.AddHash(MAKESTR(CONCAT(__action_processor_,method)), compile::hash(MAKESTR(CONCAT(&ActionProcessor::,method)))); (void)(&ActionProcessor::##method)
-	#define INSERT_METHOD_HASH_OVERLOAD(method, overload, type) g_publicsManager.AddHash(MAKESTR(CONCAT(CONCAT(__action_processor_,method),overload)), compile::hash(MAKESTR(CONCAT(CONCAT(&ActionProcessor::,method),overload)))); (void)(static_cast<type>(&ActionProcessor::##method))
-	#define INSERT_METHOD_HASH_NAME(method, name, force) g_publicsManager.AddHash(MAKESTR(CONCAT(__action_processor_,name)), compile::hash(MAKESTR(CONCAT(&ActionProcessor::,method))), force); (void)(&ActionProcessor::##method)
-#else
-	#define INSERT_METHOD_HASH(method)  g_publicsManager.AddHash(MAKESTR(CONCAT(__action_processor_,method)), compile::hash(MAKESTR(CONCAT(&ActionProcessor::,method))))
-	#define INSERT_METHOD_HASH_OVERLOAD(method, overload, type) g_publicsManager.AddHash(MAKESTR(CONCAT(CONCAT(__action_processor_,method),overload)), compile::hash(MAKESTR(CONCAT(CONCAT(&ActionProcessor::,method),overload))))
-	#define INSERT_METHOD_HASH_NAME(method, name, force) g_publicsManager.AddHash(MAKESTR(CONCAT(__action_processor_,name)), compile::hash(MAKESTR(CONCAT(&ActionProcessor::,method))), force)
-#endif // COMPILER_MSVC
-*/
 
 #define INSERT_METHOD_HASH(method) \
 do \
@@ -90,25 +79,49 @@ const char* ActionPublicsManager::GetName(HashValue hash)
 
 void ActionPublicsManager::SyncPlugin(IPluginContext* pl)
 {
+	SyncListeners(pl);
+	SyncEncoders(pl);
+}
+
+void ActionPublicsManager::SyncListeners(SourcePawn::IPluginContext* pl)
+{
 	auto iter = m_varMap.iter();
-	uint32_t index;
-	int err;
 
 	while (!iter.empty())
 	{
-		err = pl->GetRuntime()->FindPubvarByName(iter->key.data(), &index);
-		if (!err)
-		{
-			sp_pubvar_t* var;
-			pl->GetRuntime()->GetPubvarByIndex(index, &var);
-			if (var)
-			{
-				*var->offs = (cell_t)iter->value;
-			}
-		}
-
+		SetPluginPubVar(pl, iter->key.data(), (void*)iter->value);
 		iter.next();
 	}
+}
+
+void ActionPublicsManager::SyncEncoders(SourcePawn::IPluginContext* pl)
+{
+	auto& encoder = Encoder::GetEncoders();
+
+	for (auto it = encoder.cbegin(); it != encoder.cend(); it++)
+	{
+		auto& encoder = *it;
+		SetPluginPubVar(pl, encoder->PublicName(), (void*)encoder);
+	}
+}
+
+bool ActionPublicsManager::SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, void* value)
+{
+	uint32_t index;
+	int err = pl->GetRuntime()->FindPubvarByName(name, &index);
+	if (!err)
+	{
+		sp_pubvar_t* var;
+		pl->GetRuntime()->GetPubvarByIndex(index, &var);
+		if (var)
+		{
+			*var->offs = (cell_t)value;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 bool ActionPublicsManager::IsUnique(HashValue value)

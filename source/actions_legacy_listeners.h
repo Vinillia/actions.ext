@@ -6,7 +6,7 @@
 #define LEGACY_NATIVE_MAKESTR(x) __LEGACY_NATIVE_MAKESTR(x)
 #define LEGACY_NATIVE_CONCAT(x,y) __LEGACY_NATIVE_CONCAT(x,y)
 
-#define NATIVE_LEGACY_NAME(x) __LEGACY_NATIVE_MAKESTR(BehaviorAction.x.set)
+#define LEGACY_NATIVE_NAME(x) __LEGACY_NATIVE_MAKESTR(BehaviorAction.x.set)
 
 #define REGISTER_LEGACY_NATIVE(name) \
 do \
@@ -14,7 +14,7 @@ do \
 	LEGACY_NATIVE_CONCAT(LegacyNative,name) __legacy_native; \
 } while(0) 
 
-#define IMPLEMENT_LEGACY_NATIVE_EX(name, pvarname)																		\
+#define IMPLEMENT_LEGACY_NATIVE_OVERLOAD(name, pvarname)																		\
 class LEGACY_NATIVE_CONCAT(LegacyNative,name)																							\
 {																														\
 	static inline constexpr std::string_view pvarstr = LEGACY_NATIVE_MAKESTR(pvarname);												\
@@ -46,8 +46,8 @@ public:																													\
 	{																													\
 		static sp_nativeinfo_t legacy_native[] =																		\
 		{																												\
-			{ NATIVE_LEGACY_NAME(name), NAT_LegacyNative },																\
-			{ NATIVE_LEGACY_NAME(LEGACY_NATIVE_CONCAT(name,Post)), NAT_LegacyNativePost },											\
+			{ LEGACY_NATIVE_NAME(name), NAT_LegacyNative },																\
+			{ LEGACY_NATIVE_NAME(LEGACY_NATIVE_CONCAT(name,Post)), NAT_LegacyNativePost },											\
 			{ NULL, NULL }																								\
 		};																												\
 																														\
@@ -55,7 +55,7 @@ public:																													\
 	}																													\
 }
 
-#define IMPLEMENT_LEGACY_NATIVE(name) IMPLEMENT_LEGACY_NATIVE_EX(name, name)															
+#define IMPLEMENT_LEGACY_NATIVE(name) IMPLEMENT_LEGACY_NATIVE_OVERLOAD(name, name)															
 
 IMPLEMENT_LEGACY_NATIVE(OnStart);
 IMPLEMENT_LEGACY_NATIVE(OnEnd);
@@ -110,10 +110,10 @@ IMPLEMENT_LEGACY_NATIVE(OnActorEmoted);
 IMPLEMENT_LEGACY_NATIVE(ShouldRetreat);
 IMPLEMENT_LEGACY_NATIVE(ShouldAttack);
 
-IMPLEMENT_LEGACY_NATIVE_EX(OnCommandApproachV, OnCommandApproachByVector);
-IMPLEMENT_LEGACY_NATIVE_EX(OnCommandApproachE, OnCommandApproachByEntity);
-IMPLEMENT_LEGACY_NATIVE_EX(OnInitialContainedAction, InitialContainedAction);
-IMPLEMENT_LEGACY_NATIVE_EX(OnUpdate, Update);
+IMPLEMENT_LEGACY_NATIVE_OVERLOAD(OnCommandApproachV, OnCommandApproachByVector);
+IMPLEMENT_LEGACY_NATIVE_OVERLOAD(OnCommandApproachE, OnCommandApproachByEntity);
+IMPLEMENT_LEGACY_NATIVE_OVERLOAD(OnInitialContainedAction, InitialContainedAction);
+IMPLEMENT_LEGACY_NATIVE_OVERLOAD(OnUpdate, Update);
 
 void RegisterLegacyNatives()
 {

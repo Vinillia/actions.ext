@@ -100,7 +100,7 @@ public:
 
 	/* 
 	* error: no member named 'value' in 'std::is_copy_constructible<std::reference_wrapper<std::any>>'
-	* clang or whatever thinks std::any is not copy-constructible
+	* clang or whatever think std::any is not copy-constructible
 	*/
 	// inline std::optional<std::reference_wrapper<std::any>> TopRuntimeResult() noexcept;
 
@@ -157,7 +157,7 @@ inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const Acti
 		data = m_actionsIndentityUserData.at(action).at(token);
 		return true;
 	}
-	catch (const std::exception&)
+	catch (...)
 	{
 		return false;
 	}
@@ -175,7 +175,7 @@ inline bool ActionsManager::GetUserData(nb_action_ptr action, std::string_view s
 		data = m_actionsUserData.at(action).at(str);
 		return true;
 	}
-	catch (const std::exception&)
+	catch (...)
 	{
 		return false;
 	} 
@@ -218,7 +218,7 @@ inline ActionResult<CBaseEntity>* ActionsManager::GetActionRuntimeResult()
 {
 	try
 	{
-		auto& result = TopRuntimeResult();
+		std::any& result = TopRuntimeResult();
 		return std::any_cast<ActionResult<CBaseEntity>*>(result);
 	}
 	catch (const std::runtime_error&)
@@ -235,7 +235,7 @@ inline EventDesiredResult<CBaseEntity>* ActionsManager::GetActionRuntimeDesiredR
 {
 	try
 	{
-		auto result = TopRuntimeResult();
+		std::any& result = TopRuntimeResult();
 		return std::any_cast<EventDesiredResult<CBaseEntity>*>(result);
 	}
 	catch (...)
@@ -254,7 +254,9 @@ inline CBaseEntity* ActionsManager::GetActionActor(nb_action_ptr action) const n
 	auto r = m_actionActor.find(action);
 
 	if (r == m_actionActor.cend())
+	{
 		return nullptr;
+	}
 
 	return r->second;
 }

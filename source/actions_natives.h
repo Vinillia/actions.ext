@@ -184,7 +184,7 @@ cell_t NAT_actions_SetReason(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result. Make sure function callback matches prototype!");
 		return -1;
 	}
 
@@ -891,7 +891,6 @@ sp_nativeinfo_t g_actionsNatives[] =
 
 	{ "ActionDesiredResult.priority.set",			NAT_actions_SetOrGetPriority },
 	{ "ActionDesiredResult.priority.get",			NAT_actions_SetOrGetPriority },
-
 
 	{ NULL, NULL }
 };

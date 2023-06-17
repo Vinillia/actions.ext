@@ -9,7 +9,7 @@
 ActionPropagation g_actionsPropagationPre;
 ActionPropagation g_actionsPropagationPost;
 
-ActionPropagation::ActionPropagation()
+ActionPropagation::ActionPropagation() : m_isInExecution(false)
 {
 }
 
@@ -44,10 +44,13 @@ bool ActionPropagation::RemoveListener(nb_action_ptr action, HashValue hash, IPl
 	}
 
 	auto& v = m_actionsListeners[action][hash];
-	auto listener = std::find_if(v.cbegin(), v.cend(), [fn](const ActionListener& listener) { return listener.fn == fn; });
+	auto listener = std::find_if(v.begin(), v.end(), [fn](const ActionListener& listener) { return listener.fn == fn; });
 
 	if (listener == v.end())
 		return false;
+
+	if (HandleRemoveProcess(&v, listener))
+		return true;
 
 	v.erase(listener);
 	return true;
@@ -63,6 +66,9 @@ bool ActionPropagation::RemoveListener(nb_action_ptr action, HashValue hash, IPl
 	
 	if (result == v.end())
 		return false;
+
+	if (HandleRemoveProcess(&v, result))
+		return true;
 
 	v.erase(result);
 	return true;
@@ -100,7 +106,14 @@ void ActionPropagation::RemoveListener(IPluginContext* ctx)
 			{
 				if (it->fn->GetParentRuntime()->GetDefaultContext() == ctx)
 				{
-					it = listener.erase(it);
+					if (HandleRemoveProcess(&listener, it))
+					{
+						it++;
+					}
+					else
+					{
+						it = listener.erase(it);
+					}
 				}
 				else
 				{

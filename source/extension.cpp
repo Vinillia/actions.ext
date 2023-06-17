@@ -17,6 +17,8 @@
 
 #include "NextBotManager.h"
 #include "actions_commands.h"
+#include "actions_constructor.h"
+#include "actions_caller.h"
 
 SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
@@ -30,8 +32,10 @@ ConVar* NextBotDebugHistory = nullptr;
 
 CGlobalVars* gpGlobals = nullptr; 
 ICvar* icvar = nullptr;
+IBinTools* bintools = nullptr;
 
-IActionComponentDispatch g_componentDispatch;
+ActionConstructor_SMC g_actionsConstructorSMC;
+ActionConstructor_SMC* g_pActionConstructorSMC = &g_actionsConstructorSMC;
 
 extern void InitVirtualMap();
 
@@ -59,12 +63,14 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 
 	InitVirtualMap();
 	g_publicsManager.InitializePublicVariables();
-
 	CDetourManager::Init(g_pSM->GetScriptingEngine(), m_pConfig);
 
 	sharesys->AddNatives(myself, g_actionsNatives);
-	sharesys->AddNatives(myself, g_actionsNativesLegacy);
+	sharesys->AddNatives(myself, g_actionsNativesLegacy); 
+	sharesys->AddNatives(myself, g_actionsNativesCaller);
 	RegisterLegacyNatives();
+
+	gameconfs->AddUserConfigHook("ActionConstructors", &g_actionsConstructorSMC);
 
 	plsys->AddPluginsListener(this);
 	playerhelpers->AddClientListener(this);
@@ -75,6 +81,8 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 
 void SDKActions::SDK_OnAllLoaded()
 {
+	SM_GET_LATE_IFACE(BINTOOLS, bintools);
+
 	NextBotDebugHistory = icvar->FindVar("nb_debug_history");
 	developer = icvar->FindVar("developer");
 
@@ -87,6 +95,20 @@ void SDKActions::SDK_OnAllLoaded()
 	{
 		NextBotReset reset;
 		TheNextBots().ForEachBot(reset);
+	}
+}
+
+bool SDKActions::QueryRunning(char* error, size_t maxlength)
+{
+	SM_CHECK_IFACE(BINTOOLS, bintools);
+	return true;
+}
+
+void SDKActions::NotifyInterfaceDrop(SMInterface* pInterface)
+{
+	if (strcmp(pInterface->GetInterfaceName(), SMINTERFACE_BINTOOLS_NAME) == 0)
+	{
+		bintools = nullptr;
 	}
 }
 
@@ -170,11 +192,10 @@ bool SDKActions::RegisterConCommandBase(ConCommandBase* command)
 
 bool SDKActions::CreateHandleTypes(HandleError* err)
 {
-	//	tacc.access[HTypeAccess_Create] = true;
-	//	tacc.access[HTypeAccess_Inherit] = true;
+	m_htActionComponent = g_pHandleSys->CreateType("ActionComponent", this, 0, NULL, NULL, myself->GetIdentity(), err);
+	m_htActionConstructor = g_pHandleSys->CreateType("ActionConstructor", this, 0, NULL, NULL, myself->GetIdentity(), err);
 
-	m_htActionComponent = g_pHandleSys->CreateType("ActionComponent", &g_componentDispatch, 0, NULL, NULL, myself->GetIdentity(), err);
-	return m_htActionComponent != 0;
+	return m_htActionComponent != 0 && m_htActionConstructor != 0;
 }
 
 void SDKActions::OnClientDisconnecting(int client)
@@ -192,16 +213,27 @@ void SDKActions::OnClientDisconnecting(int client)
 	ActionComponent::DestroyComponents(entity);
 }
 
-void IActionComponentDispatch::OnHandleDestroy(HandleType_t type, void* object)
+void SDKActions::OnHandleDestroy(HandleType_t type, void* object)
 {
-	ActionComponent* component = (ActionComponent*)object;
-	component->OnHandleDestroy(type);
+	if (type == GetComponentHT())
+	{
+		((ActionComponent*)object)->OnHandleDestroy(type);
+	}
+	else
+	{
+		delete ((ActionConstructor*)object);
+	}
 }
 
-bool IActionComponentDispatch::GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize)
+bool SDKActions::GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize)
 {
-	ActionComponent* component = (ActionComponent*)object;
-	return component->GetHandleApproxSize(type, pSize);
+	if (type != GetComponentHT())
+	{
+		*pSize = sizeof(ActionConstructor);
+		return true;
+	}
+
+	return ((ActionComponent*)object)->GetHandleApproxSize(type, pSize);
 }
 
 #ifdef _WIN32

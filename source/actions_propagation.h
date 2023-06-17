@@ -47,11 +47,25 @@ struct ActionListener
 	IPluginFunction* fn;
 };
 
-using MethodListeners = std::unordered_map<HashValue, std::vector<ActionListener>>;
+using MethodListeners = std::unordered_map<HashValue, std::list<ActionListener>>;
 using ActionListeners = std::unordered_map<nb_action_ptr, MethodListeners>;
 
 class ActionPropagation
 {
+	struct runtime_deletor
+	{
+		using container_t = MethodListeners::mapped_type;
+		using item_t = container_t::iterator;
+
+		runtime_deletor(container_t* data, const item_t& item)
+			: data(data), item(item)
+		{
+		}
+
+		container_t* data;
+		item_t item;
+	};
+
 public:
 	ActionPropagation();
 	~ActionPropagation();
@@ -74,12 +88,12 @@ public:
 		{
 			fn->PushArray((cell_t*)&arg, sizeof(Vector));
 		}
-		else if constexpr (std::is_same_v<type, CBaseEntity*>)
+		else if constexpr (std::is_same_v<type, CBaseEntity*> || std::is_same_v<type, CBaseCombatCharacter*>)
 		{
 			cell_t entity = -1;
 
 			if (arg != nullptr)
-				entity = gamehelpers->EntityToBCompatRef(arg);
+				entity = gamehelpers->EntityToBCompatRef((CBaseEntity*)arg);
 
 			fn->PushCell(entity);
 		}
@@ -100,6 +114,7 @@ public:
 
 		ResultType returnResult, executeResult = Pl_Continue;
 		returnResult = executeResult;
+		m_isInExecution = true;
 
 		for (auto iter = list.begin(); iter != list.end(); iter++)
 		{
@@ -122,6 +137,9 @@ public:
 			if (executeResult > returnResult)
 				returnResult = executeResult;
 		}
+		
+		m_isInExecution = false;
+		ProcessDeletors();
 
 		return returnResult;
 	}
@@ -135,8 +153,35 @@ public:
 	ActionListener* HasListener(nb_action_ptr action, HashValue hash, IPluginFunction* fn);
 
 private:
+	inline bool HandleRemoveProcess(runtime_deletor::container_t* container, runtime_deletor::item_t& item);
+	inline void ProcessDeletors();
+
+protected:
 	ActionListeners m_actionsListeners;
+
+private:
+	std::vector<runtime_deletor> m_deletors;
+	bool m_isInExecution;
 };
+
+inline bool ActionPropagation::HandleRemoveProcess(runtime_deletor::container_t* container, runtime_deletor::item_t& item)
+{
+	if (!m_isInExecution)
+		return false;
+
+	m_deletors.emplace_back(container, item);
+	return true;
+}
+
+inline void ActionPropagation::ProcessDeletors()
+{
+	for (auto& iter : m_deletors)
+	{
+		iter.data->erase(iter.item);
+	}
+
+	m_deletors.clear();
+}
 
 extern ActionPropagation g_actionsPropagationPre;
 extern ActionPropagation g_actionsPropagationPost;

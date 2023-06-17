@@ -1,5 +1,3 @@
-#pragma once
-
 #ifndef _INCLUDE_ACTIONS_PUBVARS_H
 #define _INCLUDE_ACTIONS_PUBVARS_H
 
@@ -104,6 +102,11 @@ public:
 	const char* GetName(HashValue hash);
 
 	void SyncPlugin(SourcePawn::IPluginContext* pl);
+
+	void SyncListeners(SourcePawn::IPluginContext* pl);
+	void SyncEncoders(SourcePawn::IPluginContext* pl);
+
+	bool SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, void* value);
 
 private:
 	bool IsUnique(HashValue value);

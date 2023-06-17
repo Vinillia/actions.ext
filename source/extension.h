@@ -32,25 +32,19 @@
 #ifndef _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 #define _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
 
+#include <IBinTools.h>
 #include "smsdk_ext.h"
 #include "actionsdefs.h"
 
-class IActionComponentDispatch : public IHandleTypeDispatch 
-{
-protected:
-	virtual void OnHandleDestroy(HandleType_t type, void* object) override;
-	virtual bool GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize) override;
-};
-
-
-class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor, public IClientListener
+class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor, public IClientListener, public IHandleTypeDispatch
 {
 public: // SDKExtension
 	virtual bool SDK_OnLoad(char* error, size_t maxlen, bool late) override;
 	virtual void SDK_OnUnload() override;
 	virtual void SDK_OnAllLoaded() override;
 	// virtual void SDK_OnPauseChange(bool paused) override;
-	// virtual bool QueryRunning(char* error, size_t maxlen) override;
+	virtual bool QueryRunning(char* error, size_t maxlen) override; 
+	virtual void NotifyInterfaceDrop(SMInterface* pInterface) override;
 
 public: // SDKExtension MetaMod
 #if defined SMEXT_CONF_METAMOD
@@ -58,6 +52,10 @@ public: // SDKExtension MetaMod
 	// virtual bool SDK_OnMetamodUnload(char* error, size_t maxlen) override;
 	// virtual bool SDK_OnMetamodPauseChange(bool paused, char* error, size_t maxlen) override;
 #endif
+
+public: // IHandleTypeDispatch
+	virtual void OnHandleDestroy(HandleType_t type, void* object) override;
+	virtual bool GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize) override;
 
 public: // IConCommandBaseAccessor
 	virtual bool RegisterConCommandBase(ConCommandBase* command) override;
@@ -77,6 +75,7 @@ public:
 	bool CreateHandleTypes(HandleError* err);
 
 	inline HandleType_t GetComponentHT() const noexcept { return m_htActionComponent; };
+	inline HandleType_t GetConstructorHT() const noexcept { return m_htActionConstructor; };
 	inline bool IsNextBotDebugSupported() const noexcept { return m_isNextBotDebugSupported; }
 
 private:
@@ -84,6 +83,7 @@ private:
 	bool m_isNextBotDebugSupported;
 
 	HandleType_t m_htActionComponent;
+	HandleType_t m_htActionConstructor;
 
 	IForward* m_fwdOnActionCreated;
 	IForward* m_fwdOnActionDestroyed;
@@ -92,5 +92,7 @@ private:
 extern SDKActions g_sdkActions;
 extern ICvar* icvar;
 extern CGlobalVars* gpGlobals;
+extern IBinTools* bintools;
+extern class ActionConstructor_SMC* g_pActionConstructorSMC;
 
 #endif // _INCLUDE_SOURCEMOD_EXTENSION_PROPER_H_
