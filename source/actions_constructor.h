@@ -24,7 +24,7 @@ template<typename T>
 class ActionEncoder
 {
 public:
-	using param_t = typename T*&;
+	using param_t = std::add_lvalue_reference_t<std::add_pointer_t<T>>;
 	using ParamEncoder_t = std::function<bool(param_t param, char* error, size_t maxlength)>;
 	using PassEncoder_t = std::function<bool(SourceMod::PassInfo& info, char* error, size_t maxlength)>;
 
@@ -167,7 +167,7 @@ private:
 
 inline const ActionConstructor_SMC::ac_data* ActionConstructor_SMC::GetACData(const char* name)
 {
-	auto& r = m_acmap.find(name);
+	auto r = m_acmap.find(name);
 
 	if (r.found())
 	{

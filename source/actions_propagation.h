@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
+#include <list>
 
 template<class Actor>
 struct ActionResult;
