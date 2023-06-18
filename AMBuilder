@@ -5,6 +5,7 @@ projectName = 'actions'
 
 # smsdk_ext.cpp will be automatically added later
 sourceFiles = [
+  'source/actions_constructor.cpp',
   'source/actions_custom_legacy.cpp',
   'source/actions_component.cpp',
   'source/actions_manager.cpp',

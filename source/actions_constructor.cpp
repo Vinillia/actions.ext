@@ -244,9 +244,13 @@ void ActionConstructor_SMC::ReadSMC_ParseStart()
 	m_data = ac_data();
 }
 
-ActionConstructor::ActionConstructor(int actionSize) : m_actionSize(actionSize), m_paramSize(4), m_paramCount(0), m_call(nullptr), m_address(nullptr)
+ActionConstructor::ActionConstructor(int actionSize)
 {
-	
+	m_address = nullptr;
+	m_call = nullptr;
+	m_actionSize = 0;
+	m_paramCount = 0;
+	m_paramSize = 4;
 }
 
 ActionConstructor::~ActionConstructor()
@@ -290,7 +294,7 @@ nb_action_ptr ActionConstructor::Execute(IPluginContext* ctx, const cell_t* para
 
 	cell_t paramsBuffer[SP_MAX_EXEC_PARAMS] = {};
 	if (!ConstructParamsBuffer(ctx, params, paramsBuffer, numParams))
-		return false;
+		throw std::runtime_error("Failed to construct params buffer");
 
 	const int maxlength = 255;
 	char error[maxlength] = {};
