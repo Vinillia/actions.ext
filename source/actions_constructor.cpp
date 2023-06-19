@@ -250,7 +250,7 @@ ActionConstructor::ActionConstructor(int actionSize)
 	m_call = nullptr;
 	m_actionSize = 0;
 	m_paramCount = 0;
-	m_paramSize = 4;
+	m_paramSize = 0;
 }
 
 ActionConstructor::~ActionConstructor()
