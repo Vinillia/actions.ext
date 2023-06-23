@@ -6,7 +6,10 @@
 
 #define ACTION_NAME_LENGTH 32
 
+#tryinclude <version>
+
 #include <actions_processors>
+#include <actions_constructor>
 
 enum QueryResultType
 {

@@ -1,6 +1,6 @@
 #ifndef _INCLUDE_ACTIONS_CONSTRUCTOR_H
 #define _INCLUDE_ACTIONS_CONSTRUCTOR_H
-
+#include <iostream>
 
 #include "actionsdefs.h"
 
@@ -8,47 +8,24 @@
 #include <functional>
 
 #include <amtl/am-vector.h>
-#include <sm_stringhashmap.h>
 #include <amtl/am-string.h>
 
-class ActionConstructor;
+#include "actions_constructor_smc.h"
 
-template<typename T> 
+class ActionConstructor;
 class ActionEncoder;
 
-using Encoder = ActionEncoder<void>;
-
-static inline std::vector<const Encoder*> g_Encoders;
-
-template<typename T>
 class ActionEncoder
 {
-public:
-	using param_t = std::add_lvalue_reference_t<std::add_pointer_t<T>>;
-	using ParamEncoder_t = std::function<bool(param_t param, char* error, size_t maxlength)>;
-	using PassEncoder_t = std::function<bool(SourceMod::PassInfo& info, char* error, size_t maxlength)>;
-
-	static const std::vector<const Encoder*>& GetEncoders()
-	{
-		return g_Encoders;
-	}
+protected:
+	using param_t = std::add_lvalue_reference_t<void*>;
 
 public:
-	ActionEncoder(const char* pubName, const char* simName) : publicName(pubName), shortName(simName)
-	{
-		g_Encoders.push_back((Encoder*)this);
+	ActionEncoder(const char* pubName, const char* symName);
+	~ActionEncoder() = default;
 
-		paramEncoder = [](param_t param, char* error, size_t maxlength) -> bool
-		{
-			param = *(T**)param;
-			return true; 
-		};
-
-		passEncoder = [](SourceMod::PassInfo& pass, char* error, size_t maxlength) -> bool 
-		{ 
-			return true; 
-		};
-	}
+	static std::vector<const ActionEncoder*>* GetActionEncoders();
+	static const ActionEncoder* FindEncoderByName(const char* name);
 
 	inline bool operator()(param_t param, char* error, size_t maxlength) const;
 	inline bool operator()(SourceMod::PassInfo& info, char* error, size_t maxlength) const;
@@ -56,125 +33,142 @@ public:
 	inline const char* ShortName() const;
 	inline const char* PublicName() const;
 
+protected:
+	virtual bool encode(param_t param, char* error, size_t maxlength) const;
+	virtual bool typeinfo(SourceMod::PassInfo& param, char* error, size_t maxlength) const;
+
 private:
 	ActionEncoder(ActionEncoder&&) = delete;
 	ActionEncoder(const ActionEncoder&) = delete;
 	ActionEncoder& operator=(const ActionEncoder&) = delete;
 	ActionEncoder& operator=(ActionEncoder&&) = delete;
 
-protected:
-	ParamEncoder_t paramEncoder;
-	PassEncoder_t passEncoder;
-
 private:
 	const char* publicName;
 	const char* shortName;
 };
 
-template<typename T>
-bool ActionEncoder<T>::operator()(param_t param, char* error, size_t maxlength) const
+inline ActionEncoder::ActionEncoder(const char* pubName, const char* simName) : publicName(pubName), shortName(simName)
 {
-	if (paramEncoder == nullptr)
-	{
-		ke::SafeSprintf(error, maxlength, "Param encoder has no target (%s)", publicName);
-		return false;
-	}
-
-	return paramEncoder(param, error, maxlength);
+	GetActionEncoders()->push_back(this);
 }
 
-template<typename T>
-bool ActionEncoder<T>::operator()(SourceMod::PassInfo& info, char* error, size_t maxlength) const
+inline bool ActionEncoder::encode(param_t param, char* error, size_t maxlength) const
 {
-	if (passEncoder == nullptr)
-	{
-		ke::SafeSprintf(error, maxlength, "Pass encoder has no target (%s)", publicName);
-		return false;
-	}
-
-	return passEncoder(info, error, maxlength);
+	param = *(void**)param;
+	return true;
 }
 
-template<typename T>
-inline const char* ActionEncoder<T>::ShortName() const
+inline bool ActionEncoder::typeinfo(SourceMod::PassInfo& param, char* error, size_t maxlength) const
+{
+	return true;
+}
+
+inline bool ActionEncoder::operator()(param_t param, char* error, size_t maxlength) const
+{
+	return encode(param, error, maxlength);
+}
+
+inline bool ActionEncoder::operator()(SourceMod::PassInfo& info, char* error, size_t maxlength) const
+{
+	return typeinfo(info, error, maxlength);
+}
+
+inline const char* ActionEncoder::ShortName() const
 {
 	return shortName;
 }
 
-template<typename T>
-inline const char* ActionEncoder<T>::PublicName() const
+inline const char* ActionEncoder::PublicName() const
 {
 	return publicName;
 }
 
-class ActionConstructor_SMC : public ITextListener_SMC
+
+template<typename T>
+class TypeEncoder : public ActionEncoder
 {
 public:
-	enum SMC_State
+	inline TypeEncoder(const char* pubName, const char* simName) : ActionEncoder(pubName, simName)
 	{
-		SMC_Root,
-		SMC_Header,
-		SMC_Params
-	};
-
-	class ac_data
-	{
-		friend ActionConstructor_SMC;
-	public:
-		struct param_t
-		{
-			param_t() = default;
-
-			SourceMod::PassInfo info;
-			std::string encoder;
-		};
-
-		ac_data() = default;
-
-		size_t	size;
-		std::string signature;
-		std::string address;
-		std::vector<param_t> params;
-
-	private:
-		param_t* param;
-	};
-
-private:
-	static inline StringHashMap<ac_data> m_acmap;
-
-public:
-	ActionConstructor_SMC();
-
-	inline const ac_data* GetACData(const char* name);
-
-private:
-	virtual SMCResult ReadSMC_NewSection(const SMCStates* states, const char* name) override;
-	virtual SMCResult ReadSMC_KeyValue(const SMCStates* states, const char* key, const char* value) override;
-	virtual SMCResult ReadSMC_LeavingSection(const SMCStates* states) override;
-	virtual void ReadSMC_ParseStart() override;
-
-private:
-	ac_data m_data;
-	SMC_State m_state;
-
-	std::string m_section;
-	int m_ignoreLevel;
-	int m_currentLevel;
-	int m_platformLevel;
-};
-
-
-inline const ActionConstructor_SMC::ac_data* ActionConstructor_SMC::GetACData(const char* name)
-{
-	auto r = m_acmap.find(name);
-
-	if (r.found())
-	{
-		return &r->value;
+		paramEncoder = nullptr;
+		passEncoder = nullptr;
 	}
 
-	return nullptr;
+	class encode_param_t
+	{
+	public:
+		using param_t = std::add_lvalue_reference_t<std::add_pointer_t<T>>;
+
+		encode_param_t(ActionEncoder::param_t param)
+			: m_param((encode_param_t::param_t)(param))
+		{
+		}
+
+		inline T& operator*()
+		{
+			return get();
+		}
+
+		encode_param_t& operator=(const T& v)
+		{
+			set(v);
+			return *this;
+		}
+
+		inline T& get() const
+		{
+			return reinterpret_cast<T&>(*m_param);
+		}
+
+		inline void set(const T& v)
+		{
+			*m_param = v;
+		}
+
+		template<typename K>
+		inline void store(K& value)
+		{
+			m_param = (param_t)value;
+		}
+
+	private:
+		param_t m_param;
+	};
+
+protected:
+	using encode_param_ref_t = std::add_lvalue_reference_t<encode_param_t>;
+
+private:
+	using ParamEncoder = std::function<bool(encode_param_ref_t param, char* error, size_t maxlength)>;
+	using PassEncoder = std::function<bool(SourceMod::PassInfo& info, char* error, size_t maxlength)>;
+
+protected:
+	virtual bool encode(param_t param, char* error, size_t maxlength) const override;
+	virtual bool typeinfo(SourceMod::PassInfo& info, char* error, size_t maxlength) const override;
+
+protected:
+	ParamEncoder paramEncoder;
+	PassEncoder passEncoder;
+};
+
+template<typename T>
+bool TypeEncoder<T>::encode(param_t param, char* error, size_t maxlength) const
+{
+	if (paramEncoder == nullptr)
+	{
+		ke::SafeSprintf(error, maxlength, "%s: failed to encode param: paramEncoder == nullptr", PublicName());
+		return false;
+	}
+
+	encode_param_t encodeParam(param);
+	return paramEncoder(encodeParam, error, maxlength);
+}
+
+template<typename T>
+bool TypeEncoder<T>::typeinfo(SourceMod::PassInfo& info, char* error, size_t maxlength) const
+{
+	return ActionEncoder::typeinfo(info, error, maxlength);
 }
 
 class ActionConstructor
@@ -220,6 +214,9 @@ public:
 	ActionConstructor(int size = 0);
 	~ActionConstructor();
 
+	inline void SetConvention(SourceMod::CallConvention convention);
+	inline SourceMod::CallConvention GetConvention() const;
+
 	inline void SetAddress(void* address);
 	inline void* GetAddress() const;
 
@@ -227,9 +224,10 @@ public:
 	inline size_t GetSize() const;
 
 	bool AddressFromConf(IPluginContext* ctx, IGameConfig* config, const char* constructor);
+	bool SignatureFromConf(IPluginContext* ctx, IGameConfig* config, const char* constructor);
 	bool SetupFromConf(IPluginContext* ctx, IGameConfig* config, const ac_data* data);
 
-	bool AddParameter(SourceMod::PassType type, int flags = 0, const Encoder* encoder = nullptr);
+	bool AddParameter(SourceMod::PassType type, int flags = 0, const ActionEncoder* encoder = nullptr);
 	bool Finish();
 	
 	bool ConstructParamsBuffer(SourcePawn::IPluginContext* ctx, const cell_t* params, cell_t* buffer, cell_t numParams);
@@ -243,8 +241,9 @@ private:
 	size_t	m_actionSize;
 
 	SourceMod::ICallWrapper* m_call;
+	SourceMod::CallConvention m_convention;
 	SourceMod::PassInfo m_param[SP_MAX_EXEC_PARAMS];
-	const Encoder* m_paramEncoder[SP_MAX_EXEC_PARAMS];
+	const ActionEncoder* m_paramEncoder[SP_MAX_EXEC_PARAMS];
 
 	int		m_paramCount;
 	int		m_paramSize;
@@ -253,6 +252,16 @@ private:
 inline nb_action_ptr ActionConstructor::AllocateAction() const
 {
 	return (nb_action_ptr)(::operator new(m_actionSize));
+}
+
+inline void ActionConstructor::SetConvention(SourceMod::CallConvention convention)
+{
+	m_convention = convention;
+}
+
+inline SourceMod::CallConvention ActionConstructor::GetConvention() const
+{
+	return m_convention;
 }
 
 inline void ActionConstructor::SetAddress(void* address)

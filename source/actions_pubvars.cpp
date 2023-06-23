@@ -96,11 +96,11 @@ void ActionPublicsManager::SyncListeners(SourcePawn::IPluginContext* pl)
 
 void ActionPublicsManager::SyncEncoders(SourcePawn::IPluginContext* pl)
 {
-	auto& encoder = Encoder::GetEncoders();
+	auto encoders = ActionEncoder::GetActionEncoders();
 
-	for (auto it = encoder.cbegin(); it != encoder.cend(); it++)
+	for (auto it = encoders->cbegin(); it != encoders->cend(); it++)
 	{
-		auto& encoder = *it;
+		const ActionEncoder* encoder = *it;
 		SetPluginPubVar(pl, encoder->PublicName(), (void*)encoder);
 	}
 }

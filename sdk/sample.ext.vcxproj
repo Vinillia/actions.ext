@@ -15,7 +15,7 @@
     <RootNamespace>sample.ext</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <ProjectName>actions</ProjectName>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'" Label="Configuration">
@@ -27,6 +27,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
+    <EnableASAN>false</EnableASAN>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -138,6 +139,7 @@
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\udis86.c" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\smsdk_ext.cpp" />
     <ClCompile Include="..\source\actions_component.cpp" />
+    <ClCompile Include="..\source\actions_constructor_smc.cpp" />
     <ClCompile Include="..\source\actions_custom_legacy.cpp" />
     <ClCompile Include="..\source\actions_manager.cpp" />
     <ClCompile Include="..\source\actions_propagation.cpp" />
@@ -165,6 +167,7 @@
     <ClInclude Include="..\source\actions_caller.h" />
     <ClInclude Include="..\source\actions_commands.h" />
     <ClInclude Include="..\source\actions_component.h" />
+    <ClInclude Include="..\source\actions_constructor_smc.h" />
     <ClInclude Include="..\source\actions_custom_legacy.h" />
     <ClInclude Include="..\source\actions_encoders.h" />
     <ClInclude Include="..\source\actions_legacy.h" />

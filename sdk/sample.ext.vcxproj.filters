@@ -93,6 +93,7 @@
     <ClCompile Include="..\source\actions_constructor.cpp">
       <Filter>actions</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\source\actions_tools.cpp">
       <Filter>actions</Filter>
     </ClCompile>
@@ -111,6 +112,11 @@
     <ClCompile Include="..\source\sdk\l4d2\actions_tools_l4d2.cpp">
       <Filter>sdk\l4d2</Filter>
     </ClCompile>
+=======
+    <ClCompile Include="..\source\actions_constructor_smc.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+>>>>>>> 27a6eb4 (Update)
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\extension.h">
@@ -164,6 +170,7 @@
     <ClInclude Include="..\source\actions_encoders.h">
       <Filter>actions</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="..\source\actions_tools.h">
       <Filter>actions</Filter>
     </ClInclude>
@@ -212,5 +219,10 @@
     <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotIntentionInterface.h">
       <Filter>sdk\l4d2\nextbot</Filter>
     </ClInclude>
+=======
+    <ClInclude Include="..\source\actions_constructor_smc.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+>>>>>>> 27a6eb4 (Update)
   </ItemGroup>
 </Project>
