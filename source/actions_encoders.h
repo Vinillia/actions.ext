@@ -7,35 +7,39 @@
 
 #include <amtl/am-string.h>
 
-class CBaseEntityEncoder : public ActionEncoder<CBaseEntity>
+class CBaseEntityEncoder : public TypeEncoder<cell_t>
 {
 public:
-	CBaseEntityEncoder() : ActionEncoder("g_entityEncoder", "entity")
+	CBaseEntityEncoder() : TypeEncoder("g_entityEncoder", "entity")
 	{
-		paramEncoder = [](param_t param, char* error, size_t maxlength) -> bool
+		paramEncoder = [](encode_param_ref_t param, char* error, size_t maxlength) -> bool
 		{
-			cell_t index = *(cell_t*)param;
+			cell_t index = *param;
 			CBaseEntity* entity = nullptr;
-
+			
 			entity = gamehelpers->ReferenceToEntity(index);
 			if (entity == nullptr)
 			{
 				ke::SafeSprintf(error, maxlength, "Invalid entity index (%i)", index);
 				return false;
 			}
-
-			param = entity;
+			
+			param.store(entity);
 			return true;
 		};
 	}
 } g_entityEncoder;
 
-
-class CVectorEncoder : public ActionEncoder<Vector>
+class CVectorEncoder : public TypeEncoder<Vector>
 {
 public:
-	CVectorEncoder() : ActionEncoder("g_vectorEncoder", "vector")
+	CVectorEncoder() : TypeEncoder("g_vectorEncoder", "vector")
 	{
+		paramEncoder = [](encode_param_ref_t param, char* error, size_t maxlength) -> bool
+		{
+			return true;
+		};
+
 		passEncoder = [this](PassInfo& info, char* error, size_t maxlength) -> bool
 		{
 			switch (info.type)
@@ -50,7 +54,7 @@ public:
 				info.size = sizeof(Vector*);
 				break;
 			default:
-				ke::SafeSprintf(error, maxlength, "Invalid vector pass type index");
+				ke::SafeSprintf(error, maxlength, "Invalid vector pass type");
 				return false;
 				break;
 			}
@@ -60,7 +64,8 @@ public:
 	}
 
 private:
-	ObjectField fields[3] = { ObjectField::Float, ObjectField::Float, ObjectField::Float };
+	static inline ObjectField fields[3] = { ObjectField::Float, ObjectField::Float, ObjectField::Float };
 } g_vectorEncoder;
+
 
 #endif // !_INCLUDE_ACTIONS_ENCODERS_H

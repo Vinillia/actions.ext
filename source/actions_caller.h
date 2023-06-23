@@ -13,7 +13,7 @@ cell_t NAT_caller_ActionConsctructor(IPluginContext* ctx, const cell_t* params)
 		myself->GetIdentity(),
 		&error)) == BAD_HANDLE)
 	{
-		ctx->ReportError("Failed to create constructor handle (error %i)", error);
+		ctx->ReportError("Failed to create constructor handle (error %d)", error);
 		return 0;
 	}
 
@@ -30,13 +30,13 @@ cell_t NAT_caller_AddParameter(IPluginContext* ctx, const cell_t* params)
 	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
 		!= HandleError_None)
 	{
-		ctx->ReportError("Invalid component handle %x (error %d)", handle, error);
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
 		return 0;
 	}
 
 	PassType passType = (PassType)params[2];
 	size_t flags = (size_t)params[3];
-	Encoder* encoder = (Encoder*)params[4];
+	ActionEncoder* encoder = (ActionEncoder*)params[4];
 
 	return constuctor->AddParameter(passType, flags, encoder);
 }
@@ -51,11 +51,11 @@ cell_t NAT_caller_Execute(IPluginContext* ctx, const cell_t* params)
 	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
 		!= HandleError_None)
 	{
-		ctx->ReportError("Invalid component handle %x (error %d)", handle, error);
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
 		return 0;
 	}
 
-	cell_t count = params[0];
+	cell_t count = params[0] - 1;
 	nb_action_ptr action = nullptr;
 
 	try
@@ -86,7 +86,7 @@ cell_t NAT_caller_Finish(IPluginContext* ctx, const cell_t* params)
 	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
 		!= HandleError_None)
 	{
-		ctx->ReportError("Invalid component handle %x (error %d)", handle, error);
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
 		return 0;
 	}
 
@@ -103,7 +103,7 @@ cell_t NAT_caller_AddressFromConf(IPluginContext* ctx, const cell_t* params)
 	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
 		!= HandleError_None)
 	{
-		ctx->ReportError("Invalid component handle %x (error %d)", handle, error);
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
 		return 0;
 	}
 
@@ -121,7 +121,7 @@ cell_t NAT_caller_AddressFromConf(IPluginContext* ctx, const cell_t* params)
 	return constuctor->AddressFromConf(ctx, config, key);
 }
 
-cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
+cell_t NAT_caller_SignatureFromConf(IPluginContext* ctx, const cell_t* params)
 {
 	HandleSecurity sec(nullptr, myself->GetIdentity());
 	Handle_t handle = params[1];
@@ -131,7 +131,36 @@ cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
 	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
 		!= HandleError_None)
 	{
-		ctx->ReportError("Invalid component handle %x (error %d)", handle, error);
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
+		return 0;
+	}
+
+	IGameConfig* config = nullptr;
+	HandleError err;
+
+	if ((config = gameconfs->ReadHandle(params[2], ctx->GetIdentity(), &err)) == nullptr)
+	{
+		ctx->ReportError("Invalid gamedata handle %x (error %d)", params[2], err);
+		return 0;
+	}
+
+	char* key;
+	ctx->LocalToString(params[3], &key);
+	return constuctor->SignatureFromConf(ctx, config, key);
+}
+
+#if 0
+cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
+{
+	HandleSecurity sec(nullptr, myself->GetIdentity());
+	Handle_t handle = params[1];
+	HandleError error;
+
+	ActionConstructor* constructor = nullptr;
+	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constructor))
+		!= HandleError_None)
+	{
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
 		return 0;
 	}
 
@@ -144,11 +173,12 @@ cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
 
 	if (params[0] > 1)
 	{
-		constuctor->SetAddress((void*)params[2]);
+		constructor->SetAddress((void*)params[2]);
 	}
 
-	return (cell_t)constuctor->GetAddress();
+	return (cell_t)constructor->GetAddress();
 }
+#endif
 
 cell_t NAT_caller_Size(IPluginContext* ctx, const cell_t* params)
 {
@@ -160,7 +190,7 @@ cell_t NAT_caller_Size(IPluginContext* ctx, const cell_t* params)
 	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
 		!= HandleError_None)
 	{
-		ctx->ReportError("Invalid component handle %x (error %d)", handle, error);
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
 		return 0;
 	}
 
@@ -171,6 +201,30 @@ cell_t NAT_caller_Size(IPluginContext* ctx, const cell_t* params)
 
 	return constuctor->GetSize();
 }
+
+#if 0
+cell_t NAT_caller_Convention(IPluginContext* ctx, const cell_t* params)
+{
+	HandleSecurity sec(nullptr, myself->GetIdentity());
+	Handle_t handle = params[1];
+	HandleError error;
+
+	ActionConstructor* constuctor = nullptr;
+	if ((error = g_pHandleSys->ReadHandle(handle, g_sdkActions.GetConstructorHT(), &sec, (void**)&constuctor))
+		!= HandleError_None)
+	{
+		ctx->ReportError("Invalid constructor handle %x (error %d)", handle, error);
+		return 0;
+	}
+
+	if (params[0] > 1)
+	{
+		constuctor->SetConvention((SourceMod::CallConvention)params[2]);
+	}
+
+	return (cell_t)constuctor->GetConvention();
+}
+#endif 
 
 cell_t NAT_caller_SetupFromConf(IPluginContext* ctx, const cell_t* params)
 {
@@ -193,15 +247,15 @@ cell_t NAT_caller_SetupFromConf(IPluginContext* ctx, const cell_t* params)
 		return 0;
 	}
 
-	std::unique_ptr<ActionConstructor> constuctor = std::make_unique<ActionConstructor>();
-	if (!constuctor->SetupFromConf(ctx, config, ac_data))
+	std::unique_ptr<ActionConstructor> constructor = std::make_unique<ActionConstructor>();
+	if (!constructor->SetupFromConf(ctx, config, ac_data))
 		return false;
 
 	Handle_t handle;
 	HandleError error;
 
 	if ((handle = handlesys->CreateHandle(g_sdkActions.GetConstructorHT(),
-		constuctor.get(),
+		constructor.get(),
 		ctx->GetIdentity(),
 		myself->GetIdentity(),
 		&error)) == BAD_HANDLE)
@@ -210,7 +264,7 @@ cell_t NAT_caller_SetupFromConf(IPluginContext* ctx, const cell_t* params)
 		return 0;
 	}
 
-	constuctor.release();
+	constructor.release();
 	return handle;
 }
 
@@ -219,11 +273,13 @@ sp_nativeinfo_t g_actionsNativesCaller[] =
 	{ "ActionConstructor.ActionConstructor", NAT_caller_ActionConsctructor },
 	{ "ActionConstructor.SetupFromConf", NAT_caller_SetupFromConf },
 	{ "ActionConstructor.AddressFromConf", NAT_caller_AddressFromConf },
+	{ "ActionConstructor.SignatureFromConf", NAT_caller_SignatureFromConf },
 	{ "ActionConstructor.AddParameter", NAT_caller_AddParameter },
 	{ "ActionConstructor.Finish", NAT_caller_Finish },
 	{ "ActionConstructor.Execute", NAT_caller_Execute },
-	{ "ActionConstructor.Address", NAT_caller_Address },
+	// { "ActionConstructor.Address", NAT_caller_Address },
 	{ "ActionConstructor.Size", NAT_caller_Size },
+	// { "ActionConstructor.Convention", NAT_caller_Convention },
 
 	{ NULL, NULL }
 };

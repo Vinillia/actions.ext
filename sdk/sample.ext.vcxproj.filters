@@ -93,6 +93,9 @@
     <ClCompile Include="..\source\actions_constructor.cpp">
       <Filter>actions</Filter>
     </ClCompile>
+    <ClCompile Include="..\source\actions_constructor_smc.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\extension.h">
@@ -171,6 +174,9 @@
       <Filter>actions</Filter>
     </ClInclude>
     <ClInclude Include="..\source\actions_encoders.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_constructor_smc.h">
       <Filter>actions</Filter>
     </ClInclude>
   </ItemGroup>
