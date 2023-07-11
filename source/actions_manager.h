@@ -78,6 +78,8 @@ public:
 	ActionsManager();
 	~ActionsManager();
 
+	inline void Add(nb_action_ptr const action, CBaseEntity* const entity);
+
 	void Add(nb_action_ptr const action);
 	void Remove(nb_action_ptr const action);
 
@@ -132,6 +134,12 @@ private:
 	CBaseEntity* m_pRuntimeActor;
 	std::stack<std::any> m_runtimeResult;
 };
+
+inline void ActionsManager::Add(nb_action_ptr const action, CBaseEntity* const entity)
+{
+	SetActionActor(action, entity);
+	Add(action);
+}
 
 inline bool ActionsManager::IsValidAction(nb_action_ptr action)
 {
@@ -255,7 +263,7 @@ inline CBaseEntity* ActionsManager::GetActionActor(nb_action_ptr action) const n
 
 	if (r == m_actionActor.cend())
 	{
-		return nullptr;
+		return action->GetActor();
 	}
 
 	return r->second;

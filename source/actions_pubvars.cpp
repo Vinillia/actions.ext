@@ -55,7 +55,7 @@ HashValue ActionPublicsManager::GetHash(const char* name)
 
 	if (!r.found())
 	{
-		Warning("Failed to find hash (%s)", name);
+		WarningSM("Failed to find hash (%s)", name);
 		return 0;
 	}
 
@@ -146,7 +146,7 @@ bool ActionPublicsManager::AddHash(const char* pubvar, HashValue hash, bool forc
 	{
 		if (!force && !IsUnique(hash))
 		{
-			Warning("%s isn't unique! (%X)", pubvar, hash);
+			WarningSM("%s isn't unique! (%X)", pubvar, hash);
 			return false;
 		}
 

@@ -1,6 +1,7 @@
 ﻿/.vs
 /.build
-/sdk/.vs
-/sdk/Release
-/sdk/*.i
-/sdk/L4D1
+sdk/
+!sdk/.sln
+!sdk/.vcxproj
+!sdk/.filters
+!sdk/.user

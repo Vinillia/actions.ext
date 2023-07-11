@@ -630,7 +630,8 @@ cell_t NAT_actions_CreateComponent(IPluginContext* pContext, const cell_t* param
 	}
 
 	pContext->LocalToStringNULL(params[6], &compName);
-	nextbot = GetEntityNextbotPointer(entity);
+	nextbot = g_pActionsTools->MyNextBotPointer(entity);
+
 	if (nextbot == nullptr)
 	{
 		pContext->ReportError("Failed to get entity nextbot ptr %i", params[1]);

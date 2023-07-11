@@ -32,9 +32,9 @@ cell_t NAT_action_GetEntityActions(IPluginContext* ctx, const cell_t* params)
 	}
 
 	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[1]);
-	ActionTree actions;
+	std::vector<nb_action_ptr> actions;
 
-	if (entity == nullptr || !GetEntityActions(entity, actions))
+	if (entity == nullptr || !g_pActionsTools->GetEntityActions(entity, actions))
 	{
 		ctx->ReportError("Invalid entity index %i", params[1]);
 		return 0;
@@ -51,13 +51,13 @@ cell_t NAT_action_GetEntityActions(IPluginContext* ctx, const cell_t* params)
 
 cell_t NAT_action_GetEntityAction(IPluginContext* ctx, const cell_t* params)
 {
-	ActionTree actions;
+	std::vector<nb_action_ptr> actions;
 	char* match;
 
 	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[1]);
 	ctx->LocalToString(params[2], &match);
 
-	if (entity == nullptr || !GetEntityActions(entity, actions))
+	if (entity == nullptr || !g_pActionsTools->GetEntityActions(entity, actions))
 	{
 		ctx->ReportError("Invalid entity index %i", params[1]);
 		return 0;

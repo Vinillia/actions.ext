@@ -76,11 +76,9 @@ public:
 
 	inline HandleType_t GetComponentHT() const noexcept { return m_htActionComponent; };
 	inline HandleType_t GetConstructorHT() const noexcept { return m_htActionConstructor; };
-	inline bool IsNextBotDebugSupported() const noexcept { return m_isNextBotDebugSupported; }
 
 private:
 	IGameConfig* m_pConfig;
-	bool m_isNextBotDebugSupported;
 
 	HandleType_t m_htActionComponent;
 	HandleType_t m_htActionConstructor;

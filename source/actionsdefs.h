@@ -17,8 +17,8 @@ using nb_behavior_ptr = nb_behavior*;
 using nb_action = Action<CBaseEntity>;
 using nb_action_ptr = nb_action*;
 
-#define Msg(fmt, ...) g_pSM->LogMessage(myself, fmt, ##__VA_ARGS__)
-#define Warning(fmt, ...) g_pSM->LogError(myself, fmt, ##__VA_ARGS__)
+#define MsgSM(fmt, ...) g_pSM->LogMessage(myself, fmt, ##__VA_ARGS__)
+#define WarningSM(fmt, ...) g_pSM->LogError(myself, fmt, ##__VA_ARGS__)
 
 #ifdef _WIN32
 	void* operator new(size_t size);

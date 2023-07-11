@@ -3,52 +3,25 @@
 #include "actions_manager.h"
 #include "actions_component.h"
 #include "actions_processor.h"
+#include "actions_tools.h"
 #include "hook.h"
-
-#include "sourcehook.h"
 
 #include <NextBotInterface.h>
 #include <NextBotComponentInterface.h>
 #include <NextBotBehavior.h>
 #include <NextBotIntentionInterface.h>
 
-#include <unordered_map>
-#include <functional>
-
-#define FOR_EACH_COMPONENT(bot,i) for( INextBotComponent* i = bot->m_componentList; i != nullptr; i = i->m_nextComponent )
-
-std::unordered_map<CBaseEntity*, INextBot*> g_entitiesNextbot;
-std::vector<IIntention*> g_vecHookedIntentions(32);
 CDetour* g_pNextBotResetDetour = nullptr;
+int g_iHookID = -1;
 
 SH_DECL_HOOK0_void(IIntention, Reset, SH_NOATTRIB, 0);
-
-inline nb_action_ptr NextBotIntention::GetAction()
-{
-	if (behavior == nullptr)
-		return nullptr;
-
-	return (nb_action_ptr)(behavior->FirstContainedResponder());
-}
-
-inline nb_action_ptr SurvivorBotIntention::GetSubAction()
-{
-	if (subehavior == nullptr)
-		return nullptr;
-
-	return (nb_action_ptr)(subehavior->FirstContainedResponder());
-}
-
-void IIntention__ResetPre()
+void IIntention_ResetPost()
 {
 	IIntention* intention = META_IFACEPTR(IIntention);
-	UnCatchIntention(intention->GetBot(), (NextBotIntention*)intention);
-}
-
-void IIntention__ResetPost()
-{
-	IIntention* intention = META_IFACEPTR(IIntention);
-	CatchIntention(intention->GetBot(), (NextBotIntention*)intention);
+	if (intention->GetBot())
+	{
+		g_pActionsTools->OnIntentionReset(intention->GetBot(), intention);
+	}
 }
 
 DETOUR_DECL_MEMBER0(INextBot__Reset, void)
@@ -57,89 +30,25 @@ DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 
 	DETOUR_MEMBER_CALL(INextBot__Reset)();
 
-	FOR_EACH_COMPONENT(bot, component)
+	for (INextBotComponent* component = bot->m_componentList; component != nullptr; component = component->m_nextComponent)
 	{
-		NextBotIntention* intention = GetNextBotIntention(component);
+		IIntention* intention = dynamic_cast<IIntention*>(component);
 
-		if (!intention)
+		if (intention == nullptr)
 			continue;
 
-		CatchIntention(bot, intention);
-		HookIntention(intention);
-	}
-}
+		g_pActionsTools->OnIntentionReset(bot, intention);
 
-void CatchIntention(INextBot* bot, NextBotIntention* intention)
-{
-	nb_action_ptr action = intention->GetAction();
-
-	if (bot->GetEntity())
-	{
-		g_entitiesNextbot[intention->entity] = bot;
-	}
-
-	if (action)
-	{
-		g_actionsManager.SetActionActor(action, intention->entity);
-		g_actionsManager.Add(action);
-	}
-
-	if (bot->MySurvivorBotPointer())
-	{
-		nb_action_ptr subaction = ((SurvivorBotIntention*)(intention))->GetSubAction();
-
-		if (subaction)
+		if (g_iHookID == -1)
 		{
-			g_actionsManager.SetActionActor(subaction, intention->entity);
-			g_actionsManager.Add(subaction);
+			g_iHookID = SH_ADD_VPHOOK(IIntention, Reset, intention, IIntention_ResetPost, true);
+
+			if (g_iHookID == -1)
+			{
+				MsgSM("Failed to setup hook IIntention::Reset hook");
+			}
 		}
 	}
-}
-
-void UnCatchIntention(INextBot* bot, NextBotIntention* intention)
-{
-	nb_action_ptr action = intention->GetAction();
-
-	if (action)
-	{
-		g_actionsManager.Remove(action);
-	}
-
-	if (bot->MySurvivorBotPointer())
-	{
-		nb_action_ptr subaction = ((SurvivorBotIntention*)(intention))->GetSubAction();
-
-		if (subaction)
-		{
-			g_actionsManager.Remove(subaction);
-		}
-	}
-}
-
-void UnhookIntentions()
-{
-	for (auto intention : g_vecHookedIntentions)
-	{
-		SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
-		SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
-	}
-
-	g_vecHookedIntentions.clear();
-}
-
-void HookIntention(IIntention* intention)
-{
-	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
-	SH_ADD_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
-
-	g_vecHookedIntentions.push_back(intention);
-}
-
-void UnHookIntention(IIntention* intention)
-{
-	SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPre, false);
-	SH_REMOVE_HOOK(IIntention, Reset, intention, IIntention__ResetPost, true);
-	g_vecHookedIntentions.erase(std::find(g_vecHookedIntentions.begin(), g_vecHookedIntentions.end(), intention));
 }
 
 bool CreateActionsHook()
@@ -163,69 +72,9 @@ void DestroyActionsHook()
 		g_pNextBotResetDetour = nullptr;
 	}
 
-	UnhookIntentions();
-}
-
-NextBotIntention* GetNextBotIntention(INextBotComponent* component)
-{
-	IIntention* intention = dynamic_cast<IIntention*>(component);
-
-	if (!intention)
-		return nullptr;
-
-	return static_cast<NextBotIntention*>(intention);
-}
-
-INextBot* GetEntityNextbotPointer(CBaseEntity* entity)
-{
-	auto r = g_entitiesNextbot.find(entity);
-
-	if (r == g_entitiesNextbot.cend())
-		return nullptr;
-
-	return r->second;
-}
-
-bool GetEntityActions(CBaseEntity* entity, ActionTree& tree)
-{
-	INextBot* nextbot = GetEntityNextbotPointer(entity);
-
-	if (nextbot == nullptr)
-		return false;
-
-	std::function<void(nb_action_ptr)> emplace_back = [&emplace_back, &tree](nb_action_ptr head)
+	if (g_iHookID != -1)
 	{
-		tree.emplace_back(head);
-
-		if (head->GetActionBuriedUnderMe())
-			emplace_back(head->GetActionBuriedUnderMe());
-
-		if (head->GetActiveChildAction())
-			emplace_back(head->GetActiveChildAction());
-	};
-
-	FOR_EACH_COMPONENT(nextbot, comp)
-	{
-		NextBotIntention* intention = GetNextBotIntention(comp);
-
-		if (intention == nullptr)
-			continue;
-
-		nb_action_ptr head = intention->GetAction();
-
-		if (head == nullptr)
-			continue;
-
-		emplace_back(head);
-
-		if (nextbot->MySurvivorBotPointer())
-		{
-			head = ((SurvivorBotIntention*)(intention))->GetSubAction();
-
-			if (head)
-				emplace_back(head);
-		}
+		SH_REMOVE_HOOK_ID(g_iHookID);
+		g_iHookID = -1;
 	}
-
-	return true;
 }

@@ -1,9 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="actions">
-      <UniqueIdentifier>{8b2e62a8-c7eb-44a2-b912-6a626e50ae87}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sourcemod">
       <UniqueIdentifier>{ed27aef6-1695-40bd-bb33-8f1c5e4681c9}</UniqueIdentifier>
     </Filter>
@@ -17,16 +14,31 @@
       <UniqueIdentifier>{971709e4-48a0-4a4c-8b49-8d07348b7403}</UniqueIdentifier>
     </Filter>
     <Filter Include="sdk">
-      <UniqueIdentifier>{9458bb1a-0287-47c7-b53c-309e1c6e5c4b}</UniqueIdentifier>
+      <UniqueIdentifier>{3798e461-bc9f-4c9f-aede-3d8228c9ecff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="actions">
+      <UniqueIdentifier>{8b2e62a8-c7eb-44a2-b912-6a626e50ae87}</UniqueIdentifier>
     </Filter>
     <Filter Include="actions\hook">
       <UniqueIdentifier>{3faf186c-8c07-4151-b922-5341af33a4d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sdk\nextbot">
-      <UniqueIdentifier>{a6119976-044c-422a-b079-d849729648f5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="actions\natives">
       <UniqueIdentifier>{f66e72c5-6710-4c8a-a153-283cd551a90c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="actions\nextbot">
+      <UniqueIdentifier>{1ac1eb0c-b4b2-4cdf-ada4-ebe3f481c6e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\l4d">
+      <UniqueIdentifier>{7b228bf8-507a-4f70-adfe-4ac79eba2859}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\l4d\nextbot">
+      <UniqueIdentifier>{cb6ad455-6dcc-4506-a2ac-2f5f07265ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\l4d2">
+      <UniqueIdentifier>{6732f766-2b94-4b17-be4f-4fdf57b43193}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdk\l4d2\nextbot">
+      <UniqueIdentifier>{a1afd23b-4b72-4d44-9a24-330119501680}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +75,6 @@
     <ClCompile Include="..\source\actions_manager.cpp">
       <Filter>actions</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\actions_processor.cpp">
-      <Filter>actions</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\hook.cpp">
       <Filter>actions\hook</Filter>
     </ClCompile>
@@ -75,23 +84,32 @@
     <ClCompile Include="..\source\actions_pubvars.cpp">
       <Filter>actions</Filter>
     </ClCompile>
-    <ClCompile Include="..\source\sdk\NextBotInterface.cpp">
-      <Filter>sdk\nextbot</Filter>
-    </ClCompile>
     <ClCompile Include="..\source\actions_component.cpp">
       <Filter>actions</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\sdk\NextBotComponentInterface.cpp">
-      <Filter>sdk\nextbot</Filter>
-    </ClCompile>
-    <ClCompile Include="..\source\sdk\NextBotManager.cpp">
-      <Filter>sdk\nextbot</Filter>
     </ClCompile>
     <ClCompile Include="..\source\actions_custom_legacy.cpp">
       <Filter>actions</Filter>
     </ClCompile>
     <ClCompile Include="..\source\actions_constructor.cpp">
       <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\actions_tools.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\shared\NextBotComponentInterface.cpp">
+      <Filter>actions\nextbot</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\l4d\actions_processor.cpp">
+      <Filter>sdk\l4d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\l4d\actions_tools_l4d.cpp">
+      <Filter>sdk\l4d</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\l4d2\actions_processor.cpp">
+      <Filter>sdk\l4d2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\sdk\l4d2\actions_tools_l4d2.cpp">
+      <Filter>sdk\l4d2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -107,35 +125,8 @@
     <ClInclude Include="..\source\actions_manager.h">
       <Filter>actions</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\actions_processor.h">
-      <Filter>actions</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\hook.h">
       <Filter>actions\hook</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotBehavior.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotComponentInterface.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotContextualQueryInterface.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotDebug.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotEventResponderInterface.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotIntentionInterface.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotInterface.h">
-      <Filter>sdk\nextbot</Filter>
-    </ClInclude>
-    <ClInclude Include="..\source\sdk\NextBotManager.h">
-      <Filter>sdk\nextbot</Filter>
     </ClInclude>
     <ClInclude Include="..\source\actions_propagation.h">
       <Filter>actions</Filter>
@@ -172,6 +163,54 @@
     </ClInclude>
     <ClInclude Include="..\source\actions_encoders.h">
       <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\actions_tools.h">
+      <Filter>actions</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\shared\NextBotComponentInterface.h">
+      <Filter>actions\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\shared\NextBotDebug.h">
+      <Filter>actions\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\shared\NextBotInterface.h">
+      <Filter>actions\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d\actions_processor.h">
+      <Filter>sdk\l4d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d\actions_tools_l4d.h">
+      <Filter>sdk\l4d</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotBehavior.h">
+      <Filter>sdk\l4d\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotContextualQueryInterface.h">
+      <Filter>sdk\l4d\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotEventResponderInterface.h">
+      <Filter>sdk\l4d\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotIntentionInterface.h">
+      <Filter>sdk\l4d\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d2\actions_processor.h">
+      <Filter>sdk\l4d2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d2\actions_tools_l4d2.h">
+      <Filter>sdk\l4d2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotBehavior.h">
+      <Filter>sdk\l4d2\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotContextualQueryInterface.h">
+      <Filter>sdk\l4d2\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotEventResponderInterface.h">
+      <Filter>sdk\l4d2\nextbot</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotIntentionInterface.h">
+      <Filter>sdk\l4d2\nextbot</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -36,7 +36,7 @@ void ActionsManager::Remove(nb_action_ptr const action)
 
 void ActionsManager::ClearUserDataIdentity(IPluginContext* ctx)
 {
-	for (auto udIter : m_actionsIndentityUserData)
+	for (auto& udIter : m_actionsIndentityUserData)
 	{
 		auto& identmap = udIter.second;
 
@@ -100,17 +100,17 @@ void ActionsManager::ProcessResult(nb_action_ptr action, const ActionResult<CBas
 		if (result.IsDone())
 		{
 			if (action->GetActionBuriedUnderMe())
-				Msg("%i(%s): %s is done because '%s'. Continue suspended action '%s'.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN", action->GetActionBuriedUnderMe()->GetName());
+				MsgSM("%i(%s): %s has done because '%s'. Continue suspended action '%s'.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN", action->GetActionBuriedUnderMe()->GetName());
 			else
-				Msg("%i(%s): %s is done because '%s'.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
+				MsgSM("%i(%s): %s has done because '%s'.", actor, classname, action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
 		}
 		else if (result.m_type == SUSPEND_FOR)
 		{
-			Msg("%i(%s): %s suspended for %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
+			MsgSM("%i(%s): %s suspended for %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
 		}
 		else
 		{
-			Msg("%i(%s): %s changed to %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
+			MsgSM("%i(%s): %s changed to %s because '%s'.", actor, classname, action->GetName(), result.m_action->GetName(), result.m_reason ? result.m_reason : "NO REASON GIVEN");
 		}
 	}
 }
@@ -129,7 +129,7 @@ void ActionsManager::ProcessInitialContainedAction(const ResultType& pl, nb_acti
 
 		if (newaction && newaction != oldaction)
 		{
-			Warning("Tried to override initial action with Plugin_Continue: %s\n", newaction->GetName());
+			WarningSM("Tried to override initial action with Plugin_Continue: %s\n", newaction->GetName());
 			delete newaction;
 		}
 

@@ -20,14 +20,28 @@ public:
 	ActionBehavior(nb_action_ptr initialAction, const char* name, INextBot* bot);
 
 	virtual ~ActionBehavior() override;
+	
+protected:
 	void Update(CBaseEntity* me, float interval);
 	void Resume(CBaseEntity* me);
-	void SetName(const char* name);
-	const char* GetName() const;
+
+public:
+	inline void SetName(const char* name);
+	inline const char* GetName() const;
 
 public:
 	INextBot* m_nextbot;
 };
+
+inline void ActionBehavior::SetName(const char* name)
+{
+	m_name.sprintf("%s", name);
+}
+
+inline const char* ActionBehavior::GetName() const
+{
+	return (const char*)m_name;
+}
 
 class ActionComponent : public IIntention
 {
@@ -66,11 +80,10 @@ public:
 	inline SourceMod::HandleType_t GetHandle() const noexcept;
 	inline SourceMod::HandleError GetHandleError() const noexcept;
 
-	void SetName(const char* name);
-	const char* GetName() const;
+	inline void SetName(const char* name);
+	inline const char* GetName() const;
+	
 	void UnRegister();
-
-
 	static void DestroyComponents(CBaseEntity* entity);
 
 private:			
@@ -127,7 +140,22 @@ inline nb_action_ptr ActionComponent::CurrentAction()
 	return nullptr;
 }
 
+inline void ActionComponent::SetName(const char* name)
+{
+	if (m_behavior)
+	{
+		m_behavior->SetName(name);
+	}
 
-extern ConVar* NextBotDebugHistory;
+	m_name = name;
+}
+
+inline const char* ActionComponent::GetName() const
+{
+	if (m_behavior)
+		return m_behavior->GetName();
+
+	return nullptr;
+}
 
 #endif // !_INCLUDE_ACTIONS_COMPONENT_H

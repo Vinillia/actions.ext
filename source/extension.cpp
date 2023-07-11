@@ -7,6 +7,7 @@
 #include "actions_manager.h"
 #include "actions_pubvars.h"
 #include "actions_component.h"
+#include "actions_tools.h"
 
 #include "actions_natives.h"
 #include "actions_legacy.h"
@@ -15,7 +16,6 @@
 #include <CDetour/detours.h>
 #include <compat_wrappers.h>
 
-#include "NextBotManager.h"
 #include "actions_commands.h"
 #include "actions_constructor.h"
 #include "actions_caller.h"
@@ -24,11 +24,7 @@ SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
 
 ConVar ext_actions_debug("ext_actions_debug", "0", FCVAR_NONE, "1 - Enable debug, 0 - Disable debug");
-ConVar ext_actions_late_reset("ext_actions_late_reset", "0", FCVAR_NONE, "1 - Enable reset after load, 0 - Disable late load reset");
-ConVar ext_actions_debug_memory("ext_actions_debug_memory", "0", FCVAR_NONE, "Log component creation/deletion");
-
-ConVar* developer = nullptr;
-ConVar* NextBotDebugHistory = nullptr;
+ConVar ext_actions_debug_memory("ext_actions_debug_memory", "0", FCVAR_NONE, "Enable allocation logging");
 
 CGlobalVars* gpGlobals = nullptr; 
 ICvar* icvar = nullptr;
@@ -41,19 +37,14 @@ extern void InitVirtualMap();
 
 bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
-	m_isNextBotDebugSupported = false;
 	m_htActionComponent = 0;
 
 	if (!gameconfs->LoadGameConfigFile("actions.games", &m_pConfig, error, maxlen))
 		return false;
-
-	void* pTheNextBots = nullptr;
-	if (m_pConfig->GetMemSig("TheNextBots", &pTheNextBots))
-	{
-		m_isNextBotDebugSupported = true;
-		TheNextBots(pTheNextBots);
-	}
 	
+	if (!g_pActionsTools->LoadGameConfigFile(m_pConfig, error, maxlen))
+		return false;
+
 	HandleError err;
 	if (!CreateHandleTypes(&err))
 	{
@@ -83,19 +74,10 @@ void SDKActions::SDK_OnAllLoaded()
 {
 	SM_GET_LATE_IFACE(BINTOOLS, bintools);
 
-	NextBotDebugHistory = icvar->FindVar("nb_debug_history");
-	developer = icvar->FindVar("developer");
-
 	m_fwdOnActionCreated = forwards->CreateForward("OnActionCreated", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
 	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
 
 	CreateActionsHook();
-
-	if (IsNextBotDebugSupported() && ext_actions_late_reset.GetBool())
-	{
-		NextBotReset reset;
-		TheNextBots().ForEachBot(reset);
-	}
 }
 
 bool SDKActions::QueryRunning(char* error, size_t maxlength)
@@ -134,11 +116,6 @@ void SDKActions::SDK_OnUnload()
 	plsys->RemovePluginsListener(this);
 	playerhelpers->RemoveClientListener(this);
 
-	/* 
-	* Handle sys can handle this 
-	* ActionComponent::UnRegisterComponents();
-	*/
-
 	StopActionProcessing();
 	DestroyActionsHook();
 }
@@ -150,11 +127,6 @@ void SDKActions::OnPluginLoaded(IPlugin* plugin)
 
 void SDKActions::OnPluginUnloaded(IPlugin* plugin)
 {
-	/*
-	* Handle sys can handle this
-	* ActionComponent::OnPluginUnloaded(plugin->GetBaseContext());
-	*/
-
 	g_actionsManager.ClearUserDataIdentity(plugin->GetBaseContext());
 	g_actionsPropagationPre.RemoveListener(plugin->GetBaseContext());
 	g_actionsPropagationPost.RemoveListener(plugin->GetBaseContext());
@@ -163,7 +135,7 @@ void SDKActions::OnPluginUnloaded(IPlugin* plugin)
 void SDKActions::OnActionCreated(nb_action_ptr action)
 {
 	if (ext_actions_debug_memory.GetBool())
-		Msg("%.3f:%i: NEW ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
+		MsgSM("%.3f:%i: NEW ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
 
 	m_fwdOnActionCreated->PushCell((cell_t)action);
 	m_fwdOnActionCreated->PushCell(g_actionsManager.GetActionActorEntIndex(action));
@@ -174,7 +146,7 @@ void SDKActions::OnActionCreated(nb_action_ptr action)
 void SDKActions::OnActionDestroyed(nb_action_ptr action)
 {
 	if (ext_actions_debug_memory.GetBool())
-		Msg("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
+		MsgSM("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
 
 	g_actionsPropagationPre.RemoveActionListeners(action);
 	g_actionsPropagationPost.RemoveActionListeners(action);

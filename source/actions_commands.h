@@ -11,22 +11,22 @@ inline bool ClassMatchesComplex(CBaseEntity* entity, const char* match);
 
 CON_COMMAND(ext_actions_dump, "Dump entities actions")
 {
-    Msg("DUPMING ACTIONS START");
-    Msg("/----------------------------------/");
+    MsgSM("DUPMING ACTIONS START");
+    MsgSM("/----------------------------------/");
 
-    ActionTree tree;
+    std::vector<nb_action_ptr> actions;
 
-    auto dump = [&tree](CBaseEntity* entity, const char* name) -> void
+    auto dump = [&actions](CBaseEntity* entity, const char* name) -> void
     {
-        tree.clear();
-        if (!GetEntityActions(entity, tree))
+        actions.clear();
+        if (!g_pActionsTools->GetEntityActions(entity, actions))
             return;
 
-        Msg("%s has %i actions:", name, tree.size());
+        MsgSM("%s has %i actions:", name, actions.size());
         int i = 0;
-        for (auto action : tree)
+        for (auto action : actions)
         {
-            Msg("%i. %s %s %s ( 0x%X ) ", ++i, action->GetName(), action->m_isStarted ? "STARTED" : "NOT STARTED",
+            MsgSM("%i. %s %s %s ( 0x%X ) ", ++i, action->GetName(), action->m_isStarted ? "STARTED" : "NOT STARTED",
                 action->IsSuspended() ? "SUSPENDED" : "",
                 action);
         }
@@ -57,16 +57,7 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
         dump(entity, name);
     }
 
-    Msg("DUPMING ACTIONS END");
-}
-
-CON_COMMAND(ext_actions_nextbot_reset, "Resets nextbots")
-{
-    if (g_sdkActions.IsNextBotDebugSupported())
-    {
-        NextBotReset reset;
-        TheNextBots().ForEachBot(reset);
-    }
+    MsgSM("DUPMING ACTIONS END");
 }
 
 inline bool ClassMatchesComplex(cell_t entity, const char* match)
