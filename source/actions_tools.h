@@ -6,6 +6,8 @@
 #include <vector>
 #include <functional>
 
+#include "NextBotDebug.h"
+
 namespace SourceMod
 {
 	class IGameConfig;
@@ -15,8 +17,6 @@ class IIntention;
 class INextBot;
 class CBaseEntity;
 class INextBotEventResponder;
-
-enum NextBotDebugType;
 class Color;
 
 namespace ine
