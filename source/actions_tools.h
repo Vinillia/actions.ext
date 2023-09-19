@@ -97,7 +97,7 @@ inline void ActionsTools::DebugConColorMsg(INextBot* bot, NextBotDebugType debug
 template<typename ...Args>
 inline void ActionsTools::DebugConColorMsg(CBaseEntity* entity, NextBotDebugType debugType, const Color& color, const char* fmt, Args&&... args)
 {
-	DebugConColorMsg<Args...>(MyNextBotPointer(entity), debugType, color, fmt, args);
+	DebugConColorMsg<Args...>(MyNextBotPointer(entity), debugType, color, fmt, args...);
 }
 
 inline CBaseEntity* ActionsTools::GetEntity(INextBot* bot) const
