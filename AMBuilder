@@ -80,7 +80,6 @@ for sdk_name in Extension.sdks:
   compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name) ]
   compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name, 'nextbot') ]
   
-  print(os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name, 'nextbot'))
   if compiler.vendor == 'msvc':
     compiler.defines += [ '_CRT_NO_VA_START_VALIDATION' ]
     compiler.cxxflags.append('/std:c++17')
