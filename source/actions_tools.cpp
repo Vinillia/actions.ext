@@ -4,12 +4,17 @@
 
 #include "NextBotIntentionInterface.h"
 #include "NextBotBehavior.h"
+#include "NextBotDebug.h"
+
+#include <Color.h>
+#include <am-function.h>
 
 ActionsTools* g_pActionsTools = nullptr;
 
 ActionsTools::ActionsTools()
 {
-	Assert(g_pActionsTools == nullptr);
+	AssertFatalMsg(g_pActionsTools == nullptr, "Only one instance ActionTools is allowed!");
+	g_pActionsTools = this;
 
 	m_insertAction = [this](nb_action_ptr head, std::vector<nb_action_ptr>& vec)
 	{
@@ -21,10 +26,11 @@ ActionsTools::ActionsTools()
 		if (head->GetActiveChildAction())
 			m_insertAction(head->GetActiveChildAction(), vec);
 	};
-
-	g_pActionsTools = this;
+	
 	m_NextBot_GetEntity_Offset = -1;
 	m_Entity_MyNextBotPointer_Offset = -1;
+	m_NextBot_DebugConColorMsg_Address = nullptr;
+	m_NextBot_IsDebugging_Address = nullptr;
 }
 
 bool ActionsTools::OnIntentionReset(INextBot* bot, IIntention* intention)
@@ -81,7 +87,32 @@ bool ActionsTools::LoadGameConfigFile(IGameConfig* config, char* error, size_t m
 		V_snprintf(error, maxlen, "Failed to find CBaseEntity::MyNextBotPointer offset");
 		return false;
 	}
+	
+	auto Config_GetMemOrSig = [config](const char* key, void** addr) -> bool
+	{
+		if (!config->GetMemSig(key, addr) &&
+			!config->GetAddress(key, addr))
+		{
+			return false;
+		}
 
+		return (*addr) != nullptr;
+	};
+
+	if (!Config_GetMemOrSig("INextBot::DebugConColorMsg", &m_NextBot_DebugConColorMsg_Address))
+	{
+#if __DEBUG
+		MsgSM("Debug disabled: Failed to find INextBot::DebugConColorMsg");
+#endif // __DEBUG
+	}
+
+	if (!Config_GetMemOrSig("INextBot::IsDebugging", &m_NextBot_IsDebugging_Address))
+	{
+#if __DEBUG
+		MsgSM("Debug disabled: Failed to find INextBot::IsDebugging");
+#endif // __DEBUG
+	}
+	
 	return true;
 }
 
@@ -94,3 +125,4 @@ nb_action_ptr ActionsTools::ActionContainedResponder(IIntention* intention)
 
 	return (nb_action_ptr)behavior->FirstContainedResponder();
 }
+

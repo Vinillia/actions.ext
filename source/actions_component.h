@@ -84,6 +84,7 @@ public:
 	inline const char* GetName() const;
 	
 	void UnRegister();
+	
 	static void DestroyComponents(CBaseEntity* entity);
 
 private:			

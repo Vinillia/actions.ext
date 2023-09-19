@@ -1,5 +1,5 @@
 #include "actions_manager.h"
-#include "actions_processor.h"
+#include "actions_processor_impl.h"
 #include "extension.h"
 
 extern ConVar ext_actions_debug;

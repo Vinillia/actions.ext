@@ -1,3 +1,4 @@
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 #ifndef _INCLUDE_ACTIONS_ENCODERS_H
 #define _INCLUDE_ACTIONS_ENCODERS_H
 
@@ -16,14 +17,14 @@ public:
 		{
 			cell_t index = *param;
 			CBaseEntity* entity = nullptr;
-			
+
 			entity = gamehelpers->ReferenceToEntity(index);
 			if (entity == nullptr)
 			{
 				ke::SafeSprintf(error, maxlength, "Invalid entity index (%i)", index);
 				return false;
 			}
-			
+
 			param.store(entity);
 			return true;
 		};
@@ -69,3 +70,5 @@ private:
 
 
 #endif // !_INCLUDE_ACTIONS_ENCODERS_H
+
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR

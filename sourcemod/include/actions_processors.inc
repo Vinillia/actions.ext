@@ -59,9 +59,15 @@ public ActionProcessor __action_processor_SelectTargetPoint;
 public ActionProcessor __action_processor_IsPositionAllowed;
 public ActionProcessor __action_processor_QueryCurrentPath;
 public ActionProcessor __action_processor_SelectMoreDangerousThreat;
-
 public ActionProcessor __action_processor_OnCommandApproachByEntity;
 public ActionProcessor __action_processor_OnCommandApproachByVector;
+public ActionProcessor __action_processor_OnActorEmoted;
+public ActionProcessor __action_processor_OnTerritoryContested;
+public ActionProcessor __action_processor_OnTerritoryCaptured;
+public ActionProcessor __action_processor_OnTerritoryLost;
+public ActionProcessor __action_processor_OnWeaponFired;
+public ActionProcessor __action_processor_OnWin;
+public ActionProcessor __action_processor_OnLose;
 
 typeset ActionHandler
 {
@@ -481,7 +487,56 @@ methodmap BehaviorActionListeners
 			__action_setlistener(this, __action_processor_OnCommandApproachByVector, func, false);
 		}
 	}
-
+	property ActionHandler OnActorEmoted
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnActorEmoted, func, false);
+		}
+	}
+	property ActionHandler OnTerritoryContested
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnTerritoryContested, func, false);
+		}
+	}
+	property ActionHandler OnTerritoryCaptured
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnTerritoryCaptured, func, false);
+		}
+	}
+	property ActionHandler OnTerritoryLost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnTerritoryLost, func, false);
+		}
+	}
+	property ActionHandler OnWeaponFired
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnWeaponFired, func, false);
+		}
+	}
+	property ActionHandler OnWin
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnWin, func, false);
+		}
+	}
+	property ActionHandler OnLose
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnLose, func, false);
+		}
+	}
+	
     // ====================================================================================================
 	// ACTION PRE CONTEXTUAL HANDLERS
 	// ====================================================================================================
@@ -834,7 +889,56 @@ methodmap BehaviorActionListeners
 			__action_setlistener(this, __action_processor_OnCommandApproachByVector, func, true);
 		}
 	}
-
+	property ActionHandler OnActorEmotedPost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnActorEmoted, func, true);
+		}
+	}
+	property ActionHandler OnTerritoryContestedPost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnTerritoryContested, func, true);
+		}
+	}
+	property ActionHandler OnTerritoryCapturedPost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnTerritoryCaptured, func, true);
+		}
+	}
+	property ActionHandler OnTerritoryLostPost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnTerritoryLost, func, true);
+		}
+	}
+	property ActionHandler OnWeaponFiredPost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnWeaponFired, func, true);
+		}
+	}
+	property ActionHandler OnWinPost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnWin, func, true);
+		}
+	}
+	property ActionHandler OnLosePost
+	{
+		public set(ActionHandler func)
+		{
+			__action_setlistener(this, __action_processor_OnLose, func, true);
+		}
+	}
+	
     // ====================================================================================================
 	// ACTION POST CONTEXTUAL HANDLERS
 	// ====================================================================================================

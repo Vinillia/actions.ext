@@ -668,15 +668,6 @@ cell_t NAT_actions_ComponentUpdateCallback(IPluginContext* pContext, const cell_
 
 	IPluginFunction* fn = pContext->GetFunctionById(params[2]);
 
-	/*
-	* Handle sys can handle this
-	if (!ActionComponent::IsValidComponent(component))
-	{
-		pContext->ReportError("Invalid action component %X", component);
-		return 0;
-	}
-	*/
-
 	if (fn == nullptr)
 	{
 		pContext->ReportError("Invalid function %i", params[2]);
@@ -685,6 +676,22 @@ cell_t NAT_actions_ComponentUpdateCallback(IPluginContext* pContext, const cell_
 
 	component->SetUpdateCallback(fn);
 	return 0;
+}
+
+cell_t NAT_actions_ComponentAddress(IPluginContext* pContext, const cell_t* params)
+{
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleSecurity sec(nullptr, myself->GetIdentity());
+	HandleError err;
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		return pContext->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
+	}
+
+	return (cell_t)component;
 }
 
 cell_t NAT_actions_ComponentUpkeepCallback(IPluginContext* pContext, const cell_t* params)
@@ -736,15 +743,6 @@ cell_t NAT_actions_ComponentResetCallback(IPluginContext* pContext, const cell_t
 
 	IPluginFunction* fn = pContext->GetFunctionById(params[2]);
 
-	/*
-	* Handle sys can handle this
-	if (!ActionComponent::IsValidComponent(component))
-	{
-		pContext->ReportError("Invalid action component %X", component);
-		return 0;
-	}
-	*/
-
 	if (fn == nullptr)
 	{
 		pContext->ReportError("Invalid function %i", params[2]);
@@ -754,6 +752,63 @@ cell_t NAT_actions_ComponentResetCallback(IPluginContext* pContext, const cell_t
 	component->SetResetCallback(fn);
 	return 0;
 }
+
+cell_t NAT_actions_ComponentActor(IPluginContext* pContext, const cell_t* params)
+{
+	Handle_t hndl = static_cast<Handle_t>(params[1]);
+	HandleSecurity sec(nullptr, myself->GetIdentity());
+	HandleError err;
+
+	ActionComponent* component = nullptr;
+	if ((err = g_pHandleSys->ReadHandle(hndl, g_sdkActions.GetComponentHT(), &sec, (void**)&component))
+		!= HandleError_None)
+	{
+		pContext->ReportError("Invalid component handle %x (error %d)", hndl, err);
+		return 0;
+	}
+
+	INextBot* bot = component->GetBot();
+
+	if (bot == nullptr)
+		return -1;
+
+	CBaseEntity* entity = g_pActionsTools->GetEntity(bot);
+
+	if (entity == nullptr)
+	{
+		pContext->ReportError("Failed to get nextbot ptr (error %X)", entity);
+		return 0;
+	}
+
+	int entindex = gamehelpers->EntityToBCompatRef(entity);
+
+	if (entindex == -1)
+		return 0;
+
+	return entindex;
+}
+
+/*
+cell_t NAT_actions_ActorComponents(IPluginContext* pContext, const cell_t* params)
+{
+	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[1]);
+
+	if (entity == nullptr)
+	{
+		pContext->ReportError("Invalid entity index %i", params[1]);
+		return 0;
+	}
+
+	INextBot* bot = g_pActionsTools->MyNextBotPointer(entity);
+
+	if (bot == nullptr)
+	{
+		pContext->ReportError("Failed to get entity nextbot ptr %i", params[1]);
+		return 0;
+	}
+
+	return 0;
+}*/
 
 cell_t NAT_actions_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 {
@@ -767,15 +822,6 @@ cell_t NAT_actions_ComponentGetName(IPluginContext* ctx, const cell_t* params)
 	{
 		return ctx->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
 	}
-
-	/*
-	* Handle sys can handle this
-	if (!ActionComponent::IsValidComponent(component))
-	{
-		ctx->ReportError("Invalid action component %X", component);
-		return 0;
-	}
-	*/
 
 	const char* name = component->GetName();
 
@@ -803,15 +849,6 @@ cell_t NAT_actions_ComponentSetName(IPluginContext* ctx, const cell_t* params)
 	{
 		return ctx->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
 	}
-
-	/*
-	* Handle sys can handle this
-	if (!ActionComponent::IsValidComponent(component))
-	{
-		ctx->ReportError("Invalid action component %X", component);
-		return 0;
-	}
-	*/
 
 	char* name;
 	ctx->LocalToString(params[2], &name);
@@ -849,6 +886,8 @@ sp_nativeinfo_t g_actionsNatives[] =
 	{ "ActionsManager.GetActionUserData",			NAT_actions_GetActionUserData },
 
 	{ "ActionComponent.ActionComponent",			NAT_actions_CreateComponent },
+	{ "ActionComponent.Address",					NAT_actions_ComponentAddress },
+	{ "ActionComponent.Actor",						NAT_actions_ComponentActor },
 	{ "ActionComponent.GetName",					NAT_actions_ComponentGetName },
 	{ "ActionComponent.SetName",					NAT_actions_ComponentSetName },
 	{ "ActionComponent.CurrentAction.get",			NAT_actions_ComponentCurrentAction },

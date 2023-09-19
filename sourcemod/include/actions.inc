@@ -9,7 +9,7 @@
 #tryinclude <version>
 
 #include <actions_processors>
-#include <actions_constructor>
+// #include <actions_constructor>
 
 enum QueryResultType
 {
@@ -333,6 +333,25 @@ methodmap ActionComponent < Handle
 	}
 
 	/**
+ 	* @brief Returns component physical address
+	* 
+ 	*/
+	property any Address
+	{
+		public native get();
+	}
+
+	/**
+ 	* @brief Returns component actor
+	* @remark returns 0 if component is inactive
+	* 
+ 	*/
+	property int Actor
+	{
+		public native get();
+	}
+	
+	/**
  	* @brief Update callback setter
 	* 
  	* @noreturn
@@ -581,7 +600,7 @@ methodmap BehaviorAction < BehaviorActionListeners
 	* @error				Invalid action passed or invalid runtime result
  	* @noreturn
  	*/
-	#pragma deprecated This functions is deprecated. Does nothing.
+	#pragma deprecated This function is deprecated. Does nothing.
 	public native void StorePendingEventResult( ActionResultType type = CONTINUE, BehaviorAction action = INVALID_ACTION, EventResultPriorityType priority = RESULT_TRY, const char[] reason = NULL_STRING );
 	
 	// ====================================================================================================

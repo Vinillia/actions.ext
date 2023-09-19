@@ -1,5 +1,8 @@
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
+
 #ifndef _INCLUDE_ACTIONS_CONSTRUCTOR_H
 #define _INCLUDE_ACTIONS_CONSTRUCTOR_H
+
 #include <iostream>
 
 #include "actionsdefs.h"
@@ -205,7 +208,7 @@ protected:
 		{
 			return vstk;
 		}
-	
+
 		unsigned char* vstk;
 		unsigned char* vptr;
 	};
@@ -229,7 +232,7 @@ public:
 
 	bool AddParameter(SourceMod::PassType type, int flags = 0, const ActionEncoder* encoder = nullptr);
 	bool Finish();
-	
+
 	bool ConstructParamsBuffer(SourcePawn::IPluginContext* ctx, const cell_t* params, cell_t* buffer, cell_t numParams);
 	nb_action_ptr Execute(SourcePawn::IPluginContext* ctx, const cell_t* params, cell_t numParams);
 
@@ -237,7 +240,7 @@ private:
 	inline nb_action_ptr AllocateAction() const;
 
 private:
-	void*	m_address;
+	void* m_address;
 	size_t	m_actionSize;
 
 	SourceMod::ICallWrapper* m_call;
@@ -247,7 +250,7 @@ private:
 
 	int		m_paramCount;
 	int		m_paramSize;
-};			
+};
 
 inline nb_action_ptr ActionConstructor::AllocateAction() const
 {
@@ -286,3 +289,5 @@ inline size_t ActionConstructor::GetSize() const
 
 
 #endif // !_INCLUDE_ACTIONS_CONSTRUCTOR_H
+
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR

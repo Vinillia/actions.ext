@@ -5,3 +5,4 @@ sdk/
 !sdk/.vcxproj
 !sdk/.filters
 !sdk/.user
+/build

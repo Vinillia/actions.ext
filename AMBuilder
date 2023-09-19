@@ -3,21 +3,37 @@ import os, sys
 
 projectName = 'actions'
 
-# smsdk_ext.cpp will be automatically added later
+l4dSourceFiles = [
+	'source/sdk/l4d/actions_processor.cpp',
+	'source/sdk/l4d/actions_tools_l4d.cpp'
+]
+
+l4d2SourceFiles = [
+	'source/sdk/l4d2/actions_processor.cpp',
+	'source/sdk/l4d2/actions_tools_l4d2.cpp'
+]
+
+tf2SourceFiles = [
+	'source/sdk/tf2/actions_processor.cpp',
+	'source/sdk/tf2/actions_tools_tf2.cpp'
+]
+
 sourceFiles = [
+  'source/sdk/shared/NextBotBehaviorShared.cpp',
+  'source/sdk/shared/NextBotComponentInterface.cpp',
+  'source/sdk/shared/NextBotInterface.cpp',
+  'source/actions_tools.cpp',
+  'source/actions_processor_shared.cpp',
+  'source/actions_processor_impl.cpp',
   'source/actions_constructor_smc.cpp',
   'source/actions_constructor.cpp',
   'source/actions_custom_legacy.cpp',
   'source/actions_component.cpp',
   'source/actions_manager.cpp',
-  'source/actions_processor.cpp',
   'source/actions_propagation.cpp',
   'source/actions_pubvars.cpp',
   'source/hook.cpp',
   'source/extension.cpp',
-  'source/sdk/NextBotComponentInterface.cpp',
-  'source/sdk/NextBotInterface.cpp',
-  'source/sdk/NextBotManager.cpp',
   os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c'),
   os.path.join(Extension.sm_root, 'public', 'CDetour', 'detours.cpp'),
   os.path.join(Extension.sm_root, 'public', 'libudis86', 'decode.c'),
@@ -29,10 +45,16 @@ sourceFiles = [
 ]
 
 includeFiles = [
-  os.path.join(builder.sourcePath, 'source', 'sdk'),
+  os.path.join(builder.sourcePath, 'source', 'sdk', 'shared'),
   os.path.join(builder.sourcePath, 'source'),
 ]
 
+gameFiles = { 
+    'l4d2': l4d2SourceFiles, 
+    'l4d': l4dSourceFiles,
+    'tf2': tf2SourceFiles 
+}
+    
 ###############
 # Make sure to edit PackageScript, which copies your files to their appropriate locations
 # Simple extensions do not need to modify past this point.
@@ -51,10 +73,14 @@ project.sources += sourceFiles
 for sdk_name in Extension.sdks:
   sdk = Extension.sdks[sdk_name]
   
+  project.sources += gameFiles[sdk.name]
   binary = Extension.HL2Config(project, projectName + '.ext.' + sdk.ext, sdk)
   compiler = binary.compiler
   compiler.cxxincludes += includeFiles
+  compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name) ]
+  compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name, 'nextbot') ]
   
+  print(os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name, 'nextbot'))
   if compiler.vendor == 'msvc':
     compiler.defines += [ '_CRT_NO_VA_START_VALIDATION' ]
     compiler.cxxflags.append('/std:c++17')

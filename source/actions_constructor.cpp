@@ -1,3 +1,5 @@
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
+
 #include "extension.h"
 #include "actions_constructor.h"
 
@@ -22,20 +24,11 @@ const ActionEncoder* ActionEncoder::FindEncoderByName(const char* name)
 			return !strcmp(encoder->ShortName(), name) || !strcmp(encoder->PublicName(), name);
 		}
 	);
-	
+
 	if (r == encoders->end())
 		return nullptr;
 
 	return *r;
-}
-
-void ActionConstructor_SMC::ReadSMC_ParseStart()
-{
-	m_state = SMC_Root;
-	m_ignoreLevel = 0;
-	m_currentLevel = 0;
-	m_platformLevel = -1;
-	m_data = ac_data();
 }
 
 ActionConstructor::ActionConstructor(int actionSize)
@@ -122,7 +115,7 @@ bool ActionConstructor::AddParameter(PassType type, int flags, const ActionEncod
 		throw std::runtime_error("Exceed SP_MAX_EXEC_PARAMS");
 
 	PassInfo info;
-	
+
 	info.fields = nullptr;
 	info.flags = flags;
 	info.numFields = 0;
@@ -257,3 +250,5 @@ bool ActionConstructor::SetupFromConf(IPluginContext* ctx, IGameConfig* config, 
 
 	return true;
 }
+
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR

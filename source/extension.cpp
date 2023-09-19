@@ -1,13 +1,14 @@
 #include "extension.h"
 #include "hook.h"
 
-#include "actions_processor.h"
+#include "actions_processor_impl.h"
 #include "actions_pubvars.h"
 #include "actions_propagation.h"
 #include "actions_manager.h"
 #include "actions_pubvars.h"
 #include "actions_component.h"
 #include "actions_tools.h"
+// #include "actions_container.h"
 
 #include "actions_natives.h"
 #include "actions_legacy.h"
@@ -30,8 +31,10 @@ CGlobalVars* gpGlobals = nullptr;
 ICvar* icvar = nullptr;
 IBinTools* bintools = nullptr;
 
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 ActionConstructor_SMC g_actionsConstructorSMC;
 ActionConstructor_SMC* g_pActionConstructorSMC = &g_actionsConstructorSMC;
+#endif
 
 extern void InitVirtualMap();
 
@@ -61,7 +64,9 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	sharesys->AddNatives(myself, g_actionsNativesCaller);
 	RegisterLegacyNatives();
 
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 	gameconfs->AddUserConfigHook("ActionConstructors", &g_actionsConstructorSMC);
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR
 
 	plsys->AddPluginsListener(this);
 	playerhelpers->AddClientListener(this);
@@ -110,6 +115,9 @@ void SDKActions::SDK_OnUnload()
 
 	if (m_htActionComponent)
 		g_pHandleSys->RemoveType(m_htActionComponent, myself->GetIdentity());
+
+	if (m_htActionConstructor)
+		g_pHandleSys->RemoveType(m_htActionConstructor, myself->GetIdentity());
 
 	forwards->ReleaseForward(m_fwdOnActionCreated);
 	forwards->ReleaseForward(m_fwdOnActionDestroyed);
@@ -191,21 +199,29 @@ void SDKActions::OnHandleDestroy(HandleType_t type, void* object)
 	{
 		((ActionComponent*)object)->OnHandleDestroy(type);
 	}
-	else
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
+	else if (type == GetConstructorHT())
 	{
 		delete ((ActionConstructor*)object);
 	}
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR
 }
 
 bool SDKActions::GetHandleApproxSize(HandleType_t type, void* object, unsigned int* pSize)
 {
-	if (type != GetComponentHT())
+	if (type == GetComponentHT())
+	{
+		return ((ActionComponent*)object)->GetHandleApproxSize(type, pSize);
+	}
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
+	else if (type == GetConstructorHT())
 	{
 		*pSize = sizeof(ActionConstructor);
 		return true;
 	}
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR
 
-	return ((ActionComponent*)object)->GetHandleApproxSize(type, pSize);
+	return false;
 }
 
 #ifdef _WIN32

@@ -119,6 +119,15 @@ ActionConstructor_SMC::ActionConstructor_SMC()
 	m_data = ac_data();
 }
 
+void ActionConstructor_SMC::ReadSMC_ParseStart()
+{
+	m_state = SMC_Root;
+	m_ignoreLevel = 0;
+	m_currentLevel = 0;
+	m_platformLevel = -1;
+	m_data = ac_data();
+}
+
 SMCResult ActionConstructor_SMC::ReadSMC_NewSection(const SMCStates* states, const char* name)
 {
 	m_currentLevel++;

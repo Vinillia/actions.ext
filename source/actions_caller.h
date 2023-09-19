@@ -1,3 +1,4 @@
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 #ifndef _INCLUDE_ACTIONS_CALLER_H
 #define _INCLUDE_ACTIONS_CALLER_H
 
@@ -67,8 +68,8 @@ cell_t NAT_caller_Execute(IPluginContext* ctx, const cell_t* params)
 			g_actionsManager.SetActionActor(action, nullptr);
 			g_actionsManager.Add(action);
 		}
-	}	
-	catch(const std::exception& e)
+	}
+	catch (const std::exception& e)
 	{
 		ctx->ReportError("Failed to execute constructor: %s", e.what());
 	}
@@ -109,7 +110,7 @@ cell_t NAT_caller_AddressFromConf(IPluginContext* ctx, const cell_t* params)
 
 	IGameConfig* config = nullptr;
 	HandleError err;
-	
+
 	if ((config = gameconfs->ReadHandle(params[2], ctx->GetIdentity(), &err)) == nullptr)
 	{
 		ctx->ReportError("Invalid gamedata handle %x (error %d)", params[2], err);
@@ -239,7 +240,7 @@ cell_t NAT_caller_SetupFromConf(IPluginContext* ctx, const cell_t* params)
 
 	char* key;
 	ctx->LocalToString(params[2], &key);
-	
+
 	auto ac_data = g_pActionConstructorSMC->GetACData(key);
 	if (ac_data == nullptr)
 	{
@@ -285,3 +286,9 @@ sp_nativeinfo_t g_actionsNativesCaller[] =
 };
 
 #endif // !_INCLUDE_ACTIONS_CALLER_H
+#else
+sp_nativeinfo_t g_actionsNativesCaller[] =
+{
+	{ NULL, NULL }
+};
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR

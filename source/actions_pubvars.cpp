@@ -3,6 +3,7 @@
 
 #include "smsdk_ext.h"
 #include "actions_encoders.h"
+#include "actionsdefs.h"
 
 #define _MAKESTR(x) #x
 #define MAKESTR(x) _MAKESTR(x)
@@ -96,6 +97,7 @@ void ActionPublicsManager::SyncListeners(SourcePawn::IPluginContext* pl)
 
 void ActionPublicsManager::SyncEncoders(SourcePawn::IPluginContext* pl)
 {
+#ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 	auto encoders = ActionEncoder::GetActionEncoders();
 
 	for (auto it = encoders->cbegin(); it != encoders->cend(); it++)
@@ -103,6 +105,7 @@ void ActionPublicsManager::SyncEncoders(SourcePawn::IPluginContext* pl)
 		const ActionEncoder* encoder = *it;
 		SetPluginPubVar(pl, encoder->PublicName(), (void*)encoder);
 	}
+#endif // INCLUDE_ACTIONS_CONSTRUCTOR
 }
 
 bool ActionPublicsManager::SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, void* value)
@@ -209,6 +212,16 @@ void ActionPublicsManager::InitializePublicVariables()
 	INSERT_METHOD_HASH(IsPositionAllowed);
 	INSERT_METHOD_HASH(QueryCurrentPath);
 	INSERT_METHOD_HASH(SelectMoreDangerousThreat);
+
+	INSERT_METHOD_HASH(OnActorEmoted);
+	INSERT_METHOD_HASH(OnTerritoryContested);
+	INSERT_METHOD_HASH(OnTerritoryCaptured);
+	INSERT_METHOD_HASH(OnTerritoryLost);
+	INSERT_METHOD_HASH(OnWeaponFired);
+	INSERT_METHOD_HASH(OnWin);
+
+	INSERT_METHOD_HASH(ShouldRetreat);
+	INSERT_METHOD_HASH(ShouldAttack);
 	
 	INSERT_METHOD_HASH_OVERLOAD(OnCommandApproach, ByEntity, EventDesiredResult< CBaseEntity >(ActionProcessor::*)(CBaseEntity*, const Vector&, float));
 	INSERT_METHOD_HASH_OVERLOAD(OnCommandApproach, ByVector, EventDesiredResult< CBaseEntity >(ActionProcessor::*)(CBaseEntity*, CBaseEntity*));

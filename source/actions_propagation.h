@@ -6,7 +6,6 @@
 #include "smsdk_ext.h"
 #include "actionsdefs.h"
 
-#include "actions_processor.h"
 #include "actions_pubvars.h"
 #include "actions_manager.h"
 
@@ -31,10 +30,10 @@ template<typename T>
 inline constexpr bool is_action_result_v = is_action_result<T>::value || is_action_desire_result<T>::value;
 
 template<typename T>
-struct action_process_t
+struct hexecution
 {
-	ResultType resultType;
-	T returnValue;
+	ResultType rt;
+	T rv;
 };
 
 struct ActionListener
@@ -73,9 +72,9 @@ public:
 
 public:
 	template<typename T>
-	inline void ProcessMethodArg(IPluginFunction* fn, T arg)
+	inline void ProcessMethodArg(IPluginFunction* fn, T&& arg)
 	{
-		using type = std::remove_const_t<std::remove_reference_t<T>>;
+		using type = std::decay_t<T>;
 
 		if constexpr (std::is_same_v<type, float>)
 		{
@@ -102,6 +101,10 @@ public:
 		{
 			fn->PushCell((cell_t)arg);
 		}
+		else if constexpr (std::is_same_v<type, CTakeDamageInfo>)
+		{
+			fn->PushCell((cell_t)&arg);
+		}
 		else
 		{
 			fn->PushCell((cell_t)arg);
@@ -109,7 +112,7 @@ public:
 	}
 
 	template<typename RETURN, typename ...Args>
-	ResultType ProcessMethod(nb_action_ptr action, HashValue hash, RETURN* result, Args... args)
+	ResultType ProcessMethod(nb_action_ptr action, HashValue hash, RETURN* result, Args&&... args)
 	{
 		auto& list = m_actionsListeners[action][hash];
 
@@ -122,15 +125,18 @@ public:
 			IPluginFunction* fn = iter->fn;
 
 			ProcessMethodArg<nb_action_ptr>(fn, std::forward<nb_action_ptr>(action));
-			(ProcessMethodArg<Args>(fn, args), ...);
+			(ProcessMethodArg<Args>(fn, std::forward<Args>(args)), ...);
 
-			if constexpr (is_action_result_v<RETURN>)
+			if constexpr (!std::is_null_pointer_v<RETURN>)
 			{
-				fn->PushCell((cell_t)result);
-			}
-			else
-			{
-				fn->PushCellByRef((cell_t*)result);
+				if constexpr (is_action_result_v<RETURN>)
+				{
+					fn->PushCell((cell_t)result);
+				}
+				else
+				{
+					fn->PushCellByRef((cell_t*)result);
+				}
 			}
 
 			fn->Execute((cell_t*)&executeResult);
