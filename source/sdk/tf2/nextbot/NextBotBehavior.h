@@ -17,6 +17,7 @@
 #include "edict.h"
 
 #include <string_view>
+#include "actions_tools.h"
 
 
 //#define DEBUG_BEHAVIOR_MEMORY
@@ -61,11 +62,9 @@ template < typename Actor > struct IActionResult;
 
 class CBaseEntity;
 class PathFollower;
-class ActionsTools;
 
 extern const Vector vec3_origin;
 extern CGlobalVars* gpGlobals;
-extern ActionsTools* g_pActionsTools;
 
 /**
  * The possible consequences of an Action

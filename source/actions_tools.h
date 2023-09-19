@@ -3,6 +3,10 @@
 #ifndef _INCLUDE_ACTIONS_TOOLS_H
 #define _INCLUDE_ACTIONS_TOOLS_H
 
+#ifdef clamp
+#undef clamp // Valve
+#endif
+
 #include <vector>
 #include <functional>
 
