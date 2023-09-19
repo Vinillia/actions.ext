@@ -6,3 +6,4 @@ sdk/
 !sdk/.filters
 !sdk/.user
 /build
+!source/sdk

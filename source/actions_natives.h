@@ -709,15 +709,6 @@ cell_t NAT_actions_ComponentUpkeepCallback(IPluginContext* pContext, const cell_
 
 	IPluginFunction* fn = pContext->GetFunctionById(params[2]);
 
-	/*
-	* Handle sys can handle this
-	if (!ActionComponent::IsValidComponent(component))
-	{
-		pContext->ReportError("Invalid action component %X", component);
-		return 0;
-	}
-	*/
-
 	if (fn == nullptr)
 	{
 		pContext->ReportError("Invalid function %i", params[2]);
