@@ -343,7 +343,7 @@ methodmap ActionComponent < Handle
 
 	/**
  	* @brief Returns component actor
-	* @remark returns 0 if component is inactive
+	* @remark Returns 0 if component is inactive
 	* 
  	*/
 	property int Actor
@@ -709,6 +709,8 @@ public void __ext_actions_SetNTVOptional()
 	MarkNativeAsOptional("ActionComponent.Reset");
 	MarkNativeAsOptional("ActionComponent.GetName");
 	MarkNativeAsOptional("ActionComponent.SetName");
+	MarkNativeAsOptional("ActionComponent.Address");
+	MarkNativeAsOptional("ActionComponent.Actor");
 
 	MarkNativeAsOptional("ActionResult.GetReason");
 	MarkNativeAsOptional("ActionResult.SetReason");
