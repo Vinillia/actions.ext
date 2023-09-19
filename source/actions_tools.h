@@ -3,8 +3,14 @@
 #ifndef _INCLUDE_ACTIONS_TOOLS_H
 #define _INCLUDE_ACTIONS_TOOLS_H
 
+#ifdef clamp
+#undef clamp // Valve
+#endif
+
 #include <vector>
 #include <functional>
+
+#include "NextBotDebug.h"
 
 namespace SourceMod
 {
@@ -15,8 +21,6 @@ class IIntention;
 class INextBot;
 class CBaseEntity;
 class INextBotEventResponder;
-
-enum NextBotDebugType;
 class Color;
 
 namespace ine
@@ -97,7 +101,7 @@ inline void ActionsTools::DebugConColorMsg(INextBot* bot, NextBotDebugType debug
 template<typename ...Args>
 inline void ActionsTools::DebugConColorMsg(CBaseEntity* entity, NextBotDebugType debugType, const Color& color, const char* fmt, Args&&... args)
 {
-	DebugConColorMsg<Args...>(MyNextBotPointer(entity), debugType, color, fmt, args);
+	DebugConColorMsg<Args...>(MyNextBotPointer(entity), debugType, color, fmt, args...);
 }
 
 inline CBaseEntity* ActionsTools::GetEntity(INextBot* bot) const
