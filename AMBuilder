@@ -73,8 +73,8 @@ project.sources += sourceFiles
 for sdk_name in Extension.sdks:
   sdk = Extension.sdks[sdk_name]
   
-  project.sources += gameFiles[sdk.name]
   binary = Extension.HL2Config(project, projectName + '.ext.' + sdk.ext, sdk)
+  binary.sources += gameFiles[sdk.name]
   compiler = binary.compiler
   compiler.cxxincludes += includeFiles
   compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name) ]
@@ -85,7 +85,7 @@ for sdk_name in Extension.sdks:
     compiler.cxxflags.append('/std:c++17')
     compiler.linkflags.append('legacy_stdio_definitions.lib')
   elif compiler.vendor == 'clang':
-    compiler.cxxflags += [ '-Wno-reinterpret-base-class', '-Wno-infinite-recursion', '-Wno-implicit-const-int-float-conversion', '-std=c++17', '-Wno-register', '-Wno-varargs', '-fexceptions' ]
+    compiler.cxxflags += [ '-Wno-reinterpret-base-class', '-Wno-infinite-recursion', '-Wno-expansion-to-defined', '-Wno-implicit-const-int-float-conversion', '-std=c++17', '-Wno-register', '-Wno-varargs', '-fexceptions' ]
     compiler.defines += [ 'HAVE_STRING_H', '_GLIBCXX_USE_CXX11_ABI=0' ]
     compiler.linkflags += [ '-static-libstdc++' ]
 	
