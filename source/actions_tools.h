@@ -26,6 +26,14 @@ class Color;
 namespace ine
 {
 	template<typename K, typename... T>
+	inline K call_cdecl(void* addr, T... args)
+	{
+		using fn_t = K(__cdecl*)(T...);
+		fn_t fn = reinterpret_cast<fn_t>(addr);
+		return fn(args...);
+	}
+
+	template<typename K, typename... T>
 	inline K call_std(void* addr, T... args)
 	{
 		using fn_t = K(__stdcall*)(T...);
@@ -36,9 +44,13 @@ namespace ine
 	template<typename K, typename... T>
 	inline K call_this(void* addr, T... args)
 	{
+#ifdef WIN32
 		using fn_t = K(__thiscall*)(T...);
 		fn_t fn = reinterpret_cast<fn_t>(addr);
 		return fn(args...);
+#else
+		return call_cdecl<K, T...>(addr, args...);
+#endif
 	}
 
 	inline void* get_vtable_fn(void* instance, int offset)
@@ -59,7 +71,7 @@ class ActionsTools
 public:
 	ActionsTools();
 	virtual ~ActionsTools() {};
-	
+
 public:
 	virtual bool OnIntentionReset(INextBot* bot, IIntention* intention);
 	virtual bool LoadGameConfigFile(SourceMod::IGameConfig* config, char* error, size_t maxlen);
