@@ -901,6 +901,15 @@ public:
 		}
 		else
 		{
+			if (result.m_priority == RESULT_CRITICAL)
+			{
+				static ConVarRef developer("developer");
+				if (developer.GetBool())
+				{
+					DevMsg("%3.2f: WARNING: %s::%s() RESULT_CRITICAL collision\n", gpGlobals->curtime, GetName(), eventName);
+				}
+			}
+
 			// new result is lower priority than previously stored result - discard it
 			if (result.m_action)
 			{

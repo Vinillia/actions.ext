@@ -12,7 +12,7 @@
 CDetour* g_pDestructorLock = nullptr;
 extern ActionProcessorShared* g_pActionProcessor;
 
-void __action_swap_vtable(ActionProcessorShared* action)
+void __action_swap_vtable(void* action)
 {
 	auto r = g_virtualMap.find((nb_action_ptr)action);
 
@@ -26,7 +26,7 @@ void __action_swap_vtable(ActionProcessorShared* action)
 	vtable_swap(action, &data);
 }
 
-void __action_unswap_vtable(ActionProcessorShared* action)
+void __action_unswap_vtable(void* action)
 {
 	vtable_swap(action, g_pActionProcessor);
 }
@@ -117,9 +117,9 @@ void StopActionProcessing()
 	}
 }
 
-Autoswap::Autoswap(const ActionProcessorShared* action)
+Autoswap::Autoswap(const void* action)
 {
-	m_action = const_cast<ActionProcessorShared*>(action);
+	m_action = const_cast<void*>(action);
 	__action_swap_vtable(m_action);
 }
 

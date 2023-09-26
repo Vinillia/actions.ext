@@ -743,6 +743,15 @@ public:
 		}
 		else
 		{
+			if (result.m_priority == RESULT_CRITICAL)
+			{
+				static ConVarRef developer("developer");
+				if (developer.GetBool())
+				{
+					DevMsg("%3.2f: WARNING: %s::%s() RESULT_CRITICAL collision\n", gpGlobals->curtime, GetName(), eventName);
+				}
+			}
+
 			if (result.m_action)
 			{
 				// destroy the unused action

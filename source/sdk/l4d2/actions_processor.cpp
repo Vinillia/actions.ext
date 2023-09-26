@@ -233,41 +233,41 @@ bool ActionProcessor::IsAbleToBlockMovementOf(const INextBot* botInMotion) const
 QueryResultType ActionProcessor::ShouldPickUp(const INextBot* me, CBaseEntity* item) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::ShouldPickUp");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::ShouldPickUp, me, item);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::ShouldPickUp, me, item);
 }
 
 QueryResultType ActionProcessor::ShouldHurry(const INextBot* me) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::ShouldHurry");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::ShouldHurry, me);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::ShouldHurry, me);
 }
 
 QueryResultType ActionProcessor::IsHindrance(const INextBot* me, CBaseEntity* blocker) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::IsHindrance");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::IsHindrance, me, blocker);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::IsHindrance, me, blocker);
 }
 
 Vector ActionProcessor::SelectTargetPoint(const INextBot* me, const CBaseCombatCharacter* subject) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::SelectTargetPoint");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::SelectTargetPoint, me, subject);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::SelectTargetPoint, me, subject);
 }
 
 QueryResultType ActionProcessor::IsPositionAllowed(const INextBot* me, const Vector& pos) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::IsPositionAllowed");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::IsPositionAllowed, me, pos);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::IsPositionAllowed, me, pos);
 }
 
 PathFollower* ActionProcessor::QueryCurrentPath(const INextBot* me) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::QueryCurrentPath");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::QueryCurrentPath, me);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::QueryCurrentPath, me);
 }
 
 const CKnownEntity* ActionProcessor::SelectMoreDangerousThreat(const INextBot* me, const CBaseCombatCharacter* subject, const CKnownEntity* threat1, const CKnownEntity* threat2) const
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::SelectMoreDangerousThreat");
-	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &ActionProcessor::SelectMoreDangerousThreat, me, subject, threat1, threat2);
+	return ProcessHandler(hash, const_cast<ActionProcessor*>(this), &IContextualQuery::SelectMoreDangerousThreat, me, subject, threat1, threat2);
 }

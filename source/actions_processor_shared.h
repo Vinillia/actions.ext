@@ -11,6 +11,18 @@
 
 #include "actions_processor_impl.h"
 
+template <typename... Ts>
+using void_t = void;
+
+template <class K, typename T, typename = void>
+struct is_class_member : std::false_type {};
+
+template <class K, typename T>
+struct is_class_member<K, T, void_t<typename std::enable_if_t<std::is_same_v<T, void(K::*)()>>>> : std::true_type {};
+
+template <typename T>
+struct is_contextual_query : is_class_member<IContextualQuery, T> {};
+
 template<typename T>
 struct execution_result
 {
@@ -30,7 +42,7 @@ struct execution_result
 	}
 };
 
-class ActionProcessorShared : private Action<CBaseEntity>
+class ActionProcessorShared : public Action<CBaseEntity>
 {
 public:
 	ActionProcessorShared();
@@ -114,7 +126,6 @@ template<typename M, typename A, typename ...Args>
 inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Args&& ...args)
 {
 	Autoswap guard(action);
-
 	using return_t = decltype(((action)->*handler)(args...));
 	
 	// Error C2131 expression did not evaluate to a constant
@@ -124,11 +135,25 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 	{
 		if constexpr (!std::is_void_v<return_t>) 
 		{
-			return std::invoke(handler, (A)action, std::forward<Args>(args)...);
+			if constexpr (!is_contextual_query<M>::value)
+			{
+				return std::invoke(handler, (A)action, std::forward<Args>(args)...);
+			}
+			else
+			{
+				return std::invoke(handler, static_cast<IContextualQuery*>(action), std::forward<Args>(args)...);
+			}
 		}
 		else
 		{
-			std::invoke(handler, (A)action, std::forward<Args>(args)...);
+			if constexpr (!is_contextual_query<M>::value)
+			{
+				std::invoke(handler, (A)action, std::forward<Args>(args)...);
+			}
+			else
+			{
+				std::invoke(handler, static_cast<IContextualQuery*>(action), std::forward<Args>(args)...);
+			}
 		}
 	};
 
