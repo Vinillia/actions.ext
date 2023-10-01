@@ -161,7 +161,7 @@ cell_t NAT_actions_GetReason(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -208,7 +208,7 @@ cell_t NAT_actions_SetOrGetType(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -233,7 +233,7 @@ cell_t NAT_actions_SetOrGetAction(IPluginContext* pContext, const cell_t* params
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -260,7 +260,7 @@ cell_t NAT_actions_SetOrGetPriority(IPluginContext* pContext, const cell_t* para
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -294,7 +294,7 @@ cell_t NAT_actions_Continue(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -316,7 +316,7 @@ cell_t NAT_actions_ChangeTo(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -344,7 +344,7 @@ cell_t NAT_actions_SuspendFor(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -372,7 +372,7 @@ cell_t NAT_actions_Done(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -399,7 +399,7 @@ cell_t NAT_actions_TryContinue(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -423,7 +423,7 @@ cell_t NAT_actions_TryChangeTo(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -452,7 +452,7 @@ cell_t NAT_actions_TrySuspendFor(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -481,7 +481,7 @@ cell_t NAT_actions_TryDone(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 
@@ -509,7 +509,7 @@ cell_t NAT_actions_TryToSustain(IPluginContext* pContext, const cell_t* params)
 
 	if (!runtimeResult)
 	{
-		pContext->ReportError("Attempt to access an invalid result. This must be called from callback");
+		pContext->ReportError("Attempt to access an invalid result.");
 		return -1;
 	}
 

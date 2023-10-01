@@ -226,7 +226,7 @@ inline ActionResult<CBaseEntity>* ActionsManager::GetActionRuntimeResult()
 {
 	try
 	{
-		std::any& result = TopRuntimeResult();
+ 		std::any& result = TopRuntimeResult();
 		return std::any_cast<ActionResult<CBaseEntity>*>(result);
 	}
 	catch (const std::runtime_error&)

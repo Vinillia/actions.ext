@@ -13,7 +13,7 @@ class Autoswap
 {
 public:
 	Autoswap() = delete;
-	Autoswap(const ActionProcessorShared* action);
+	Autoswap(const void* action);
 	~Autoswap();
 
 private:
@@ -22,7 +22,7 @@ private:
 	Autoswap& operator=(const Autoswap&) = delete;
 	Autoswap& operator=(Autoswap&&) = delete;
 private:
-	ActionProcessorShared* m_action;
+	void* m_action;
 };
 
 bool BeginActionProcessing(nb_action_ptr action);

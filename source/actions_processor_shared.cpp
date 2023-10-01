@@ -1,7 +1,7 @@
 #include "actions_processor_shared.h"
 
-void __action_swap_vtable(ActionProcessorShared* action);
-void __action_unswap_vtable(ActionProcessorShared* action);
+void __action_swap_vtable(void* action);
+void __action_unswap_vtable(void* action);
 
 ActionProcessorShared* g_pActionProcessor = nullptr;
 
