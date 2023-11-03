@@ -81,7 +81,7 @@ typeset ActionHandler
 	function void (any action, int actor, any priorAction, ActionResult result);
 
 	/* InitialContainedAction */
-	function Action (any action, int actor, any& action);
+	function Action (any action, int actor, any& child);
 
 	/* OnLeaveGround, OnLandOnGround, OnDrop, OnShoved, OnBlinded, OnHitByVomitJar, OnCommandAttack */
 	function Action (any action, int actor, int entity, ActionDesiredResult result);
