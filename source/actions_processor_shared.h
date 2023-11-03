@@ -142,7 +142,10 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 					const return_t child = std::invoke(handler, (A)action, std::forward<Args>(args)...);
 
 					if (child != nullptr)
+					{
+						g_actionsManager.SetActionActor(child, action->GetActor());
 						g_actionsManager.Add(child);
+					}
 
 					return child;
 				}
