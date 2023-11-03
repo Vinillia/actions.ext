@@ -133,11 +133,23 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 
 	auto ul = [&]() -> return_t
 	{
-		if constexpr (!std::is_void_v<return_t>) 
+		if constexpr (!std::is_void_v<return_t>)
 		{
 			if constexpr (!is_contextual_query<M>::value)
 			{
-				return std::invoke(handler, (A)action, std::forward<Args>(args)...);
+				if constexpr (std::is_same_v<return_t, Action< CBaseEntity >*>)
+				{
+					const return_t child = std::invoke(handler, (A)action, std::forward<Args>(args)...);
+
+					if (child != nullptr)
+						g_actionsManager.Add(child);
+
+					return child;
+				}
+				else
+				{
+					return std::invoke(handler, (A)action, std::forward<Args>(args)...);
+				}
 			}
 			else
 			{
