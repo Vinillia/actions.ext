@@ -53,13 +53,13 @@ using ActionListeners = std::unordered_map<nb_action_ptr, MethodListeners>;
 extern ConVar ext_actions_debug_memory;
 
 template<typename T>
-static inline bool is_result_same(const T& left, const T& right)
+inline bool is_result_same(const T& left, const T& right)
 {
 	return left.m_action == right.m_action && left.m_type == right.m_type;
 }
 
 template<>
-static inline bool is_result_same<EventDesiredResult<CBaseEntity>>(const EventDesiredResult<CBaseEntity>& left, const EventDesiredResult<CBaseEntity>& right)
+inline bool is_result_same(const EventDesiredResult<CBaseEntity>& left, const EventDesiredResult<CBaseEntity>& right)
 {
 	return left.m_priority == right.m_priority && is_result_same((const ActionResult<CBaseEntity>&)left, (const ActionResult<CBaseEntity>&)right);
 }
