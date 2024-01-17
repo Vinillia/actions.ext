@@ -59,7 +59,7 @@ static inline bool is_result_same(const T& left, const T& right)
 }
 
 template<>
-static inline bool is_result_same<EventDesiredResult<CBaseEntity>>(const EventDesiredResult<CBaseEntity>& left, const EventDesiredResult<CBaseEntity>& right)
+static inline bool is_result_same(const EventDesiredResult<CBaseEntity>& left, const EventDesiredResult<CBaseEntity>& right)
 {
 	return left.m_priority == right.m_priority && is_result_same((const ActionResult<CBaseEntity>&)left, (const ActionResult<CBaseEntity>&)right);
 }
