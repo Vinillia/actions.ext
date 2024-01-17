@@ -26,15 +26,15 @@ struct is_contextual_query : is_class_member<IContextualQuery, T> {};
 template<typename T>
 struct execution_result
 {
-	hexecution<T> handlerExecution;
+	handler_result<T> handlerExecution;
 	T effectiveResult;
 
-	const ResultType& rt() {	
-		return handlerExecution.rt; 
+	const ResultType& rt() {
+		return handlerExecution.plresult;
 	}
-	
-	const T& rv()	{	
-		return handlerExecution.rv; 
+
+	const T& value() {
+		return handlerExecution.value;
 	}
 
 	const T& result() {
@@ -67,45 +67,74 @@ public:
 
 extern ActionProcessorShared* g_pActionProcessor;
 
+template<typename T>
+static void ProcessResultTransition(T& handlerResult, T& desiredResult)
+{
+	// if listener required to change action
+	if (desiredResult.m_type == CHANGE_TO || desiredResult.m_type == SUSPEND_FOR)
+	{
+		// desired action is null, report it.
+		if (!desiredResult.m_action)
+		{
+			g_pSM->LogError(myself, "Trying to change to null action!");
+			desiredResult.m_type = CONTINUE;
+		}
+		else
+		{
+			// Transition has been successful but new action isn't final yet.
+			g_actionsManager.AddPending(desiredResult.m_action);
+		}
+	}
+	else if (desiredResult.m_action)
+	{
+		g_pSM->LogError(myself, "Trying to change action without result!");
+	}
+}
+
 template<typename R, typename M, typename ...Args>
-hexecution<R> ProcessHandlerImpl(M&& handler, nb_action_ptr action, HashValue hash, R& result, Args&&... args)
+handler_result<R> ProcessHandlerImpl(M&& handler, nb_action_ptr action, HashValue hash, R& newResult, Args&&... args)
 {
 	ResultType plpre = Pl_Continue, plpost = Pl_Continue;
-	hexecution<R> he = {};
+	handler_result<R> handlerResult = {};
+	bool addPending = false;
 
-	g_actionsManager.PushRuntimeResult(&result);
-	plpre = g_actionsPropagationPre.ProcessMethod<R, Args...>(action, hash, &result, std::forward<Args>(args)...);
+	g_actionsManager.PushRuntimeResult(&newResult);
+	plpre = g_actionsPropagationPre.ProcessMethod<R, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
 
 	if (plpre != Pl_Handled)
 	{
-		he.rv = handler();
-
-		if constexpr (is_action_result_v<R>)
-		{
-			if (he.rv.m_action)
-				g_actionsManager.AddPending(he.rv.m_action);
-		}
+		// Call original handler if hasn't been blocked
+		handlerResult.value = handler();
 
 		if (plpre < Pl_Changed)
-			result = he.rv;
+		{
+			// No answer from listeners. Keep original return value
+			newResult = handlerResult.value;
+		}
 	}
 
-	plpost = g_actionsPropagationPost.ProcessMethod<R, Args...>(action, hash, &result, std::forward<Args>(args)...);
+	plpost = g_actionsPropagationPost.ProcessMethod<R, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
 	g_actionsManager.PopRuntimeResult();
-
-	if (plpre < Pl_Changed && plpost < Pl_Changed)
-		result = he.rv;
 
 	if constexpr (is_action_result_v<R>)
 	{
-		if (result.m_action == nullptr && (result.m_type == CHANGE_TO || result.m_type == SUSPEND_FOR))
-			result = he.rv;
-
-		g_actionsManager.ProcessResult(action, reinterpret_cast<const ActionResult<CBaseEntity>&>(result));
+		ProcessResultTransition(handlerResult.value, newResult);
 	}
 
-	he.rt = std::max<decltype(he.rt)>(plpre, plpost);
-	return he;
+	// Either pre or post listeners changed result. Use handler's return
+	if (plpre < Pl_Changed && plpost < Pl_Changed)
+		newResult = handlerResult.value;
+
+	if constexpr (is_action_result_v<R>)
+	{
+		if (newResult.m_action == nullptr && (newResult.m_type == CHANGE_TO || newResult.m_type == SUSPEND_FOR))
+			newResult = handlerResult.value;
+
+		g_actionsManager.ProcessResult(action, reinterpret_cast<const ActionResult<CBaseEntity>&>(newResult));
+	}
+
+	handlerResult.plresult = std::max<ResultType>(plpre, plpost);
+	return handlerResult;
 }
 
 template<typename M, typename ...Args>
@@ -127,50 +156,50 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 {
 	Autoswap guard(action);
 	using return_t = decltype(((action)->*handler)(args...));
-	
+
 	// Error C2131 expression did not evaluate to a constant
 	// constexpr bool isVoid = std::is_void_v<return_t>; 
 
 	auto ul = [&]() -> return_t
-	{
-		if constexpr (!std::is_void_v<return_t>)
 		{
-			if constexpr (!is_contextual_query<M>::value)
+			if constexpr (!std::is_void_v<return_t>)
 			{
-				if constexpr (std::is_same_v<return_t, Action< CBaseEntity >*>)
+				if constexpr (!is_contextual_query<M>::value)
 				{
-					const return_t child = std::invoke(handler, (A)action, std::forward<Args>(args)...);
-
-					if (child != nullptr)
+					if constexpr (std::is_same_v<return_t, Action< CBaseEntity >*>)
 					{
-						g_actionsManager.SetActionActor(child, action->GetActor());
-						g_actionsManager.Add(child);
-					}
+						const return_t child = std::invoke(handler, (A)action, std::forward<Args>(args)...);
 
-					return child;
+						if (child != nullptr)
+						{
+							g_actionsManager.SetActionActor(child, action->GetActor());
+							g_actionsManager.Add(child);
+						}
+
+						return child;
+					}
+					else
+					{
+						return std::invoke(handler, (A)action, std::forward<Args>(args)...);
+					}
 				}
 				else
 				{
-					return std::invoke(handler, (A)action, std::forward<Args>(args)...);
+					return std::invoke(handler, static_cast<IContextualQuery*>(action), std::forward<Args>(args)...);
 				}
 			}
 			else
 			{
-				return std::invoke(handler, static_cast<IContextualQuery*>(action), std::forward<Args>(args)...);
+				if constexpr (!is_contextual_query<M>::value)
+				{
+					std::invoke(handler, (A)action, std::forward<Args>(args)...);
+				}
+				else
+				{
+					std::invoke(handler, static_cast<IContextualQuery*>(action), std::forward<Args>(args)...);
+				}
 			}
-		}
-		else
-		{
-			if constexpr (!is_contextual_query<M>::value)
-			{
-				std::invoke(handler, (A)action, std::forward<Args>(args)...);
-			}
-			else
-			{
-				std::invoke(handler, static_cast<IContextualQuery*>(action), std::forward<Args>(args)...);
-			}
-		}
-	};
+		};
 
 	if constexpr (!std::is_void_v<return_t>)
 	{

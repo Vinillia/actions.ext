@@ -762,7 +762,5 @@ public void __ext_actions_SetNTVOptional()
 
 	MarkNativeAsOptional("__action_setlistener");
 	MarkNativeAsOptional("__action_removelistener");
-	
-	__ext_actions_SetNTVOptionalLegacy();
 }
 #endif 

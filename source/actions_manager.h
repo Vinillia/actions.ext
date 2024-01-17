@@ -100,6 +100,9 @@ public:
 	inline void PushRuntimeResult(std::any result);
 	inline void PopRuntimeResult() noexcept;
 
+	inline void SetRuntimeAction(nb_action_ptr action);
+	inline nb_action_ptr GetRuntimeAction() const noexcept;
+
 	/* 
 	* error: no member named 'value' in 'std::is_copy_constructible<std::reference_wrapper<std::any>>'
 	* clang or whatever think std::any is not copy-constructible
@@ -131,7 +134,7 @@ private:
 	std::unordered_map<nb_action_ptr, UserDataMap> m_actionsUserData;
 	std::unordered_map<nb_action_ptr, UserDataIdentityMap> m_actionsIndentityUserData;
 
-	CBaseEntity* m_pRuntimeActor;
+	nb_action_ptr m_pRuntimeAction;
 	std::stack<std::any> m_runtimeResult;
 };
 
@@ -212,6 +215,16 @@ inline void ActionsManager::PushRuntimeResult(std::any result)
 inline void ActionsManager::PopRuntimeResult() noexcept
 {
 	m_runtimeResult.pop();
+}
+
+inline void ActionsManager::SetRuntimeAction(nb_action_ptr action)
+{
+	m_pRuntimeAction = action;
+}
+
+inline nb_action_ptr ActionsManager::GetRuntimeAction() const noexcept
+{
+	return m_pRuntimeAction;
 }
 
 inline std::any& ActionsManager::TopRuntimeResult()

@@ -12,7 +12,6 @@
 
 #include "actions_natives.h"
 #include "actions_legacy.h"
-#include "actions_legacy_listeners.h"
 
 #include <CDetour/detours.h>
 #include <compat_wrappers.h>
@@ -62,7 +61,6 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	sharesys->AddNatives(myself, g_actionsNatives);
 	sharesys->AddNatives(myself, g_actionsNativesLegacy); 
 	sharesys->AddNatives(myself, g_actionsNativesCaller);
-	RegisterLegacyNatives();
 
 #ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 	gameconfs->AddUserConfigHook("ActionConstructors", &g_actionsConstructorSMC);

@@ -150,7 +150,6 @@ cell_t NAT_caller_SignatureFromConf(IPluginContext* ctx, const cell_t* params)
 	return constuctor->SignatureFromConf(ctx, config, key);
 }
 
-#if 0
 cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
 {
 	HandleSecurity sec(nullptr, myself->GetIdentity());
@@ -179,7 +178,6 @@ cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
 
 	return (cell_t)constructor->GetAddress();
 }
-#endif
 
 cell_t NAT_caller_Size(IPluginContext* ctx, const cell_t* params)
 {
@@ -278,7 +276,7 @@ sp_nativeinfo_t g_actionsNativesCaller[] =
 	{ "ActionConstructor.AddParameter", NAT_caller_AddParameter },
 	{ "ActionConstructor.Finish", NAT_caller_Finish },
 	{ "ActionConstructor.Execute", NAT_caller_Execute },
-	// { "ActionConstructor.Address", NAT_caller_Address },
+	{ "ActionConstructor.Address", NAT_caller_Address },
 	{ "ActionConstructor.Size", NAT_caller_Size },
 	// { "ActionConstructor.Convention", NAT_caller_Convention },
 

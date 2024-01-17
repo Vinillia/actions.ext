@@ -3,6 +3,51 @@
 #ifndef _INCLUDE_ACTIONS_NATIVES_H
 #define _INCLUDE_ACTIONS_NATIVES_H
 
+static inline  ActionResult< CBaseEntity > Continue(void)
+{
+	return ActionResult< CBaseEntity >(CONTINUE, NULL, NULL);
+}
+
+static inline  ActionResult< CBaseEntity > ChangeTo(Action< CBaseEntity >* action, const char* reason)
+{
+	return ActionResult< CBaseEntity >(CHANGE_TO, action, reason);
+}
+
+static inline  ActionResult< CBaseEntity > SuspendFor(Action< CBaseEntity >* action, const char* reason)
+{
+	return ActionResult< CBaseEntity >(SUSPEND_FOR, action, reason);
+}
+
+static inline  ActionResult< CBaseEntity > Done(const char* reason)
+{
+	return ActionResult< CBaseEntity >(DONE, NULL, reason);
+}
+
+static inline  EventDesiredResult< CBaseEntity > TryContinue(EventResultPriorityType priority)
+{
+	return EventDesiredResult< CBaseEntity >(CONTINUE, NULL, priority);
+}
+
+static inline  EventDesiredResult< CBaseEntity > TryChangeTo(Action< CBaseEntity >* action, EventResultPriorityType priority, const char* reason)
+{
+	return EventDesiredResult< CBaseEntity >(CHANGE_TO, action, priority, reason);
+}
+
+static inline  EventDesiredResult< CBaseEntity > TrySuspendFor(Action< CBaseEntity >* action, EventResultPriorityType priority, const char* reason)
+{
+	return EventDesiredResult< CBaseEntity >(SUSPEND_FOR, action, priority, reason);
+}
+
+static inline  EventDesiredResult< CBaseEntity > TryDone(EventResultPriorityType priority, const char* reason = NULL)
+{
+	return EventDesiredResult< CBaseEntity >(DONE, NULL, priority, reason);
+}
+
+static inline EventDesiredResult< CBaseEntity > TryToSustain(EventResultPriorityType priority, const char* reason = NULL)
+{
+	return EventDesiredResult< CBaseEntity >(SUSTAIN, NULL, priority, reason);
+}
+
 inline bool _action_changelistener(IPluginContext* ctx, const cell_t* params, bool remove)
 {
 	nb_action_ptr action = (nb_action_ptr)params[1];
@@ -298,7 +343,7 @@ cell_t NAT_actions_Continue(IPluginContext* pContext, const cell_t* params)
 		return -1;
 	}
 
-	runtimeResult->m_type = CONTINUE;
+	*runtimeResult = Continue();
 	return Pl_Changed;
 }
 
@@ -323,10 +368,7 @@ cell_t NAT_actions_ChangeTo(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[3], &reason);
 
-	runtimeResult->m_type = CHANGE_TO;
-	runtimeResult->m_action = (nb_action_ptr)(params[2]);
-	runtimeResult->m_reason = reason;
-
+	*runtimeResult = ChangeTo((nb_action_ptr)(params[2]), reason);
 	return Pl_Changed;
 }
 
@@ -351,10 +393,12 @@ cell_t NAT_actions_SuspendFor(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[3], &reason);
 
-	runtimeResult->m_type = SUSPEND_FOR;
-	runtimeResult->m_action = (nb_action_ptr)(params[2]);
-	runtimeResult->m_reason = reason;
+	nb_action_ptr runtimeAction = g_actionsManager.GetRuntimeAction();
 
+	if (runtimeAction)
+		runtimeAction->m_eventResult = TryContinue(RESULT_NONE);
+
+	*runtimeResult = SuspendFor((nb_action_ptr)(params[2]), reason);
 	return Pl_Changed;
 }
 
@@ -379,9 +423,7 @@ cell_t NAT_actions_Done(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[2], &reason);
 
-	runtimeResult->m_type = DONE;
-	runtimeResult->m_reason = reason;
-
+	*runtimeResult = Done(reason);
 	return Pl_Changed;
 }
 
@@ -403,9 +445,7 @@ cell_t NAT_actions_TryContinue(IPluginContext* pContext, const cell_t* params)
 		return -1;
 	}
 
-	runtimeResult->m_type = CONTINUE;
-	runtimeResult->m_priority = (EventResultPriorityType)params[2];
-
+	*runtimeResult = TryContinue((EventResultPriorityType)params[2]);
 	return Pl_Changed;
 }
 
@@ -430,11 +470,7 @@ cell_t NAT_actions_TryChangeTo(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[4], &reason);
 
-	runtimeResult->m_type = CHANGE_TO;
-	runtimeResult->m_action = (nb_action_ptr)(params[2]);
-	runtimeResult->m_reason = reason;
-	runtimeResult->m_priority = (EventResultPriorityType)params[3];
-
+	*runtimeResult = TryChangeTo((nb_action_ptr)params[2], (EventResultPriorityType)params[3], reason);
 	return Pl_Changed;
 }
 
@@ -459,11 +495,7 @@ cell_t NAT_actions_TrySuspendFor(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[4], &reason);
 
-	runtimeResult->m_type = SUSPEND_FOR;
-	runtimeResult->m_action = (nb_action_ptr)(params[2]);
-	runtimeResult->m_reason = reason;
-	runtimeResult->m_priority = (EventResultPriorityType)params[3];
-
+	*runtimeResult = TrySuspendFor((nb_action_ptr)(params[2]), (EventResultPriorityType)params[3], reason);
 	return Pl_Changed;
 }
 
@@ -488,10 +520,7 @@ cell_t NAT_actions_TryDone(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[3], &reason);
 
-	runtimeResult->m_type = DONE;
-	runtimeResult->m_reason = reason;
-	runtimeResult->m_priority = (EventResultPriorityType)params[2];
-
+	*runtimeResult = TryDone((EventResultPriorityType)params[2], reason);
 	return Pl_Changed;
 }
 
@@ -516,10 +545,7 @@ cell_t NAT_actions_TryToSustain(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[3], &reason);
 
-	runtimeResult->m_type = SUSTAIN;
-	runtimeResult->m_reason = reason;
-	runtimeResult->m_priority = (EventResultPriorityType)params[2];
-
+	*runtimeResult = TryToSustain((EventResultPriorityType)params[2], reason);
 	return Pl_Changed;
 }
 

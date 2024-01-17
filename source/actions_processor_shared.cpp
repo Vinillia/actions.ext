@@ -82,6 +82,6 @@ Action< CBaseEntity >* ActionProcessorShared::InitialContainedAction(CBaseEntity
 {
 	constexpr HashValue hash = compile::hash("&ActionProcessor::InitialContainedAction");
 	execution_result<Action<CBaseEntity>*> er = ProcessHandlerEx(hash, this, &ActionProcessorShared::InitialContainedAction, me);
-	g_actionsManager.ProcessInitialContainedAction(er.rt(), this, er.rv(), er.effectiveResult);
+	g_actionsManager.ProcessInitialContainedAction(er.rt(), this, er.value(), er.effectiveResult);
 	return er.effectiveResult;
 }

@@ -46,6 +46,18 @@
     <Filter Include="sdk\tf2\nextbot">
       <UniqueIdentifier>{39ce7b44-d1bb-43eb-910b-7ee0d306c18f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="package">
+      <UniqueIdentifier>{42ae0ba8-fb38-4392-be93-94c428c06ce6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="package\gamedata">
+      <UniqueIdentifier>{e191fae8-e914-4185-96d5-26a214eb34bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="package\scripting">
+      <UniqueIdentifier>{7f2f4500-2dc7-41b5-8204-34e0d00cd83f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="package\scripting\include">
+      <UniqueIdentifier>{8b3e369b-4df5-42cb-a16f-96ad346d23a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\extension.cpp">
@@ -167,9 +179,6 @@
     <ClInclude Include="..\source\actions_legacy.h">
       <Filter>actions\natives</Filter>
     </ClInclude>
-    <ClInclude Include="..\source\actions_legacy_listeners.h">
-      <Filter>actions\natives</Filter>
-    </ClInclude>
     <ClInclude Include="..\source\actions_vtableswap.h">
       <Filter>actions</Filter>
     </ClInclude>
@@ -269,5 +278,21 @@
     <ClInclude Include="..\source\sdk\l4d2\actions_tools_l4d2.h">
       <Filter>sdk\l4d2</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\sourcemod\gamedata\actions.games.txt">
+      <Filter>package\gamedata</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\sourcemod\include\actions.inc">
+      <Filter>package\scripting\include</Filter>
+    </None>
+    <None Include="..\sourcemod\include\actions_constructor.inc">
+      <Filter>package\scripting\include</Filter>
+    </None>
+    <None Include="..\sourcemod\include\actions_processors.inc">
+      <Filter>package\scripting\include</Filter>
+    </None>
   </ItemGroup>
 </Project>
