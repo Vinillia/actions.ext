@@ -9,7 +9,7 @@
 #tryinclude <version>
 
 #include <actions_processors>
-// #include <actions_constructor>
+#include <actions_constructor>
 
 enum QueryResultType
 {
@@ -557,7 +557,7 @@ methodmap BehaviorAction < BehaviorActionListeners
 	/**
  	* @brief Simple wrapper to get action data 
  	*
- 	* @param int			Offset to data 
+ 	* @param offset			Offset to data 
  	* @param type			How many bytes read (See NumberType)
  	*
  	* @return				Stored data
@@ -570,7 +570,7 @@ methodmap BehaviorAction < BehaviorActionListeners
 	/**
  	* @brief Simple wrapper to set action data 
  	*
- 	* @param int			Offset to data 
+ 	* @param offset			Offset to data 
  	* @param data			Data to set
  	* @param type			How many bytes set (See NumberType)
  	*
@@ -586,7 +586,37 @@ methodmap BehaviorAction < BehaviorActionListeners
 	{
 		StoreToAddress(view_as<Address>(this) + view_as<Address>(offset), data, type, updateMemAccess);
 	}
- #endif	
+ #endif
+
+ 	/**
+ 	* @brief Stores a vector at specified offset
+ 	*
+ 	* @param offset			Offset to data 
+ 	* @param vec			Vector to set from
+ 	*
+ 	* @noreturn
+ 	*/
+	public void SetVector( int offset, const float vec[3] )
+	{
+		this.Set(offset, vec[0], NumberType_Int32);
+		this.Set(offset + 4, vec[1], NumberType_Int32);
+		this.Set(offset + 8, vec[2], NumberType_Int32);
+	}
+	
+ 	/**
+ 	* @brief Loads a vector at specified offset
+ 	*
+ 	* @param offset			Offset to data 
+ 	* @param out			Vector to load to
+ 	*
+ 	* @noreturn
+ 	*/
+	public void GetVector( int offset, float out[3] )
+	{
+		data[0] = view_as<float>(this.Get(offset, NumberType_Int32));
+		data[1] = view_as<float>(this.Get(offset + 4, NumberType_Int32));
+		data[2] = view_as<float>(this.Get(offset + 8, NumberType_Int32));
+	}
 
 	/**
  	* @brief Stores pending event result
@@ -673,7 +703,7 @@ methodmap BehaviorAction < BehaviorActionListeners
 	
 	/**
  	* @brief Property to get/set started state of action
-	* @note if this returns true then OnStart handled has already been called 
+	* @note if this returns true then OnStart handled has already been called or is about to be called next frame
 	* 
  	* @return				true if started, false otherwise
  	*/
@@ -762,5 +792,7 @@ public void __ext_actions_SetNTVOptional()
 
 	MarkNativeAsOptional("__action_setlistener");
 	MarkNativeAsOptional("__action_removelistener");
+
+	__ext_actions_constructor_SetNTVOptional();
 }
 #endif 

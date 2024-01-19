@@ -32,6 +32,12 @@ inline constexpr bool is_action_result_v = is_action_result<T>::value || is_acti
 template<typename T>
 struct handler_result
 {
+	handler_result()
+	{
+		plresult = Pl_Continue;
+		value = T();
+	}
+
 	ResultType plresult;
 	T value;
 };

@@ -3,7 +3,9 @@
 
 #include "NextBotBehavior.h"
 
-#undef clamp // **** ***
+#ifdef clamp
+#undef clamp
+#endif
 
 #include "actions_propagation.h"
 #include "actions_pubvars.h"
@@ -68,7 +70,7 @@ public:
 extern ActionProcessorShared* g_pActionProcessor;
 
 template<typename T>
-static void ProcessResultTransition(T& handlerResult, T& desiredResult)
+static void ProcessResultTransition(T& desiredResult)
 {
 	// if listener required to change action
 	if (desiredResult.m_type == CHANGE_TO || desiredResult.m_type == SUSPEND_FOR)
@@ -95,8 +97,7 @@ template<typename R, typename M, typename ...Args>
 handler_result<R> ProcessHandlerImpl(M&& handler, nb_action_ptr action, HashValue hash, R& newResult, Args&&... args)
 {
 	ResultType plpre = Pl_Continue, plpost = Pl_Continue;
-	handler_result<R> handlerResult = {};
-	bool addPending = false;
+	handler_result<R> handlerResult;
 
 	g_actionsManager.PushRuntimeResult(&newResult);
 	plpre = g_actionsPropagationPre.ProcessMethod<R, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
@@ -113,23 +114,21 @@ handler_result<R> ProcessHandlerImpl(M&& handler, nb_action_ptr action, HashValu
 		}
 	}
 
+	if constexpr (is_action_result_v<R>)
+	{
+		g_actionsManager.AddPending(newResult.m_action);
+	}
+
 	plpost = g_actionsPropagationPost.ProcessMethod<R, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
 	g_actionsManager.PopRuntimeResult();
 
-	if constexpr (is_action_result_v<R>)
-	{
-		ProcessResultTransition(handlerResult.value, newResult);
-	}
-
 	// Either pre or post listeners changed result. Use handler's return
-	if (plpre < Pl_Changed && plpost < Pl_Changed)
-		newResult = handlerResult.value;
+	// if (plpre < Pl_Changed && plpost < Pl_Changed)
+	//		newResult = handlerResult.value;
 
 	if constexpr (is_action_result_v<R>)
 	{
-		if (newResult.m_action == nullptr && (newResult.m_type == CHANGE_TO || newResult.m_type == SUSPEND_FOR))
-			newResult = handlerResult.value;
-
+		ProcessResultTransition(newResult);
 		g_actionsManager.ProcessResult(action, reinterpret_cast<const ActionResult<CBaseEntity>&>(newResult));
 	}
 
