@@ -613,9 +613,9 @@ methodmap BehaviorAction < BehaviorActionListeners
  	*/
 	public void GetVector( int offset, float out[3] )
 	{
-		data[0] = view_as<float>(this.Get(offset, NumberType_Int32));
-		data[1] = view_as<float>(this.Get(offset + 4, NumberType_Int32));
-		data[2] = view_as<float>(this.Get(offset + 8, NumberType_Int32));
+		out[0] = view_as<float>(this.Get(offset, NumberType_Int32));
+		out[1] = view_as<float>(this.Get(offset + 4, NumberType_Int32));
+		out[2] = view_as<float>(this.Get(offset + 8, NumberType_Int32));
 	}
 
 	/**
