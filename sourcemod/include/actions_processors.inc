@@ -55,6 +55,8 @@ public ActionProcessor __action_processor_IsAbleToBlockMovementOf;
 public ActionProcessor __action_processor_ShouldPickUp;
 public ActionProcessor __action_processor_ShouldHurry;
 public ActionProcessor __action_processor_IsHindrance;
+public ActionProcessor __action_processor_ShouldRetreat;
+public ActionProcessor __action_processor_ShouldAttack;
 public ActionProcessor __action_processor_SelectTargetPoint;
 public ActionProcessor __action_processor_IsPositionAllowed;
 public ActionProcessor __action_processor_QueryCurrentPath;
@@ -562,6 +564,20 @@ methodmap BehaviorActionListeners
 			__action_setlistener(this, __action_processor_IsHindrance, func, false);
 		}
 	}
+	property ActionContextualHandler ShouldRetreat
+	{
+		public set(ActionContextualHandler func)
+		{
+			__action_setlistener(this, __action_processor_ShouldRetreat, func, false);
+		}
+	}
+	property ActionContextualHandler ShouldAttack
+	{
+		public set(ActionContextualHandler func)
+		{
+			__action_setlistener(this, __action_processor_ShouldAttack, func, false);
+		}
+	}
 	property ActionContextualHandler SelectTargetPoint
 	{
 		public set(ActionContextualHandler func)
@@ -581,6 +597,13 @@ methodmap BehaviorActionListeners
 		public set(ActionContextualHandler func)
 		{
 			__action_setlistener(this, __action_processor_QueryCurrentPath, func, false);
+		}
+	}
+	property ActionContextualHandler SelectMoreDangerousThreat
+	{
+		public set(ActionContextualHandler func)
+		{
+			__action_setlistener(this, __action_processor_SelectMoreDangerousThreat, func, false);
 		}
 	}
 
@@ -964,6 +987,20 @@ methodmap BehaviorActionListeners
 			__action_setlistener(this, __action_processor_IsHindrance, func, true);
 		}
 	}
+	property ActionContextualHandler ShouldRetreatPost
+	{
+		public set(ActionContextualHandler func)
+		{
+			__action_setlistener(this, __action_processor_ShouldRetreat, func, true);
+		}
+	}
+	property ActionContextualHandler ShouldAttackPost
+	{
+		public set(ActionContextualHandler func)
+		{
+			__action_setlistener(this, __action_processor_ShouldAttack, func, true);
+		}
+	}
 	property ActionContextualHandler SelectTargetPointPost
 	{
 		public set(ActionContextualHandler func)
@@ -983,6 +1020,13 @@ methodmap BehaviorActionListeners
 		public set(ActionContextualHandler func)
 		{
 			__action_setlistener(this, __action_processor_QueryCurrentPath, func, true);
+		}
+	}
+	property ActionContextualHandler SelectMoreDangerousThreatPost
+	{
+		public set(ActionContextualHandler func)
+		{
+			__action_setlistener(this, __action_processor_SelectMoreDangerousThreat, func, true);
 		}
 	}
 
