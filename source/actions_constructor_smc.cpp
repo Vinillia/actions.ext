@@ -68,9 +68,9 @@ static bool StringToPassType(const char* value, PassType& type)
 	{
 		type = PassType_Float; ok = true;
 	}
-	else if (!strcmp(value, "float") || !strcmp(value, "xmm"))
+	else if (!strcmp(value, "object") || !strcmp(value, "obj"))
 	{
-		type = PassType_Float; ok = true;
+		type = PassType_Object; ok = true;
 	}
 
 	return ok;
@@ -142,7 +142,7 @@ SMCResult ActionConstructor_SMC::ReadSMC_NewSection(const SMCStates* states, con
 	{
 		if (m_platformLevel != -1)
 		{
-			Warning("Nested platform section \"%s\". You have already specified OS. Line: %i, Col: %i", name, states->line, states->col);
+			g_pSM->LogMessage(myself, "Nested platform section \"%s\". You have already specified OS. Line: %i, Col: %i", name, states->line, states->col);
 			return SMCResult_HaltFail;
 		}
 
@@ -172,7 +172,7 @@ SMCResult ActionConstructor_SMC::ReadSMC_NewSection(const SMCStates* states, con
 	{
 		if (m_data.param != nullptr)
 		{
-			Warning("Nested param section \"%s\". Params can't have params. Line: %i, Col: %i", name, states->line, states->col);
+			g_pSM->LogMessage(myself, "Nested param section \"%s\". Params can't have params. Line: %i, Col: %i", name, states->line, states->col);
 			return SMCResult_HaltFail;
 		}
 
@@ -205,7 +205,7 @@ SMCResult ActionConstructor_SMC::ReadSMC_KeyValue(const SMCStates* states, const
 		{
 			if (!StringToConvention(value, m_data.convention))
 			{
-				Warning("Invalid call convention type: \"%s\".Line: % i, Col : % i", value, states->line, states->col);
+				g_pSM->LogMessage(myself, "Invalid call convention type: \"%s\".Line: % i, Col : % i", value, states->line, states->col);
 				return SMCResult_HaltFail;
 			}
 		}
@@ -219,7 +219,7 @@ SMCResult ActionConstructor_SMC::ReadSMC_KeyValue(const SMCStates* states, const
 		{
 			if (!StringToPassType(value, m_data.param->info.type))
 			{
-				Warning("Invalid pass type: \"%s\".Line: % i, Col : % i", value, states->line, states->col);
+				g_pSM->LogMessage(myself, "Invalid pass type: \"%s\".Line: % i, Col : % i", value, states->line, states->col);
 				return SMCResult_HaltFail;
 			}
 		}
@@ -227,7 +227,7 @@ SMCResult ActionConstructor_SMC::ReadSMC_KeyValue(const SMCStates* states, const
 		{
 			if (!StringToFlags(value, m_data.param->info.flags))
 			{
-				Warning("Invalid pass flags: \"%s\".Line: % i, Col : % i", value, states->line, states->col);
+				g_pSM->LogMessage(myself, "Invalid pass flags: \"%s\".Line: % i, Col : % i", value, states->line, states->col);
 			}
 		}
 		else if (!strcmp(key, "encoder"))
