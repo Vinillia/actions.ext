@@ -31,7 +31,8 @@ def CopyFiles(src, dest, files):
 # Include files 
 CopyFiles('sourcemod/include', 'addons/sourcemod/scripting/include',
   [ 'actions.inc', 
-    'actions_processors.inc'
+    'actions_processors.inc',
+    'actions_constructor.inc'
   ]
 )
 

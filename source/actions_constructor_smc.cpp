@@ -64,11 +64,11 @@ static bool StringToPassType(const char* value, PassType& type)
 	{
 		type = PassType_Basic; ok = true;
 	}
-	else if (!strcmp(value, "float") || !strcmp(value, "xmm"))
+	else if (!strcmp(value, "float"))
 	{
 		type = PassType_Float; ok = true;
 	}
-	else if (!strcmp(value, "object") || !strcmp(value, "obj"))
+	else if (!strcmp(value, "object"))
 	{
 		type = PassType_Object; ok = true;
 	}
@@ -266,14 +266,14 @@ SMCResult ActionConstructor_SMC::ReadSMC_LeavingSection(const SMCStates* states)
 	{
 		const ac_data* data = GetACData(m_section);
 
-		if (data == nullptr)
+		//if (data == nullptr)
 		{
-			m_acmap.insert(m_section, m_data);
+			m_acmap.replace(m_section, m_data);
 		}
-		else if (*data != m_data)
-		{
-			Warning("Duplicate \"%s\" constructor with different definition. Consider remove or rename.", m_section);
-		}
+		//else if (*data != m_data)
+		//{
+			//g_pSM->LogMessage(myself, "Duplicate \"%s\" constructor with different definition. Consider remove or rename.", m_section);
+		//}
 
 		m_state = SMC_Root;
 		m_data = ac_data();
