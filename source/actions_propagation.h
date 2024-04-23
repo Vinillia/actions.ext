@@ -30,10 +30,16 @@ template<typename T>
 inline constexpr bool is_action_result_v = is_action_result<T>::value || is_action_desire_result<T>::value;
 
 template<typename T>
-struct hexecution
+struct handler_result
 {
-	ResultType rt;
-	T rv;
+	handler_result()
+	{
+		plresult = Pl_Continue;
+		value = T();
+	}
+
+	ResultType plresult;
+	T value;
 };
 
 struct ActionListener
@@ -49,6 +55,20 @@ struct ActionListener
 
 using MethodListeners = std::unordered_map<HashValue, std::list<ActionListener>>;
 using ActionListeners = std::unordered_map<nb_action_ptr, MethodListeners>;
+
+extern ConVar ext_actions_debug_memory;
+
+template<typename T>
+inline bool is_result_same(const T& left, const T& right)
+{
+	return left.m_action == right.m_action && left.m_type == right.m_type;
+}
+
+template<>
+inline bool is_result_same(const EventDesiredResult<CBaseEntity>& left, const EventDesiredResult<CBaseEntity>& right)
+{
+	return left.m_priority == right.m_priority && is_result_same((const ActionResult<CBaseEntity>&)left, (const ActionResult<CBaseEntity>&)right);
+}
 
 class ActionPropagation
 {
@@ -111,25 +131,28 @@ public:
 		}
 	}
 
-	template<typename RETURN, typename ...Args>
-	ResultType ProcessMethod(nb_action_ptr action, HashValue hash, RETURN* result, Args&&... args)
+	template<typename TReturn, typename ...Args>
+	ResultType ProcessMethod(nb_action_ptr action, HashValue hash, TReturn* result, Args&&... args)
 	{
-		auto& list = m_actionsListeners[action][hash];
+		auto& listeners = m_actionsListeners[action][hash];
 
 		ResultType returnResult, executeResult = Pl_Continue;
+
 		returnResult = executeResult;
 		m_isInExecution = true;
+		g_actionsManager.SetRuntimeAction(action);
 
-		for (auto iter = list.begin(); iter != list.end(); iter++)
+		for (auto it = listeners.begin(); it != listeners.end(); it++)
 		{
-			IPluginFunction* fn = iter->fn;
+			IPluginFunction* fn = it->fn;
+			TReturn priorResult = *result;
 
 			ProcessMethodArg<nb_action_ptr>(fn, std::forward<nb_action_ptr>(action));
 			(ProcessMethodArg<Args>(fn, std::forward<Args>(args)), ...);
 
-			if constexpr (!std::is_null_pointer_v<RETURN>)
+			if constexpr (!std::is_null_pointer_v<TReturn>)
 			{
-				if constexpr (is_action_result_v<RETURN>)
+				if constexpr (is_action_result_v<TReturn>)
 				{
 					fn->PushCell((cell_t)result);
 				}
@@ -141,10 +164,43 @@ public:
 
 			fn->Execute((cell_t*)&executeResult);
 
+			if constexpr (is_action_result_v<TReturn>)
+			{
+				if (executeResult < Pl_Changed && !is_result_same(priorResult, *result))
+				{
+					// plugin changed result but returned Plugin_Continue. It's ok but we need to do something otherwise we might crash later.
+					fn->GetParentRuntime()->GetDefaultContext()->BlamePluginError(fn, "Changing result with Plugin_Continue is an error");
+
+					// delete plugin's action and use prior as the most safest result
+					if (result->m_action && result->m_action != priorResult.m_action)
+					{
+						delete result->m_action;
+						*result = priorResult;
+					}
+
+					RemoveListener(action, it->hash, it->fn);
+				}
+				
+				if (priorResult.m_action && priorResult.m_action != result->m_action)
+				{
+					if (ext_actions_debug_memory.GetBool())
+						MsgSM("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), priorResult.m_action->GetName(), priorResult.m_action);
+
+					// delete an outdated action
+					delete priorResult.m_action;
+					priorResult.m_action = nullptr;
+				}
+			}
+
 			if (executeResult > returnResult)
+			{
+				// new result is more superior
 				returnResult = executeResult;
+			}
 		}
-		
+
+		g_actionsManager.SetRuntimeAction(nullptr);
+
 		m_isInExecution = false;
 		ProcessDeletors();
 

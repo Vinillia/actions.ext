@@ -27,6 +27,8 @@ struct EventDesiredResult;
 
 struct ActionUserData
 {
+	~ActionUserData() = default;
+
 	struct Hash
 	{
 		std::size_t operator ()(const std::string_view& str) const noexcept
@@ -42,6 +44,14 @@ struct ActionUserData
 			return left.compare(right) == 0;
 		}
 	};
+
+	
+	// union
+	// {
+	void* data;
+	Vector vector;
+	std::string string;
+	// };
 };
 
 struct ActionUserDataIdentity
@@ -51,7 +61,7 @@ struct ActionUserDataIdentity
 		std::size_t operator ()(const ActionUserDataIdentity& indentity) const noexcept
 		{
 			std::size_t h1 = std::hash<decltype(indentity.token)>{}(indentity.token);
-			std::size_t h2 = ke::FastHashCharSequence(indentity.str.data(), indentity.str.length());
+			std::size_t h2 = ke::FastHashCharSequence(indentity.key.data(), indentity.key.length());
 			return h1 ^ (h2 << 1);
 		}
 	};
@@ -60,19 +70,19 @@ struct ActionUserDataIdentity
 	{
 		bool operator ()(const ActionUserDataIdentity& left, const ActionUserDataIdentity& right) const noexcept
 		{
-			return left.token == right.token;
+			return left.token == right.token && left.key.compare(right.key) == 0;
 		}
 	};
 
 	IdentityToken_t* token;
-	std::string_view str;
+	std::string_view key;
 };
 
 class ActionsManager
 {
 	using ActionsContanier = ke::HashSet<nb_action_ptr, ke::PointerPolicy<nb_action>>;
-	using UserDataMap = std::unordered_map<std::string_view, void*, ActionUserData::Hash, ActionUserData::Equal>;
-	using UserDataIdentityMap = std::unordered_map<ActionUserDataIdentity, void*, ActionUserDataIdentity::Hash, ActionUserDataIdentity::Equal>;
+	using UserDataMap = std::unordered_map<std::string_view, ActionUserData, ActionUserData::Hash, ActionUserData::Equal>;
+	using UserDataIdentityMap = std::unordered_map<ActionUserDataIdentity, ActionUserData, ActionUserDataIdentity::Hash, ActionUserDataIdentity::Equal>;
 
 public:
 	ActionsManager();
@@ -87,11 +97,23 @@ public:
 	inline void RemovePending(nb_action_ptr const action) noexcept;
 
 	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void* data);
-	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void*& data) const; 
+	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, const Vector& vector);
+	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, std::string_view string);
+
+	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void*& data) const;
+	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, Vector& vector) const;
+	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, std::string& string) const;
+
 	void ClearUserDataIdentity(IPluginContext* ctx);
 
-	inline void SetUserData(nb_action_ptr action, std::string_view str, void* data); 
+	inline void SetUserData(nb_action_ptr action, std::string_view str, void* data);
+	inline void SetUserData(nb_action_ptr action, std::string_view str, const Vector& vector);
+	inline void SetUserData(nb_action_ptr action, std::string_view str, std::string_view string);
+	
 	inline bool GetUserData(nb_action_ptr action, std::string_view str, void*& data) const;
+	inline bool GetUserData(nb_action_ptr action, std::string_view str, Vector& vector);
+	inline bool GetUserData(nb_action_ptr action, std::string_view str, std::string& string);
+
 	void ClearUserData(nb_action_ptr action);
 
 	void ProcessResult(nb_action_ptr action, const ActionResult<CBaseEntity>& result);
@@ -100,9 +122,12 @@ public:
 	inline void PushRuntimeResult(std::any result);
 	inline void PopRuntimeResult() noexcept;
 
+	inline void SetRuntimeAction(nb_action_ptr action);
+	inline nb_action_ptr GetRuntimeAction() const noexcept;
+
 	/* 
 	* error: no member named 'value' in 'std::is_copy_constructible<std::reference_wrapper<std::any>>'
-	* clang or whatever think std::any is not copy-constructible
+	* clang or whatever thinks std::any is not copy-constructible
 	*/
 	// inline std::optional<std::reference_wrapper<std::any>> TopRuntimeResult() noexcept;
 
@@ -131,7 +156,7 @@ private:
 	std::unordered_map<nb_action_ptr, UserDataMap> m_actionsUserData;
 	std::unordered_map<nb_action_ptr, UserDataIdentityMap> m_actionsIndentityUserData;
 
-	CBaseEntity* m_pRuntimeActor;
+	nb_action_ptr m_pRuntimeAction;
 	std::stack<std::any> m_runtimeResult;
 };
 
@@ -155,14 +180,50 @@ inline bool ActionsManager::IsValidAction(nb_action_ptr action)
 
 inline void ActionsManager::SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void* data)
 {
-	m_actionsIndentityUserData[action][token] = data;
+	m_actionsIndentityUserData[action][token].data = data;
+}
+
+inline void ActionsManager::SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, const Vector& vector)
+{
+	m_actionsIndentityUserData[action][token].vector = vector;
+}
+
+inline void ActionsManager::SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, std::string_view string)
+{
+	m_actionsIndentityUserData[action][token].string = string;
 }
 
 inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void*& data) const
 {
 	try
 	{
-		data = m_actionsIndentityUserData.at(action).at(token);
+		data = m_actionsIndentityUserData.at(action).at(token).data;
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
+inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, Vector& vector) const
+{
+	try
+	{
+		vector = m_actionsIndentityUserData.at(action).at(token).vector;
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
+inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, std::string& string) const
+{
+	try
+	{
+		string = m_actionsIndentityUserData.at(action).at(token).string;
 		return true;
 	}
 	catch (...)
@@ -173,20 +234,56 @@ inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const Acti
 
 inline void ActionsManager::SetUserData(nb_action_ptr action, std::string_view str, void* data)
 {
-	m_actionsUserData[action][str] = data;
+	m_actionsUserData[action][str].data = data;
+}
+
+inline void ActionsManager::SetUserData(nb_action_ptr action, std::string_view str, const Vector& vector)
+{
+	m_actionsUserData[action][str].vector = vector;
+}
+
+inline void ActionsManager::SetUserData(nb_action_ptr action, std::string_view str, std::string_view string)
+{
+	m_actionsUserData[action][str].string = string;
 }
 
 inline bool ActionsManager::GetUserData(nb_action_ptr action, std::string_view str, void*& data) const
 {
 	try
 	{
-		data = m_actionsUserData.at(action).at(str);
+		data = m_actionsUserData.at(action).at(str).data;
 		return true;
 	}
 	catch (...)
 	{
 		return false;
 	} 
+}
+
+inline bool ActionsManager::GetUserData(nb_action_ptr action, std::string_view str, Vector& vector)
+{
+	try
+	{
+		vector = m_actionsUserData.at(action).at(str).vector;
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
+}
+
+inline bool ActionsManager::GetUserData(nb_action_ptr action, std::string_view str, std::string& string)
+{
+	try
+	{
+		string = m_actionsUserData.at(action).at(str).string;
+		return true;
+	}
+	catch (...)
+	{
+		return false;
+	}
 }
 
 inline bool ActionsManager::IsPending(nb_action_ptr action)
@@ -212,6 +309,16 @@ inline void ActionsManager::PushRuntimeResult(std::any result)
 inline void ActionsManager::PopRuntimeResult() noexcept
 {
 	m_runtimeResult.pop();
+}
+
+inline void ActionsManager::SetRuntimeAction(nb_action_ptr action)
+{
+	m_pRuntimeAction = action;
+}
+
+inline nb_action_ptr ActionsManager::GetRuntimeAction() const noexcept
+{
+	return m_pRuntimeAction;
 }
 
 inline std::any& ActionsManager::TopRuntimeResult()

@@ -107,3 +107,17 @@ methodmap ActionConstructor < Handle
 		public native set(int size);
 	}
 }
+
+#if !defined REQUIRE_EXTENSIONS
+public void __ext_actions_constructor_SetNTVOptional()
+{
+	MarkNativeAsOptional("ActionConstructor.ActionConstructor");
+	MarkNativeAsOptional("ActionConstructor.SetupFromConf");
+	MarkNativeAsOptional("ActionConstructor.AddressFromConf");
+	MarkNativeAsOptional("ActionConstructor.SignatureFromConf");
+	MarkNativeAsOptional("ActionConstructor.AddParameter");
+	MarkNativeAsOptional("ActionConstructor.Finish");
+	MarkNativeAsOptional("ActionConstructor.Execute");
+	MarkNativeAsOptional("ActionConstructor.Size");
+}
+#endif 

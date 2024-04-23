@@ -8,7 +8,6 @@ ActionsManager g_actionsManager;
 ActionsManager::ActionsManager()
 {
 	m_actions.init();
-	m_pRuntimeActor = nullptr;
 }
 
 ActionsManager::~ActionsManager()

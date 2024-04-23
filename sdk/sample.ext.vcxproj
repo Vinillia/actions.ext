@@ -70,7 +70,7 @@
     <ClCompile>
       <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d2\nextbot;$(ProjectDir)..\source\sdk\l4d2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D2)\public\;$(HL2SDKL4D2)\public\tier1\;$(HL2SDKL4D2)\public\tier2\;$(HL2SDKL4D2)\public\tier3\;$(HL2SDKL4D2)\public\tier4\;$(HL2SDKL4D2)\public\tier0\;$(HL2SDKL4D2)\public\mathlib\;$(HL2SDKL4D2)\public\game\server\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=16;SE_LEFT4DEAD2=16;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=16;SE_LEFT4DEAD2=16;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
       <OmitFramePointer>true</OmitFramePointer>
@@ -109,7 +109,7 @@
     <ClCompile>
       <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\tf2\nextbot;$(ProjectDir)..\source\sdk\tf2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKTF2)\public\;$(HL2SDKTF2)\public\tier1\;$(HL2SDKTF2)\public\tier2\;$(HL2SDKTF2)\public\tier3\;$(HL2SDKTF2)\public\tier4\;$(HL2SDKTF2)\public\tier0\;$(HL2SDKTF2)\public\mathlib\;$(HL2SDKTF2)\public\game\server\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=11;SE_TF=11;ORANGEBOX=3;SE_LEFT4DEAD=12;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=11;SE_TF=11;ORANGEBOX=3;SE_LEFT4DEAD=12;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
       <OmitFramePointer>true</OmitFramePointer>
@@ -148,7 +148,7 @@
     <ClCompile>
       <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d\nextbot;$(ProjectDir)..\source\sdk\l4d;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D)\public\;$(HL2SDKL4D)\public\tier1\;$(HL2SDKL4D)\public\tier2\;$(HL2SDKL4D)\public\tier3\;$(HL2SDKL4D)\public\tier4\;$(HL2SDKL4D)\public\tier0\;$(HL2SDKL4D)\public\mathlib\;$(HL2SDKL4D)\public\game\server\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=14;SE_LEFT4DEAD=14;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;__DEBUG</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=14;SE_LEFT4DEAD=14;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
       <OmitFramePointer>true</OmitFramePointer>
@@ -244,7 +244,6 @@
     <ClInclude Include="..\source\actions_custom_legacy.h" />
     <ClInclude Include="..\source\actions_encoders.h" />
     <ClInclude Include="..\source\actions_legacy.h" />
-    <ClInclude Include="..\source\actions_legacy_listeners.h" />
     <ClInclude Include="..\source\actions_manager.h" />
     <ClInclude Include="..\source\actions_natives.h" />
     <ClInclude Include="..\source\actions_processor_impl.h" />
@@ -333,6 +332,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\smsdk_config.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\sourcemod\gamedata\actions.games.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\sourcemod\include\actions.inc" />
+    <None Include="..\sourcemod\include\actions_constructor.inc" />
+    <None Include="..\sourcemod\include\actions_processors.inc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
