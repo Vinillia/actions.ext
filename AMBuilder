@@ -79,6 +79,8 @@ for sdk_name in Extension.sdks:
   compiler.cxxincludes += includeFiles
   compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name) ]
   compiler.cxxincludes += [ os.path.join(builder.sourcePath, 'source', 'sdk', sdk.name, 'nextbot') ]
+  compiler.defines += [ 'INCLUDE_ACTIONS_CONSTRUCTOR' ]
+	  
   
   if compiler.vendor == 'msvc':
     compiler.defines += [ '_CRT_NO_VA_START_VALIDATION' ]
