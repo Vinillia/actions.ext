@@ -746,7 +746,7 @@ cell_t NAT_actions_GetActionUserDataString(IPluginContext* pContext, const cell_
 	std::string data;
 	if (g_actionsManager.GetUserData(action, str, data))
 	{
-		strcpy_s(out, params[4], data.c_str());
+		ke::SafeStrcpy(out, params[4], data.c_str());
 		return 1;
 	}
 
@@ -783,7 +783,7 @@ cell_t NAT_actions_GetActionUserDataIdentityString(IPluginContext* pContext, con
 	std::string data;
 	if (g_actionsManager.GetUserDataIdentity(action, { pContext->GetIdentity(), str }, data))
 	{
-		strcpy_s(out, params[4], data.c_str());
+		ke::SafeStrcpy(out, params[4], data.c_str());
 		return 1;
 	}
 
