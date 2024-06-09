@@ -97,7 +97,7 @@ nb_action_ptr ActionConstructor::Execute(IPluginContext* ctx, const cell_t* para
 		void* param = (void*)paramsBuffer[i];
 
 		const ActionEncoder& encoder = *(m_paramEncoder[i]);
-		if (!encoder(param, error, maxlength))
+		if (!encoder.encode(param, error, maxlength))
 		{
 			throw std::runtime_error(error);
 		}
@@ -148,7 +148,7 @@ bool ActionConstructor::AddParameter(PassType type, int flags, const ActionEncod
 
 	const int maxlength = 255;
 	char error[maxlength] = {};
-	if (encoder && !(*encoder)(info, error, maxlength))
+	if (encoder && !encoder->typeinfo(info, error, maxlength))
 	{
 		throw std::runtime_error(error);
 		return false;

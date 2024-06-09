@@ -13,7 +13,7 @@ class CBaseEntityEncoder : public TypeEncoder<cell_t>
 public:
 	CBaseEntityEncoder() : TypeEncoder("g_entityEncoder", "entity")
 	{
-		paramEncoder = [](encode_param_ref_t param, char* error, size_t maxlength) -> bool
+		m_param_encoder = [](encode_param_ref_t param, char* error, size_t maxlength) -> bool
 		{
 			cell_t index = *param;
 			CBaseEntity* entity = nullptr;
@@ -36,12 +36,12 @@ class CVectorEncoder : public TypeEncoder<Vector>
 public:
 	CVectorEncoder() : TypeEncoder("g_vectorEncoder", "vector")
 	{
-		paramEncoder = [](encode_param_ref_t param, char* error, size_t maxlength) -> bool
+		m_param_encoder = [](encode_param_ref_t param, char* error, size_t maxlength) -> bool
 		{
 			return true;
 		};
 
-		passEncoder = [this](PassInfo& info, char* error, size_t maxlength) -> bool
+		m_type_encoder = [this](PassInfo& info, char* error, size_t maxlength) -> bool
 		{
 			switch (info.type)
 			{

@@ -30,13 +30,10 @@ public:
 	static std::vector<const ActionEncoder*>* GetActionEncoders();
 	static const ActionEncoder* FindEncoderByName(const char* name);
 
-	inline bool operator()(param_t param, char* error, size_t maxlength) const;
-	inline bool operator()(SourceMod::PassInfo& info, char* error, size_t maxlength) const;
-
 	inline const char* ShortName() const;
 	inline const char* PublicName() const;
 
-protected:
+public:
 	virtual bool encode(param_t param, char* error, size_t maxlength) const;
 	virtual bool typeinfo(SourceMod::PassInfo& param, char* error, size_t maxlength) const;
 
@@ -67,16 +64,6 @@ inline bool ActionEncoder::typeinfo(SourceMod::PassInfo& param, char* error, siz
 	return true;
 }
 
-inline bool ActionEncoder::operator()(param_t param, char* error, size_t maxlength) const
-{
-	return encode(param, error, maxlength);
-}
-
-inline bool ActionEncoder::operator()(SourceMod::PassInfo& info, char* error, size_t maxlength) const
-{
-	return typeinfo(info, error, maxlength);
-}
-
 inline const char* ActionEncoder::ShortName() const
 {
 	return shortName;
@@ -94,8 +81,8 @@ class TypeEncoder : public ActionEncoder
 public:
 	inline TypeEncoder(const char* pubName, const char* simName) : ActionEncoder(pubName, simName)
 	{
-		paramEncoder = nullptr;
-		passEncoder = nullptr;
+		m_param_encoder = nullptr;
+		m_type_encoder = nullptr;
 	}
 
 	class encode_param_t
@@ -151,27 +138,32 @@ protected:
 	virtual bool typeinfo(SourceMod::PassInfo& info, char* error, size_t maxlength) const override;
 
 protected:
-	ParamEncoder paramEncoder;
-	PassEncoder passEncoder;
+	ParamEncoder m_param_encoder;
+	PassEncoder m_type_encoder;
 };
 
 template<typename T>
 bool TypeEncoder<T>::encode(param_t param, char* error, size_t maxlength) const
 {
-	if (paramEncoder == nullptr)
+	if (m_param_encoder == nullptr)
 	{
 		ke::SafeSprintf(error, maxlength, "%s: failed to encode param: paramEncoder == nullptr", PublicName());
 		return false;
 	}
 
 	encode_param_t encodeParam(param);
-	return paramEncoder(encodeParam, error, maxlength);
+	return m_param_encoder(encodeParam, error, maxlength);
 }
 
 template<typename T>
 bool TypeEncoder<T>::typeinfo(SourceMod::PassInfo& info, char* error, size_t maxlength) const
 {
-	return ActionEncoder::typeinfo(info, error, maxlength);
+	if (m_type_encoder == nullptr)
+	{
+		return ActionEncoder::typeinfo(info, error, maxlength);
+	}
+
+	return m_type_encoder(info, error, maxlength);
 }
 
 class ActionConstructor

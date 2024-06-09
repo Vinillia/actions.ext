@@ -112,7 +112,8 @@ public:
 		{
 			cell_t entity = -1;
 
-			if (arg != nullptr)
+			/* https://github.com/Vinillia/actions.ext/issues/24 */
+			if ((void*)arg != (void*)0xFFFFFFFF && arg != nullptr)
 				entity = gamehelpers->EntityToBCompatRef((CBaseEntity*)arg);
 
 			fn->PushCell(entity);
