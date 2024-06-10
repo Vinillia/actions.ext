@@ -29,19 +29,6 @@ struct is_action_desire_result : public std::is_same<T, EventDesiredResult<CBase
 template<typename T>
 inline constexpr bool is_action_result_v = is_action_result<T>::value || is_action_desire_result<T>::value;
 
-template<typename T>
-struct handler_result
-{
-	handler_result()
-	{
-		plresult = Pl_Continue;
-		value = T();
-	}
-
-	ResultType plresult;
-	T value;
-};
-
 struct ActionListener
 {
 	ActionListener() = default;
@@ -94,21 +81,16 @@ public:
 	template<typename T>
 	inline void ProcessMethodArg(IPluginFunction* fn, T&& arg)
 	{
-		using type = std::decay_t<T>;
+		using type = std::decay_t<decltype(arg)>;
 
 		if constexpr (std::is_same_v<type, float>)
 		{
 			fn->PushFloat((float)arg);
 		}
-		else if constexpr (std::is_same_v<type, char*> || std::is_same_v<type, const char*>)
-		{
-			fn->PushString((char*)arg);
-		}
-		else if constexpr (std::is_same_v<type, Vector>)
-		{
-			fn->PushArray((cell_t*)&arg, sizeof(Vector));
-		}
-		else if constexpr (std::is_same_v<type, CBaseEntity*> || std::is_same_v<type, CBaseCombatCharacter*>)
+		else if constexpr (std::is_same_v<type, CBaseEntity*> ||
+			std::is_same_v<type, CBaseCombatCharacter*> ||
+			std::is_same_v<type, const CBaseCombatCharacter*> ||
+			std::is_same_v<type, CBaseCombatWeapon*>)
 		{
 			cell_t entity = -1;
 
@@ -118,7 +100,35 @@ public:
 
 			fn->PushCell(entity);
 		}
-		else if constexpr (std::is_same_v<type, int> || std::is_pointer_v<T> || std::is_enum_v<T>)
+		else if constexpr (std::is_same_v<type, const INextBot*>)
+		{
+#ifdef _CONVERT_NEXTBOT_TO_ENTITY
+			cell_t entity = -1;
+
+			if (arg != nullptr)
+			{
+				CBaseEntity* pEntity = g_pActionsTools->GetEntity(const_cast<INextBot*&>(arg));
+
+				if (pEntity)
+					entity = gamehelpers->EntityToBCompatRef(pEntity);
+			}
+
+			fn->PushCell(entity);
+#else
+			fn->PushCell((cell_t)arg);
+#endif // _CONVERT_NEXTBOT_TO_ENTITY
+		}
+		else if constexpr (std::is_same_v<type, CGameTrace*> ||
+			std::is_same_v<type, nb_action_ptr> ||
+			std::is_same_v<type, const Path*> ||
+			std::is_same_v<type, MoveToFailureType> ||
+			std::is_same_v<type, int> ||
+			std::is_same_v<type, animevent_t*> ||
+			std::is_same_v<type, AI_Response*> ||
+			std::is_same_v<type, void*> ||
+			std::is_same_v<type, CNavArea*> ||
+			std::is_same_v<type, CKnownEntity*>||
+			std::is_same_v<type, const CKnownEntity*>)
 		{
 			fn->PushCell((cell_t)arg);
 		}
@@ -126,9 +136,23 @@ public:
 		{
 			fn->PushCell((cell_t)&arg);
 		}
+		else if constexpr (std::is_same_v<type, KeyValues*>)
+		{
+			// There should be a way to pass this as soucemod's handle
+			fn->PushCell((cell_t)&arg);
+		}
+		else if constexpr (std::is_same_v<type, Vector>)
+		{
+			fn->PushArray((cell_t*)&arg, sizeof(Vector));
+		}
+		else if constexpr (std::is_same_v<type, const char*>)
+		{
+			fn->PushString((char*)arg);
+		}
 		else
 		{
-			fn->PushCell((cell_t)arg);
+			static_assert(std::is_same_v<type, void>, "Unsupported type");
+			static_assert(!std::is_same_v<type, void>, "Unsupported type");
 		}
 	}
 
@@ -146,7 +170,7 @@ public:
 		for (auto it = listeners.begin(); it != listeners.end(); it++)
 		{
 			IPluginFunction* fn = it->fn;
-			TReturn priorResult = *result;
+			TReturn saveResult = *result;
 
 			ProcessMethodArg<nb_action_ptr>(fn, std::forward<nb_action_ptr>(action));
 			(ProcessMethodArg<Args>(fn, std::forward<Args>(args)), ...);
@@ -157,9 +181,18 @@ public:
 				{
 					fn->PushCell((cell_t)result);
 				}
-				else
+				else if constexpr (sizeof(TReturn) <= sizeof(void*))
 				{
 					fn->PushCellByRef((cell_t*)result);
+				}
+				else if constexpr (std::is_same_v<TReturn, Vector>)
+				{
+					fn->PushArray((cell_t*)result, sizeof(Vector), SM_PARAM_COPYBACK);
+				}
+				else
+				{
+					static_assert(std::is_same_v<TReturn, void>, "Unsupported type");
+					static_assert(!std::is_same_v<TReturn, void>, "Unsupported type");
 				}
 			}
 
@@ -167,33 +200,38 @@ public:
 
 			if constexpr (is_action_result_v<TReturn>)
 			{
-				if (executeResult < Pl_Changed && !is_result_same(priorResult, *result))
+				if (executeResult < Pl_Changed && !is_result_same(saveResult, *result))
 				{
 					// plugin changed result but returned Plugin_Continue. It's ok but we need to do something otherwise we might crash later.
 					fn->GetParentRuntime()->GetDefaultContext()->BlamePluginError(fn, "Changing result with Plugin_Continue is an error");
 
 					// delete plugin's action and use prior as the most safest result
-					if (result->m_action && result->m_action != priorResult.m_action)
+					if (result->m_action && result->m_action != saveResult.m_action)
 					{
 						delete result->m_action;
-						*result = priorResult;
+						*result = saveResult;
 					}
 
 					RemoveListener(action, it->hash, it->fn);
 				}
-				
-				if (priorResult.m_action && priorResult.m_action != result->m_action)
+
+				if (saveResult.m_action && saveResult.m_action != result->m_action)
 				{
 					if (ext_actions_debug_memory.GetBool())
-						MsgSM("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), priorResult.m_action->GetName(), priorResult.m_action);
+						MsgSM("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), saveResult.m_action->GetName(), saveResult.m_action);
 
 					// delete an outdated action
-					delete priorResult.m_action;
-					priorResult.m_action = nullptr;
+					delete saveResult.m_action;
+					saveResult.m_action = nullptr;
 				}
 			}
 
-			if (executeResult > returnResult)
+			if (executeResult <= Pl_Continue)
+			{
+				// changing result with Pl_Continue is forbidden
+				*result = saveResult;
+			}
+			else if (executeResult > returnResult)
 			{
 				// new result is more superior
 				returnResult = executeResult;

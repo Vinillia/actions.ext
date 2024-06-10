@@ -26,22 +26,45 @@ template <typename T>
 struct is_contextual_query : is_class_member<IContextualQuery, T> {};
 
 template<typename T>
-struct execution_result
+inline static void _construct_type(T& value)
 {
-	handler_result<T> handlerExecution;
-	T effectiveResult;
+	if constexpr (std::is_same_v<T, Vector>)
+	{
+		value.x = 0.0f; value.y = 0.0f; value.z = 0.0f;
+	}
+	else if constexpr  (std::is_pointer_v<T>)
+	{
+		value = nullptr;
+	}
+	else
+	{
+		value = T();
+	}
+}
 
-	const ResultType& rt() {
-		return handlerExecution.plresult;
+template<typename T>
+struct Handler
+{
+	Handler()
+	{
+		result_type = Pl_Continue;
+		_construct_type(result);
 	}
 
-	const T& value() {
-		return handlerExecution.value;
+	ResultType result_type;
+	T result;
+};
+
+template<typename T>
+struct Execution
+{
+	Execution()
+	{
+		_construct_type(result);
 	}
 
-	const T& result() {
-		return effectiveResult;
-	}
+	Handler<T> handler;
+	T result;
 };
 
 class ActionProcessorShared : public Action<CBaseEntity>
@@ -89,51 +112,51 @@ static void ProcessResultTransition(T& desiredResult)
 	}
 	else if (desiredResult.m_action)
 	{
-		g_pSM->LogError(myself, "Trying to change action without result!");
+		g_pSM->LogError(myself, "Trying to change action without request!");
 	}
 }
 
-template<typename R, typename M, typename ...Args>
-handler_result<R> ProcessHandlerImpl(M&& handler, nb_action_ptr action, HashValue hash, R& newResult, Args&&... args)
+template<typename TReturn, typename TMethod, typename ...Args>
+Handler<TReturn> ProcessHandlerImpl(TMethod&& method, nb_action_ptr action, HashValue hash, TReturn& newResult, Args&&... args)
 {
 	ResultType plpre = Pl_Continue, plpost = Pl_Continue;
-	handler_result<R> handlerResult;
+	Handler<TReturn> handler;
 
 	g_actionsManager.PushRuntimeResult(&newResult);
-	plpre = g_actionsPropagationPre.ProcessMethod<R, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
+	plpre = g_actionsPropagationPre.ProcessMethod<TReturn, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
 
 	if (plpre != Pl_Handled)
 	{
 		// Call original handler if hasn't been blocked
-		handlerResult.value = handler();
+		handler.result = method();
 
 		if (plpre < Pl_Changed)
 		{
 			// No answer from listeners. Keep original return value
-			newResult = handlerResult.value;
+			newResult = handler.result;
 		}
 	}
 
-	if constexpr (is_action_result_v<R>)
+	if constexpr (is_action_result_v<TReturn>)
 	{
 		g_actionsManager.AddPending(newResult.m_action);
 	}
 
-	plpost = g_actionsPropagationPost.ProcessMethod<R, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
+	plpost = g_actionsPropagationPost.ProcessMethod<TReturn, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
 	g_actionsManager.PopRuntimeResult();
 
 	// Either pre or post listeners changed result. Use handler's return
 	// if (plpre < Pl_Changed && plpost < Pl_Changed)
-	//		newResult = handlerResult.value;
+	//		newResult = handler.value;
 
-	if constexpr (is_action_result_v<R>)
+	if constexpr (is_action_result_v<TReturn>)
 	{
 		ProcessResultTransition(newResult);
 		g_actionsManager.ProcessResult(action, reinterpret_cast<const ActionResult<CBaseEntity>&>(newResult));
 	}
 
-	handlerResult.plresult = std::max<ResultType>(plpre, plpost);
-	return handlerResult;
+	handler.result_type = std::max<ResultType>(plpre, plpost);
+	return handler;
 }
 
 template<typename M, typename ...Args>
@@ -154,20 +177,20 @@ template<typename M, typename A, typename ...Args>
 inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Args&& ...args)
 {
 	Autoswap guard(action);
-	using return_t = decltype(((action)->*handler)(args...));
+	using TReturn = decltype(((action)->*handler)(args...));
 
 	// Error C2131 expression did not evaluate to a constant
-	// constexpr bool isVoid = std::is_void_v<return_t>; 
+	// constexpr bool isVoid = std::is_void_v<TReturn>; 
 
-	auto ul = [&]() -> return_t
+	auto ul = [&]() -> TReturn
 		{
-			if constexpr (!std::is_void_v<return_t>)
+			if constexpr (!std::is_void_v<TReturn>)
 			{
 				if constexpr (!is_contextual_query<M>::value)
 				{
-					if constexpr (std::is_same_v<return_t, Action< CBaseEntity >*>)
+					if constexpr (std::is_same_v<TReturn, Action< CBaseEntity >*>)
 					{
-						const return_t child = std::invoke(handler, (A)action, std::forward<Args>(args)...);
+						const TReturn child = std::invoke(handler, (A)action, std::forward<Args>(args)...);
 
 						if (child != nullptr)
 						{
@@ -200,11 +223,11 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 			}
 		};
 
-	if constexpr (!std::is_void_v<return_t>)
+	if constexpr (!std::is_void_v<TReturn>)
 	{
-		execution_result<return_t> er = {};
-		er.handlerExecution = ProcessHandlerImpl(ul, reinterpret_cast<nb_action_ptr>(action), hash, er.effectiveResult, std::forward<Args>(args)...);
-		return er;
+		Execution<TReturn> execution = {};
+		execution.handler = ProcessHandlerImpl(ul, reinterpret_cast<nb_action_ptr>(action), hash, execution.result, std::forward<Args>(args)...);
+		return execution;
 	}
 	else
 	{
@@ -215,7 +238,7 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 template<typename M, typename A, typename ...Args>
 inline decltype(auto) ProcessHandler(HashValue hash, A action, M&& handler, Args&& ...args)
 {
-	return ProcessHandlerEx(hash, action, std::forward<M>(handler), std::forward<Args>(args)...).effectiveResult;
+	return ProcessHandlerEx(hash, action, std::forward<M>(handler), std::forward<Args>(args)...).result;
 }
 
 #endif // !_INCLUDE_ACTIONS_PROCESSOR_SHARED_H

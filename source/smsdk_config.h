@@ -40,7 +40,7 @@
 /* Basic information exposed publicly */
 #define SMEXT_CONF_NAME			"Actions"
 #define SMEXT_CONF_DESCRIPTION	"Nextbot action tree manager"
-#define SMEXT_CONF_VERSION		"3.7.7"
+#define SMEXT_CONF_VERSION		"3.8.7"
 #define SMEXT_CONF_AUTHOR		"BHaType"
 #define SMEXT_CONF_URL			"http://www.sourcemod.net/"
 #define SMEXT_CONF_LOGTAG		"Actions"

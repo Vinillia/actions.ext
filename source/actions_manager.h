@@ -48,7 +48,7 @@ struct ActionUserData
 	
 	// union
 	// {
-	void* data;
+	void* data = nullptr;
 	Vector vector;
 	std::string string;
 	// };
