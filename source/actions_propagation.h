@@ -170,7 +170,12 @@ public:
 		for (auto it = listeners.begin(); it != listeners.end(); it++)
 		{
 			IPluginFunction* fn = it->fn;
-			TReturn saveResult = *result;
+			TReturn saveResult;
+
+			if constexpr (!std::is_null_pointer_v<TReturn>)
+			{
+				saveResult = *result;
+			}
 
 			ProcessMethodArg<nb_action_ptr>(fn, std::forward<nb_action_ptr>(action));
 			(ProcessMethodArg<Args>(fn, std::forward<Args>(args)), ...);
@@ -225,11 +230,14 @@ public:
 					saveResult.m_action = nullptr;
 				}
 			}
-
+			
 			if (executeResult <= Pl_Continue)
 			{
-				// changing result with Pl_Continue is forbidden
-				*result = saveResult;
+				if constexpr (!std::is_null_pointer_v<TReturn>)
+				{
+					// changing result with Pl_Continue is forbidden
+					*result = saveResult;
+				}
 			}
 			else if (executeResult > returnResult)
 			{

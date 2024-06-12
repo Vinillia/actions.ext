@@ -80,7 +80,8 @@ typeset ActionHandler
 	function Action (any action, int actor, float interval, ActionResult result);
 
 	/* OnEnd */
-	function void (any action, int actor, any priorAction, ActionResult result);
+	function void (any action, int actor, any nextAction, ActionResult result);
+	function Action (any action, int actor, any nextAction, ActionResult result);
 
 	/* InitialContainedAction */
 	function Action (any action, int actor, any& child);
