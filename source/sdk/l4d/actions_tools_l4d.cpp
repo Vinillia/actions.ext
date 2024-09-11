@@ -2,6 +2,8 @@
 #include "actions_tools_l4d.h"
 #include "../../l4d2/actions_tools_l4d2.cpp"
 
+L4DActionTools g_L4DActionsTools;
+
 #ifndef WIN32
 IIntention* L4DActionTools::GetIntentionComponent(INextBotComponent* component)
 {
