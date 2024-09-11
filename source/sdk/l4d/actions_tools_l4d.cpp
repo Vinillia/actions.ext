@@ -8,7 +8,7 @@ IIntention* L4DActionTools::GetIntentionComponent(INextBotComponent* component)
     const std::type_info& lhs = typeid(IIntention);
     const std::type_info& rhs = typeid(component);
 
-    MsgSM("%s %s %i", typeid(component).name(), typeid(component).raw_name(), typeid(lhs).before(rhs));
+    MsgSM("%s %i", typeid(component).name(), typeid(lhs).before(rhs));
     return nullptr;
 }
 #endif
