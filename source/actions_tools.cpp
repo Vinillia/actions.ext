@@ -54,6 +54,11 @@ void ActionsTools::GetIntentionActions(IIntention* intention, std::vector<nb_act
 	}
 }
 
+IIntention* ActionsTools::GetIntentionComponent(INextBotComponent* component)
+{
+	return dynamic_cast<IIntention*>(component);
+}
+
 bool ActionsTools::GetEntityActions(CBaseEntity* entity, std::vector<nb_action_ptr>& vec)
 {
 	INextBot* nextbot = MyNextBotPointer(entity);
@@ -63,7 +68,7 @@ bool ActionsTools::GetEntityActions(CBaseEntity* entity, std::vector<nb_action_p
 
 	for (INextBotComponent* i = nextbot->m_componentList; i != nullptr; i = i->m_nextComponent)
 	{
-		IIntention* intention = dynamic_cast<IIntention*>(i);
+		IIntention* intention = GetIntentionComponent(i);
 
 		if (intention == nullptr)
 			continue;

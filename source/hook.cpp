@@ -32,7 +32,7 @@ DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 
 	for (INextBotComponent* component = bot->m_componentList; component != nullptr; component = component->m_nextComponent)
 	{
-		IIntention* intention = dynamic_cast<IIntention*>(component);
+		IIntention* intention = g_pActionsTools->GetIntentionComponent(component);
 
 		if (intention == nullptr)
 			continue;

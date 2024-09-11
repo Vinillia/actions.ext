@@ -18,6 +18,7 @@ namespace SourceMod
 }
 
 class IIntention;
+class INextBotComponent;
 class INextBot;
 class CBaseEntity;
 class INextBotEventResponder;
@@ -76,6 +77,8 @@ public:
 	virtual bool OnIntentionReset(INextBot* bot, IIntention* intention);
 	virtual bool LoadGameConfigFile(SourceMod::IGameConfig* config, char* error, size_t maxlen);
 	virtual void GetIntentionActions(IIntention* intention, std::vector<nb_action_ptr>& vec);
+
+	virtual IIntention* GetIntentionComponent(INextBotComponent* component);
 
 	nb_action_ptr ActionContainedResponder(IIntention* intention);
 
