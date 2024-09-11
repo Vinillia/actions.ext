@@ -9,7 +9,7 @@
 class L4DActionTools : public L4D2ActionsTools
 {
 public:
-#ifdef WIN32
+#ifndef WIN32
 	virtual IIntention* GetIntentionComponent(INextBotComponent* component) override;
 #endif
 };

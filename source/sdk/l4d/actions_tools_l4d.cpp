@@ -2,7 +2,7 @@
 #include "actions_tools_l4d.h"
 #include "../../l4d2/actions_tools_l4d2.cpp"
 
-#ifdef WIN32
+#ifndef WIN32
 IIntention* L4DActionTools::GetIntentionComponent(INextBotComponent* component)
 {
     const std::type_info& lhs = typeid(IIntention);
