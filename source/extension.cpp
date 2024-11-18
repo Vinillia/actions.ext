@@ -50,7 +50,7 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	HandleError err;
 	if (!CreateHandleTypes(&err))
 	{
-		V_snprintf(error, maxlen, "Failed to create handle type (error: %i)", err);
+		V_snprintf(error, static_cast<int>(maxlen), "Failed to create handle type (error: %i)", err);
 		return false;
 	}
 
@@ -143,7 +143,7 @@ void SDKActions::OnActionCreated(nb_action_ptr action)
 	if (ext_actions_debug_memory.GetBool())
 		MsgSM("%.3f:%i: NEW ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
 
-	m_fwdOnActionCreated->PushCell((cell_t)action);
+	m_fwdOnActionCreated->PushCell(ToPseudoAddress(action));
 	m_fwdOnActionCreated->PushCell(g_actionsManager.GetActionActorEntIndex(action));
 	m_fwdOnActionCreated->PushString(action->GetName());
 	m_fwdOnActionCreated->Execute();
@@ -157,7 +157,7 @@ void SDKActions::OnActionDestroyed(nb_action_ptr action)
 	g_actionsPropagationPre.RemoveActionListeners(action);
 	g_actionsPropagationPost.RemoveActionListeners(action);
 
-	m_fwdOnActionDestroyed->PushCell((cell_t)action);
+	m_fwdOnActionDestroyed->PushCell(ToPseudoAddress(action));
 	m_fwdOnActionDestroyed->PushCell(g_actionsManager.GetActionActorEntIndex(action));
 	m_fwdOnActionDestroyed->PushString(action->GetName());
 	m_fwdOnActionDestroyed->Execute();

@@ -36,7 +36,11 @@ namespace ine
 	template<typename K, typename... T>
 	inline K call_std(void* addr, T... args)
 	{
+#ifdef WIN32
 		using fn_t = K(__stdcall*)(T...);
+#else
+		using fn_t = K(__cdecl*)(T...);
+#endif
 		fn_t fn = reinterpret_cast<fn_t>(addr);
 		return fn(args...);
 	}
@@ -45,7 +49,11 @@ namespace ine
 	inline K call_this(void* addr, T... args)
 	{
 #ifdef WIN32
+#if PLATFORM_64BITS
+		using fn_t = K(__fastcall*)(T...);
+#else
 		using fn_t = K(__thiscall*)(T...);
+#endif
 		fn_t fn = reinterpret_cast<fn_t>(addr);
 		return fn(args...);
 #else

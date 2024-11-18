@@ -1,5 +1,0 @@
-push
-mov ebp, esp
-sub ebp, 0x2B
-mov ecx, [ebp + 8]
-call deepthisboundlesdream 

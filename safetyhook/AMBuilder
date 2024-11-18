@@ -1,0 +1,66 @@
+import os
+
+def AddSourceFilesFromDir(path, files):
+  list = []
+  for file in files:
+    list.append(os.path.join(path, file))
+  return list
+
+libsafetyhook = builder.StaticLibraryProject('safetyhook')
+# SafetyHook sourcefiles
+libsafetyhook.sources = AddSourceFilesFromDir(os.path.join(builder.currentSourcePath, 'src'),[
+  "allocator.cpp",
+  "easy.cpp",
+  "inline_hook.cpp",
+  "mid_hook.cpp",
+  "utility.cpp",
+  "vmt_hook.cpp",
+])
+# Safetyhook dependency Zydis
+libsafetyhook.sources += AddSourceFilesFromDir(os.path.join(builder.currentSourcePath, 'zydis'),[
+  "Zydis.c"
+])
+
+for compiler in SafetyHook.all_targets:
+  binary = libsafetyhook.Configure(compiler, libsafetyhook.name, 'Release - {0}'.format(compiler.target.arch))
+  # Configure the binary's compiler
+  compiler = binary.compiler
+  # Reset all flags, safetyhook requires specific compilation flags
+  compiler.cxxflags = []
+  compiler.cflags = []
+  compiler.defines = []
+  compiler.includes = []
+  compiler.cxxincludes = []
+
+  if compiler.target.platform == 'windows':
+    compiler.cflags += [
+      "/W4",
+    ]
+    compiler.cxxflags += [
+      "/EHsc",
+      "/permissive-",
+      "/w14640",
+      "/std:c++17"
+    ]
+    binary.sources += [ os.path.join(builder.currentSourcePath, 'src', 'os.windows.cpp') ]
+  elif compiler.target.platform == 'linux':
+    compiler.cflags += [
+      "-Werror",
+      "-Wall",
+      "-Wextra",
+      "-pedantic",
+      "-Wshadow",
+      "-Wno-unused-const-variable",
+      "-Wno-unused-function",
+      "-fPIC"
+    ]
+    compiler.cxxflags += [
+      "-Wnon-virtual-dtor",
+      "-Wno-format",
+      "-std=c++17"
+    ]
+    binary.sources += [ os.path.join(builder.currentSourcePath, 'src', 'os.linux.cpp') ]
+  compiler.includes += [os.path.join(builder.currentSourcePath, 'include'), os.path.join(builder.currentSourcePath, 'zydis')]
+
+# Send back the binaries
+SafetyHook.libsafetyhook = builder.Add(libsafetyhook)

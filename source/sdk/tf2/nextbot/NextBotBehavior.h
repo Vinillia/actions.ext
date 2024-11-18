@@ -19,7 +19,6 @@
 #include <string_view>
 #include "actions_tools.h"
 
-
 //#define DEBUG_BEHAVIOR_MEMORY
 extern ConVar NextBotDebugHistory;
 
@@ -183,8 +182,9 @@ template < typename Actor >
 class Behavior : public INextBotEventResponder, public IContextualQuery
 {
 public:
-	Behavior(Action< Actor >* initialAction, const char* name = "") : m_name("%s", name)
+	Behavior(Action< Actor >* initialAction, const char* name = "")
 	{
+		strncpy(m_name, name, sizeof(m_name));
 		m_action = initialAction;
 		m_me = NULL;
 	}
@@ -582,7 +582,7 @@ public:
 	Action< Actor >* m_action;
 
 #define MAX_NAME_LENGTH 32
-	CFmtStrN< MAX_NAME_LENGTH > m_name;
+	char m_name[MAX_NAME_LENGTH];
 
 	Actor* m_me;
 
@@ -723,8 +723,8 @@ public:
 	virtual bool IsAbleToBlockMovementOf(const INextBot* botInMotion) const { return true; }
 
 	// INextBotEventResponder propagation ----------------------------------------------------------------------
-	virtual INextBotEventResponder* FirstContainedResponder(void) const;
-	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const;
+	virtual INextBotEventResponder* FirstContainedResponder(void) const override;
+	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const override;
 
 
 private:

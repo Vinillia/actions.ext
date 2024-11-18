@@ -7,13 +7,19 @@
 			"MyNextBotPointer"
 			{
 				"windows" "74"
+				"windows64" "74"
+				
 				"linux" "75"
+				"linux64" "75"
 			}
 			
 			"GetEntity"
 			{
 				"windows" "46"
+				"windows64" "47"
+				
 				"linux" "47"
+				"linux64" "47"
 			}
 		}
 		
@@ -21,9 +27,11 @@
 		{
 			"INextBot::Reset"
 			{
-				"library" "server"
-				"windows" "\xC7\x41\x14\x19\xFC\xFF\xFF"
-				"linux" "@_ZN8INextBot5ResetEv"
+				"library" 		"server"
+				"windows" 		"\xC7\x41\x14\x19\xFC\xFF\xFF"
+				"windows64" 	"\x40\x53\x48\x83\xEC\x20\x48\x8B\x59\x08\x33\xC0"
+				"linux" 		"@_ZN8INextBot5ResetEv"
+				"linux" 		"@_ZN8INextBot5ResetEv"
 			}
 		}
 	}
@@ -56,8 +64,8 @@
 			"INextBot::Reset"
 			{
 				"library" "server"
-				"windows" "\xD9\x05\x2A\x2A\x2A\x2A\x56\x8B\xF1\x57\x8D\x7E\x38"
-				"linux" "@_ZN8INextBot5ResetEv"
+				"windows" 		"\xD9\x05\x2A\x2A\x2A\x2A\x56\x8B\xF1\x57\x8D\x7E\x38"
+				"linux" 		"@_ZN8INextBot5ResetEv"
 			}
 		}
 	}

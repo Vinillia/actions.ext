@@ -36,8 +36,8 @@ cell_t NAT_caller_AddParameter(IPluginContext* ctx, const cell_t* params)
 	}
 
 	PassType passType = (PassType)params[2];
-	size_t flags = (size_t)params[3];
-	ActionEncoder* encoder = (ActionEncoder*)params[4];
+	int flags = params[3];
+	ActionEncoder* encoder = get_native_param<ActionEncoder*>(params, 4);
 
 	return constuctor->AddParameter(passType, flags, encoder);
 }
@@ -74,7 +74,7 @@ cell_t NAT_caller_Execute(IPluginContext* ctx, const cell_t* params)
 		ctx->ReportError("Failed to execute constructor: %s", e.what());
 	}
 
-	return (cell_t)action;
+	return ToPseudoAddress(action);
 }
 
 cell_t NAT_caller_Finish(IPluginContext* ctx, const cell_t* params)
@@ -164,7 +164,7 @@ cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
 		return 0;
 	}
 
-	void* addr = (void*)params[2];
+	void* addr = get_native_param<void*>(params, 2);
 	if ((uintptr_t)addr <= 0x1000)
 	{
 		ctx->ReportError("Invalid function address (0x%X)", addr);
@@ -173,10 +173,10 @@ cell_t NAT_caller_Address(IPluginContext* ctx, const cell_t* params)
 
 	if (params[0] > 1)
 	{
-		constructor->SetAddress((void*)params[2]);
+		constructor->SetAddress(get_native_param<void*>(params, 2));
 	}
 
-	return (cell_t)constructor->GetAddress();
+	return ToPseudoAddress(constructor->GetAddress());
 }
 
 cell_t NAT_caller_Size(IPluginContext* ctx, const cell_t* params)
@@ -198,7 +198,7 @@ cell_t NAT_caller_Size(IPluginContext* ctx, const cell_t* params)
 		constuctor->SetSize(params[2]);
 	}
 
-	return constuctor->GetSize();
+	return static_cast<cell_t>(constuctor->GetSize());
 }
 
 #if 0

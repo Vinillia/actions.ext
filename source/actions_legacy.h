@@ -4,12 +4,12 @@
 
 cell_t NAT_action_Allocate(IPluginContext* pContext, const cell_t* params)
 {
-	return (cell_t)::operator new((size_t)params[1]);
+	return ToPseudoAddress((void*)::operator new((size_t)params[1]));
 }
 
 cell_t NAT_action_Deallocate(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -42,11 +42,11 @@ cell_t NAT_action_GetEntityActions(IPluginContext* ctx, const cell_t* params)
 
 	for (auto action : actions)
 	{
-		fn->PushCell((cell_t)action);
+		fn->PushCell(ToPseudoAddress(action));
 		fn->Execute(NULL);
 	}
 
-	return actions.size();
+	return static_cast<cell_t>(actions.size());
 }
 
 cell_t NAT_action_GetEntityAction(IPluginContext* ctx, const cell_t* params)
@@ -68,7 +68,7 @@ cell_t NAT_action_GetEntityAction(IPluginContext* ctx, const cell_t* params)
 	if (res == actions.cend())
 		return 0;
 
-	return (cell_t)*res;
+	return ToPseudoAddress(*res);
 }
 
 cell_t NAT_action_Create(IPluginContext* pContext, const cell_t* params)
@@ -79,7 +79,7 @@ cell_t NAT_action_Create(IPluginContext* pContext, const cell_t* params)
 	ActionCustomLegacy* action = new ActionCustomLegacy((const char*)name);
 	g_actionsManager.AddPending((nb_action_ptr)action);
 
-	return (cell_t)action;
+	return ToPseudoAddress(action);
 }
 
 sp_nativeinfo_t g_actionsNativesLegacy[] =

@@ -2,7 +2,7 @@
 #define _INCLUDE_ACTIONS_CONSTRUCTOR_SMC_H
 
 #include <string>
-#include <sm_stringhashmap.h>
+#include <sm_hashmap.h>
 #include "extension.h"
 
 namespace SourceMod

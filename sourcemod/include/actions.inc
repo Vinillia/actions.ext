@@ -865,6 +865,25 @@ methodmap BehaviorAction < BehaviorActionListeners
 		out[1] = view_as<float>(this.Get(offset + 4, NumberType_Int32));
 		out[2] = view_as<float>(this.Get(offset + 8, NumberType_Int32));
 	}
+	
+ 	/**
+ 	* @brief Returns entity index from entity handle at specified offset
+ 	*
+ 	* @param offset			Offset to ehandle 
+ 	*
+ 	* @return				entity index
+ 	*/
+	public native int GetHandleEntity( int offset );
+	
+ 	/**
+ 	* @brief Set entity handle by entity index at specified offset
+ 	*
+ 	* @param offset			Offset to ehandle 
+ 	* @param entity			entity index
+ 	*
+ 	* @return				entity index
+ 	*/
+	public native void SetHandleEntity( int offset, int entity );
 
  	/**
  	* @brief Checks if action matches specified name
@@ -1046,6 +1065,8 @@ public void __ext_actions_SetNTVOptional()
 	MarkNativeAsOptional("BehaviorAction.Under.get");
 	MarkNativeAsOptional("BehaviorAction.Above.get");
 	MarkNativeAsOptional("BehaviorAction.Actor.get");
+	MarkNativeAsOptional("BehaviorAction.GetHandleEntity");
+	MarkNativeAsOptional("BehaviorAction.SetHandleEntity");
 
 	MarkNativeAsOptional("BehaviorAction.IsSuspended.get");
 	MarkNativeAsOptional("BehaviorAction.IsSuspended.set");

@@ -182,9 +182,9 @@ template < typename Actor >
 class Behavior : public INextBotEventResponder, public IContextualQuery
 {
 public:
-
-	Behavior(Action< Actor >* initialAction, const char* name = "") : m_name(name)
+	Behavior(Action< Actor >* initialAction, const char* name = "")
 	{
+		strncpy(m_name, name, sizeof(m_name));
 		m_action = initialAction;
 	}
 
@@ -494,7 +494,7 @@ protected:
 	Action< Actor >* m_action;
 
 #define MAX_NAME_LENGTH 32
-	CFmtStrN< MAX_NAME_LENGTH > m_name;
+	char m_name[MAX_NAME_LENGTH];
 };
 
 
@@ -581,8 +581,8 @@ public:
 	const char* DebugString(void) const;						
 	virtual bool IsAbleToBlockMovementOf(const INextBot* botInMotion) const { return true; }
 
-	virtual INextBotEventResponder* FirstContainedResponder(void) const;
-	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const;
+	virtual INextBotEventResponder* FirstContainedResponder(void) const override;
+	virtual INextBotEventResponder* NextContainedResponder(INextBotEventResponder* current) const override;
 
 private:
 	virtual void OnLeaveGround(CBaseEntity* ground) override { PROCESS_EVENT_WITH_1_ARG(OnLeaveGround, ground); }

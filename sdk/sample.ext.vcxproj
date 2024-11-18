@@ -5,13 +5,25 @@
       <Configuration>Left 4 Dead 1</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Left 4 Dead 1|x64">
+      <Configuration>Left 4 Dead 1</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Left 4 Dead 2|Win32">
       <Configuration>Left 4 Dead 2</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Left 4 Dead 2|x64">
+      <Configuration>Left 4 Dead 2</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
     <ProjectConfiguration Include="Team Fortress 2|Win32">
       <Configuration>Team Fortress 2</Configuration>
       <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Team Fortress 2|x64">
+      <Configuration>Team Fortress 2</Configuration>
+      <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -27,12 +39,28 @@
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+    <EnableASAN>false</EnableASAN>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
     <PlatformToolset>v143</PlatformToolset>
@@ -44,10 +72,19 @@
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros">
@@ -60,16 +97,22 @@
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">$(Configuration)\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">$(Configuration)\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</LinkIncremental>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</LinkIncremental>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">actions.ext.2.l4d2</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">actions.ext.2.l4d2</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">actions.ext.2.tf2</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">actions.ext.2.tf2</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">actions.ext.2.l4d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">actions.ext.2.l4d</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">
     <ClCompile>
       <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d2\nextbot;$(ProjectDir)..\source\sdk\l4d2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D2)\public\;$(HL2SDKL4D2)\public\tier1\;$(HL2SDKL4D2)\public\tier2\;$(HL2SDKL4D2)\public\tier3\;$(HL2SDKL4D2)\public\tier4\;$(HL2SDKL4D2)\public\tier0\;$(HL2SDKL4D2)\public\mathlib\;$(HL2SDKL4D2)\public\game\server\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\SDK\sourcemod\public\extensions;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\safetyhook\zydis;D:\SDK\sourcemod\public\safetyhook\include\;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d2\nextbot;$(ProjectDir)..\source\sdk\l4d2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D2)\public\;$(HL2SDKL4D2)\public\tier1\;$(HL2SDKL4D2)\public\tier2\;$(HL2SDKL4D2)\public\tier3\;$(HL2SDKL4D2)\public\tier4\;$(HL2SDKL4D2)\public\tier0\;$(HL2SDKL4D2)\public\mathlib\;$(HL2SDKL4D2)\public\game\server\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=16;SE_LEFT4DEAD2=16;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -105,10 +148,48 @@
       <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(L4D2DS)\left4dead2\addons\sourcemod\extensions"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">
+    <ClCompile>
+      <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\SDK\sourcemod\public\extensions;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\safetyhook\zydis;D:\SDK\sourcemod\public\safetyhook\include\;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d2\nextbot;$(ProjectDir)..\source\sdk\l4d2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D2)\public\;$(HL2SDKL4D2)\public\tier1\;$(HL2SDKL4D2)\public\tier2\;$(HL2SDKL4D2)\public\tier3\;$(HL2SDKL4D2)\public\tier4\;$(HL2SDKL4D2)\public\tier0\;$(HL2SDKL4D2)\public\mathlib\;$(HL2SDKL4D2)\public\game\server\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;PLATFORM_64BITS;SOURCE_ENGINE=16;SE_LEFT4DEAD2=16;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <OmitFramePointer>true</OmitFramePointer>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalModuleDependencies>$(HL2SDKL4D2)\lib\public;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <UseStandardPreprocessor>false</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_ITERATOR_DEBUG_LEVEL=0;WIN32;_WINDOWS;META_NO_HL2SDK;COMPILER_MSVC;COMPILER_MSVC32</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies);kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;$(HL2SDKL4D2)\lib\public\tier0.lib;legacy_stdio_definitions.lib;$(HL2SDKL4D2)\lib\public\vstdlib.lib;$(HL2SDKL4D2)\lib\public\tier1.lib;$(HL2SDKL4D2)\lib\public\mathlib.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(L4D2DS)\left4dead2\addons\sourcemod\extensions"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">
     <ClCompile>
       <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\tf2\nextbot;$(ProjectDir)..\source\sdk\tf2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKTF2)\public\;$(HL2SDKTF2)\public\tier1\;$(HL2SDKTF2)\public\tier2\;$(HL2SDKTF2)\public\tier3\;$(HL2SDKTF2)\public\tier4\;$(HL2SDKTF2)\public\tier0\;$(HL2SDKTF2)\public\mathlib\;$(HL2SDKTF2)\public\game\server\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\SDK\sourcemod\public\extensions;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\safetyhook\zydis;D:\SDK\sourcemod\public\safetyhook\include\;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\tf2\nextbot;$(ProjectDir)..\source\sdk\tf2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKTF2)\public\;$(HL2SDKTF2)\public\tier1\;$(HL2SDKTF2)\public\tier2\;$(HL2SDKTF2)\public\tier3\;$(HL2SDKTF2)\public\tier4\;$(HL2SDKTF2)\public\tier0\;$(HL2SDKTF2)\public\mathlib\;$(HL2SDKTF2)\public\game\server\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=11;SE_TF=11;ORANGEBOX=3;SE_LEFT4DEAD=12;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -144,10 +225,48 @@
       <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(TF2DS)\tf\addons\sourcemod\extensions"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">
+    <ClCompile>
+      <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\SDK\sourcemod\public\extensions;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\safetyhook\zydis;D:\SDK\sourcemod\public\safetyhook\include\;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\tf2\nextbot;$(ProjectDir)..\source\sdk\tf2;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKTF2)\public\;$(HL2SDKTF2)\public\tier1\;$(HL2SDKTF2)\public\tier2\;$(HL2SDKTF2)\public\tier3\;$(HL2SDKTF2)\public\tier4\;$(HL2SDKTF2)\public\tier0\;$(HL2SDKTF2)\public\mathlib\;$(HL2SDKTF2)\public\game\server\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;PLATFORM_64BITS;SOURCE_ENGINE=11;SE_TF=11;ORANGEBOX=3;SE_LEFT4DEAD=12;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;DBGFLAG_ASSERT;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <OmitFramePointer>true</OmitFramePointer>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalModuleDependencies>$(HL2SDKTF2)\lib\win64\public;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <UseStandardPreprocessor>false</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_ITERATOR_DEBUG_LEVEL=0;WIN32;_WINDOWS;META_NO_HL2SDK;COMPILER_MSVC;COMPILER_MSVC32</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies);kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;$(HL2SDKTF2)\lib\public\win64\tier0.lib;legacy_stdio_definitions.lib;$(HL2SDKTF2)\lib\public\win64\vstdlib.lib;$(HL2SDKTF2)\lib\public\win64\tier1.lib;$(HL2SDKTF2)\lib\public\win64\mathlib.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(TF2DS)\tf\addons\sourcemod\extensions"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">
     <ClCompile>
       <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d\nextbot;$(ProjectDir)..\source\sdk\l4d;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D)\public\;$(HL2SDKL4D)\public\tier1\;$(HL2SDKL4D)\public\tier2\;$(HL2SDKL4D)\public\tier3\;$(HL2SDKL4D)\public\tier4\;$(HL2SDKL4D)\public\tier0\;$(HL2SDKL4D)\public\mathlib\;$(HL2SDKL4D)\public\game\server\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\SDK\sourcemod\public\extensions;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\safetyhook\zydis;D:\SDK\sourcemod\public\safetyhook\include\;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d\nextbot;$(ProjectDir)..\source\sdk\l4d;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D)\public\;$(HL2SDKL4D)\public\tier1\;$(HL2SDKL4D)\public\tier2\;$(HL2SDKL4D)\public\tier3\;$(HL2SDKL4D)\public\tier4\;$(HL2SDKL4D)\public\tier0\;$(HL2SDKL4D)\public\mathlib\;$(HL2SDKL4D)\public\game\server\</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;SOURCE_ENGINE=14;SE_LEFT4DEAD=14;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -185,15 +304,57 @@
       <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(L4D1DS)\left4dead\addons\sourcemod\extensions"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">
+    <ClCompile>
+      <AdditionalOptions>/D_ITERATOR_DEBUG_LEVEL=0</AdditionalOptions>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\SDK\sourcemod\public\extensions;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public\safetyhook\zydis;D:\SDK\sourcemod\public\safetyhook\include\;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;$(ProjectDir)..\source\sdk\l4d\nextbot;$(ProjectDir)..\source\sdk\l4d;$(ProjectDir)..\source\sdk\shared;$(ProjectDir)..\source\sdk\;$(ProjectDir)..\source\;$(HL2SDKL4D)\public\;$(HL2SDKL4D)\public\tier1\;$(HL2SDKL4D)\public\tier2\;$(HL2SDKL4D)\public\tier3\;$(HL2SDKL4D)\public\tier4\;$(HL2SDKL4D)\public\tier0\;$(HL2SDKL4D)\public\mathlib\;$(HL2SDKL4D)\public\game\server\</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;WIN32;_WINDOWS;COMPILER_MSVC;COMPILER_MSVC32;PLATFORM_64BITS;SOURCE_ENGINE=14;SE_LEFT4DEAD=14;MEM_OVERRIDE_ON;NOMINMAX;_CRT_NO_VA_START_VALIDATION;__DEBUG;INCLUDE_ACTIONS_CONSTRUCTOR</PreprocessorDefinitions>
+      <Optimization>Disabled</Optimization>
+      <MinimalRebuild>false</MinimalRebuild>
+      <OmitFramePointer>true</OmitFramePointer>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalModuleDependencies>$(HL2SDKL4D2)\lib\public;%(AdditionalModuleDependencies)</AdditionalModuleDependencies>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <UseStandardPreprocessor>false</UseStandardPreprocessor>
+      <ShowIncludes>false</ShowIncludes>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions);_CRT_SECURE_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_CRT_NONSTDC_NO_DEPRECATE;_ITERATOR_DEBUG_LEVEL=0;WIN32;_WINDOWS;META_NO_HL2SDK;COMPILER_MSVC;COMPILER_MSVC32</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\SDK\sourcemod\public;D:\dev\vs\repos\actions\;D:\dev\vs\repos\actions\sdk;D:\SDK\sourcemod\public;D:\SDK\sourcemod\public\extensions;D:\SDK\sourcemod\sourcepawn\include;D:\SDK\sourcemod\public\amtl\amtl;D:\SDK\sourcemod\public\amtl;D:\SDK\metamod-source\core;D:\SDK\metamod-source\core\sourcehook;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>%(AdditionalDependencies);kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;$(HL2SDKL4D)\lib\public\tier0.lib;legacy_stdio_definitions.lib;$(HL2SDKL4D)\lib\public\vstdlib.lib;$(HL2SDKL4D)\lib\public\tier1.lib;$(HL2SDKL4D)\lib\public\mathlib.lib</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetFileName)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(TargetDir)$(TargetName).dll" "$(L4D1DS)\left4dead\addons\sourcemod\extensions"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\asm\asm.c" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\CDetour\detours.cpp" />
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\decode.c" />
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\itab.c" />
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-att.c" />
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-intel.c" />
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn.c" />
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\udis86.c" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\allocator.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\easy.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\inline_hook.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\mid_hook.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\os.linux.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\os.windows.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\utility.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\vmt_hook.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.c" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\smsdk_ext.cpp" />
     <ClCompile Include="..\source\actions_component.cpp" />
     <ClCompile Include="..\source\actions_constructor_smc.cpp" />
@@ -209,33 +370,46 @@
     <ClCompile Include="..\source\hook.cpp" />
     <ClCompile Include="..\source\sdk\l4d2\actions_processor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\source\sdk\l4d2\actions_tools_l4d2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\source\sdk\l4d\actions_processor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\source\sdk\l4d\actions_tools_l4d.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\source\sdk\shared\NextBotBehaviorShared.cpp" />
     <ClCompile Include="..\source\sdk\shared\NextBotComponentInterface.cpp" />
     <ClCompile Include="..\source\sdk\shared\NextBotInterface.cpp" />
     <ClCompile Include="..\source\sdk\tf2\actions_processor.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\source\sdk\tf2\actions_tools_tf2.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.h" />
     <ClInclude Include="..\source\actionsdefs.h" />
     <ClInclude Include="..\source\actions_caller.h" />
     <ClInclude Include="..\source\actions_commands.h" />
@@ -257,51 +431,75 @@
     <ClInclude Include="..\source\hook.h" />
     <ClInclude Include="..\source\sdk\l4d2\actions_processor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d2\actions_tools_l4d2.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotBehavior.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotContextualQueryInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotEventResponderInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d2\nextbot\NextBotIntentionInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d\actions_processor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d\actions_tools_l4d.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotBehavior.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotContextualQueryInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotEventResponderInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d\nextbot\NextBotIntentionInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Team Fortress 2|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\shared\NextBotBehaviorShared.h" />
     <ClInclude Include="..\source\sdk\shared\NextBotComponentInterface.h" />
@@ -309,27 +507,39 @@
     <ClInclude Include="..\source\sdk\shared\NextBotInterface.h" />
     <ClInclude Include="..\source\sdk\tf2\actions_processor.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\tf2\actions_tools_tf2.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\tf2\nextbot\NextBotBehavior.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\tf2\nextbot\NextBotContextualQueryInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\tf2\nextbot\NextBotEventResponderInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\sdk\tf2\nextbot\NextBotIntentionInterface.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 2|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClInclude>
     <ClInclude Include="..\source\smsdk_config.h" />
   </ItemGroup>

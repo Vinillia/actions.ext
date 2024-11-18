@@ -9,6 +9,8 @@
 #include "actions_pubvars.h"
 #include "actions_manager.h"
 
+#include "extension.h"
+
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
@@ -115,39 +117,42 @@ public:
 
 			fn->PushCell(entity);
 #else
-			fn->PushCell((cell_t)arg);
+			fn->PushCell(ToPseudoAddress(arg));
 #endif // _CONVERT_NEXTBOT_TO_ENTITY
 		}
 		else if constexpr (std::is_same_v<type, CGameTrace*> ||
 			std::is_same_v<type, nb_action_ptr> ||
 			std::is_same_v<type, const Path*> ||
-			std::is_same_v<type, MoveToFailureType> ||
-			std::is_same_v<type, int> ||
 			std::is_same_v<type, animevent_t*> ||
 			std::is_same_v<type, AI_Response*> ||
 			std::is_same_v<type, void*> ||
 			std::is_same_v<type, CNavArea*> ||
-			std::is_same_v<type, CKnownEntity*>||
+			std::is_same_v<type, CKnownEntity*> ||
 			std::is_same_v<type, const CKnownEntity*>)
+		{
+			fn->PushCell(ToPseudoAddress(arg));
+		}
+		else if constexpr (std::is_same_v<type, MoveToFailureType> ||
+			std::is_same_v<type, int>)
 		{
 			fn->PushCell((cell_t)arg);
 		}
 		else if constexpr (std::is_same_v<type, CTakeDamageInfo>)
 		{
-			fn->PushCell((cell_t)&arg);
+			fn->PushCell(ToPseudoAddress(&arg));
 		}
 		else if constexpr (std::is_same_v<type, KeyValues*>)
 		{
 			// There should be a way to pass this as soucemod's handle
-			fn->PushCell((cell_t)&arg);
+			fn->PushCell(ToPseudoAddress(arg));
 		}
 		else if constexpr (std::is_same_v<type, Vector>)
 		{
-			fn->PushArray((cell_t*)&arg, sizeof(Vector));
+			fn->PushArray((cell_t*)ToPseudoAddress(&arg), sizeof(Vector));
 		}
 		else if constexpr (std::is_same_v<type, const char*>)
 		{
-			fn->PushString((char*)arg);
+			fn->PushString(arg);
 		}
 		else
 		{
@@ -184,11 +189,7 @@ public:
 			{
 				if constexpr (is_action_result_v<TReturn>)
 				{
-					fn->PushCell((cell_t)result);
-				}
-				else if constexpr (sizeof(TReturn) <= sizeof(void*))
-				{
-					fn->PushCellByRef((cell_t*)result);
+					fn->PushCell(ToPseudoAddress(result));
 				}
 				else if constexpr (std::is_same_v<TReturn, Vector>)
 				{
@@ -196,9 +197,13 @@ public:
 				}
 				else
 				{
-					static_assert(std::is_same_v<TReturn, void>, "Unsupported type");
-					static_assert(!std::is_same_v<TReturn, void>, "Unsupported type");
+					fn->PushCellByRef((cell_t*)result);
 				}
+				//else
+				//{
+				//	static_assert(std::is_same_v<TReturn, void>, "Unsupported type");
+				//	static_assert(!std::is_same_v<TReturn, void>, "Unsupported type");
+				//}
 			}
 
 			fn->Execute((cell_t*)&executeResult);
@@ -230,7 +235,12 @@ public:
 					saveResult.m_action = nullptr;
 				}
 			}
-			
+			else if constexpr (!std::is_null_pointer_v<TReturn> && std::is_pointer_v<TReturn>)
+			{
+				if (saveResult != *result)
+					*result = FromPseudoAddress<TReturn>(*reinterpret_cast<cell_t*>(result));
+			}
+
 			if (executeResult <= Pl_Continue)
 			{
 				if constexpr (!std::is_null_pointer_v<TReturn>)

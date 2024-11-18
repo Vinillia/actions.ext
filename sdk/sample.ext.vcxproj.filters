@@ -4,14 +4,8 @@
     <Filter Include="sourcemod">
       <UniqueIdentifier>{ed27aef6-1695-40bd-bb33-8f1c5e4681c9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="sourcemod\libudis">
-      <UniqueIdentifier>{1853f7b1-28e5-42e2-bae6-e51ba55f93f2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="sourcemod\CDetour">
       <UniqueIdentifier>{e88312d0-39f8-44ac-b5fa-42cc35bf0ad7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="sourcemod\asm">
-      <UniqueIdentifier>{971709e4-48a0-4a4c-8b49-8d07348b7403}</UniqueIdentifier>
     </Filter>
     <Filter Include="sdk">
       <UniqueIdentifier>{3798e461-bc9f-4c9f-aede-3d8228c9ecff}</UniqueIdentifier>
@@ -58,6 +52,12 @@
     <Filter Include="package\scripting\include">
       <UniqueIdentifier>{8b3e369b-4df5-42cb-a16f-96ad346d23a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sourcemod\safetyhook">
+      <UniqueIdentifier>{c8b2a459-f970-4076-a685-fea2d830677a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sourcemod\zydis">
+      <UniqueIdentifier>{23dcd93e-3f4c-49b8-a459-9b4833aae1cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\extension.cpp">
@@ -65,27 +65,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\smsdk_ext.cpp">
       <Filter>sourcemod</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\asm\asm.c">
-      <Filter>sourcemod\asm</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\decode.c">
-      <Filter>sourcemod\libudis</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\itab.c">
-      <Filter>sourcemod\libudis</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn.c">
-      <Filter>sourcemod\libudis</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-att.c">
-      <Filter>sourcemod\libudis</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-intel.c">
-      <Filter>sourcemod\libudis</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\udis86.c">
-      <Filter>sourcemod\libudis</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\CDetour\detours.cpp">
       <Filter>sourcemod\CDetour</Filter>
@@ -149,6 +128,33 @@
     </ClCompile>
     <ClCompile Include="..\source\sdk\l4d2\actions_tools_l4d2.cpp">
       <Filter>sdk\l4d2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\allocator.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\easy.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\inline_hook.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\mid_hook.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\os.linux.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\os.windows.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\utility.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\vmt_hook.cpp">
+      <Filter>sourcemod\safetyhook</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.c">
+      <Filter>sourcemod\zydis</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -277,6 +283,9 @@
     </ClInclude>
     <ClInclude Include="..\source\sdk\l4d2\actions_tools_l4d2.h">
       <Filter>sdk\l4d2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.h">
+      <Filter>sourcemod\zydis</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

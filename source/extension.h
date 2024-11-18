@@ -8,7 +8,7 @@
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License, version 3.0, as published by the
  * Free Software Foundation.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
@@ -36,6 +36,39 @@
 #include "smsdk_ext.h"
 #include "actionsdefs.h"
 
+static inline cell_t ToPseudoAddress(void* address)
+{
+#if defined(PLATFORM_64BITS)
+	return g_pSM->ToPseudoAddress(address);
+#else
+	return reinterpret_cast<cell_t>(address);
+#endif
+}
+
+static inline void* FromPseudoAddress(cell_t pseudoAddress)
+{
+#if defined(PLATFORM_64BITS)
+	return g_pSM->FromPseudoAddress(pseudoAddress);
+#else
+	return reinterpret_cast<void*>(pseudoAddress);
+#endif
+}
+
+template<typename TAddress>
+inline cell_t ToPseudoAddress(TAddress address)
+{
+#if defined(PLATFORM_64BITS)
+	static_assert(std::is_pointer_v<TAddress> && sizeof(TAddress) > 4, "Must be a pointer");
+#endif
+	return ToPseudoAddress(const_cast<void*>(reinterpret_cast<const void*>(address)));
+}
+
+template<typename TReturn>
+inline TReturn FromPseudoAddress(cell_t address)
+{
+	return reinterpret_cast<TReturn>(FromPseudoAddress(address));
+}
+
 class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor, public IClientListener, public IHandleTypeDispatch
 {
 public: // SDKExtension
@@ -43,12 +76,12 @@ public: // SDKExtension
 	virtual void SDK_OnUnload() override;
 	virtual void SDK_OnAllLoaded() override;
 	// virtual void SDK_OnPauseChange(bool paused) override;
-	virtual bool QueryRunning(char* error, size_t maxlen) override; 
+	virtual bool QueryRunning(char* error, size_t maxlen) override;
 	virtual void NotifyInterfaceDrop(SMInterface* pInterface) override;
 
 public: // SDKExtension MetaMod
 #if defined SMEXT_CONF_METAMOD
-	virtual bool SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bool late);
+	virtual bool SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bool late) override;
 	// virtual bool SDK_OnMetamodUnload(char* error, size_t maxlen) override;
 	// virtual bool SDK_OnMetamodPauseChange(bool paused, char* error, size_t maxlen) override;
 #endif

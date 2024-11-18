@@ -26,7 +26,7 @@ CON_COMMAND(ext_actions_dump, "Dump entities actions")
         int i = 0;
         for (auto action : actions)
         {
-            MsgSM("%i. %s %s %s ( 0x%X ) ", ++i, action->GetName(), action->m_isStarted ? "STARTED" : "NOT STARTED",
+            MsgSM("%i. %s %s %s ( 0x%llX ) ", ++i, action->GetName(), action->m_isStarted ? "STARTED" : "NOT STARTED",
                 action->IsSuspended() ? "SUSPENDED" : "",
                 action);
         }

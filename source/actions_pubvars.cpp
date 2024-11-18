@@ -90,7 +90,7 @@ void ActionPublicsManager::SyncListeners(SourcePawn::IPluginContext* pl)
 
 	while (!iter.empty())
 	{
-		SetPluginPubVar(pl, iter->key.data(), (void*)iter->value);
+		SetPluginPubVar(pl, iter->key.data(), static_cast<cell_t>(iter->value));
 		iter.next();
 	}
 }
@@ -103,12 +103,12 @@ void ActionPublicsManager::SyncEncoders(SourcePawn::IPluginContext* pl)
 	for (auto it = encoders->cbegin(); it != encoders->cend(); it++)
 	{
 		const ActionEncoder* encoder = *it;
-		SetPluginPubVar(pl, encoder->PublicName(), (void*)encoder);
+		SetPluginPubVar(pl, encoder->PublicName(), ToPseudoAddress(encoder));
 	}
 #endif // INCLUDE_ACTIONS_CONSTRUCTOR
 }
 
-bool ActionPublicsManager::SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, void* value)
+bool ActionPublicsManager::SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, cell_t value)
 {
 	uint32_t index;
 	int err = pl->GetRuntime()->FindPubvarByName(name, &index);
@@ -118,7 +118,7 @@ bool ActionPublicsManager::SetPluginPubVar(SourcePawn::IPluginContext* pl, const
 		pl->GetRuntime()->GetPubvarByIndex(index, &var);
 		if (var)
 		{
-			*var->offs = (cell_t)value;
+			*var->offs = value;
 		}
 
 		return true;

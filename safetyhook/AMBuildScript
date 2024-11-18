@@ -1,0 +1,25 @@
+class SafetyHook(object):
+  def __init__(self):
+    self.all_targets = []
+    self.libsafetyhook = {}
+  def configure(self):
+    target_archs = []
+    if builder.options.targets:
+      target_archs = builder.options.targets.split(',')
+    else:
+      target_archs = ['x86', 'x86_64']
+
+    for arch in target_archs:
+      try:
+        cxx = builder.DetectCxx(target_arch = arch)
+      except Exception as e:
+        if builder.options.targets:
+          raise
+        print('Skipping target {}: {}'.format(arch, e))
+        continue
+      self.all_targets.append(cxx)
+
+SH = SafetyHook()
+SH.configure()
+
+builder.Build('AMBuilder', {'SafetyHook': SH })

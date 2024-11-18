@@ -240,8 +240,8 @@ private:
 	SourceMod::PassInfo m_param[SP_MAX_EXEC_PARAMS];
 	const ActionEncoder* m_paramEncoder[SP_MAX_EXEC_PARAMS];
 
-	int		m_paramCount;
-	int		m_paramSize;
+	int8_t		m_paramCount;
+	int8_t		m_paramSize;
 };
 
 inline nb_action_ptr ActionConstructor::AllocateAction() const

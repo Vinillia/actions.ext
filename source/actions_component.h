@@ -35,7 +35,7 @@ public:
 
 inline void ActionBehavior::SetName(const char* name)
 {
-	m_name.sprintf("%s", name);
+	V_snprintf(m_name, sizeof(m_name), "%s", name);
 }
 
 inline const char* ActionBehavior::GetName() const

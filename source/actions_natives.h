@@ -48,9 +48,19 @@ static inline EventDesiredResult< CBaseEntity > TryToSustain(EventResultPriority
 	return EventDesiredResult< CBaseEntity >(SUSTAIN, NULL, priority, reason);
 }
 
+template<typename T>
+static T get_native_param(const cell_t* params, int8_t num)
+{
+#ifdef PLATFORM_64BITS
+	return FromPseudoAddress<T>(params[num]);
+#else
+	return (T)params[num];
+#endif // PLATFORM_64BITS
+}
+
 inline bool _action_changelistener(IPluginContext* ctx, const cell_t* params, bool remove)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 	HashValue hash = (HashValue)params[2];
 	IPluginFunction* fn = ctx->GetFunctionById((funcid_t)params[3]);
 	bool post = (bool)params[4];
@@ -82,7 +92,7 @@ cell_t NAT_actions_removelistener(IPluginContext* ctx, const cell_t* params)
 
 cell_t NAT_actions_GetName(IPluginContext* ctx, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -96,7 +106,7 @@ cell_t NAT_actions_GetName(IPluginContext* ctx, const cell_t* params)
 
 cell_t NAT_actions_GetParent(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -104,12 +114,12 @@ cell_t NAT_actions_GetParent(IPluginContext* pContext, const cell_t* params)
 		return 0;
 	}
 
-	return (cell_t)action->m_parent;
+	return ToPseudoAddress(action->m_parent);
 }
 
 cell_t NAT_actions_GetChild(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -117,12 +127,12 @@ cell_t NAT_actions_GetChild(IPluginContext* pContext, const cell_t* params)
 		return 0;
 	}
 
-	return (cell_t)action->GetActiveChildAction();
+	return ToPseudoAddress(action->GetActiveChildAction());
 }
 
 cell_t NAT_actions_GetUnder(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -130,12 +140,12 @@ cell_t NAT_actions_GetUnder(IPluginContext* pContext, const cell_t* params)
 		return 0;
 	}
 
-	return (cell_t)action->GetActionBuriedUnderMe();
+	return ToPseudoAddress(action->GetActionBuriedUnderMe());
 }
 
 cell_t NAT_actions_GetAbove(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -143,12 +153,12 @@ cell_t NAT_actions_GetAbove(IPluginContext* pContext, const cell_t* params)
 		return 0;
 	}
 
-	return (cell_t)action->GetActionCoveringMe();
+	return ToPseudoAddress(action->GetActionCoveringMe());
 }
 
 cell_t NAT_actions_GetActor(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -161,7 +171,7 @@ cell_t NAT_actions_GetActor(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_IsSuspended(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -181,7 +191,7 @@ cell_t NAT_actions_IsSuspended(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_IsStarted(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -199,9 +209,52 @@ cell_t NAT_actions_IsStarted(IPluginContext* pContext, const cell_t* params)
 	return started;
 }
 
+cell_t NAT_actions_SetHandleEntity(IPluginContext* pContext, const cell_t* params)
+{
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
+
+	if (!g_actionsManager.IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	uint32_t offset = params[2];
+
+	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[3]);
+	CBaseHandle& handle = *reinterpret_cast<CBaseHandle*>(reinterpret_cast<uintptr_t>(action) + offset);
+
+	if (entity)
+	{
+		handle = reinterpret_cast<IHandleEntity*>(entity)->GetRefEHandle();
+	}
+	else
+	{
+		handle = INVALID_EHANDLE_INDEX;
+	}
+
+	return 0;
+}
+
+cell_t NAT_actions_GetHandleEntity(IPluginContext* pContext, const cell_t* params)
+{
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
+
+	if (!g_actionsManager.IsValidAction(action))
+	{
+		pContext->ReportError("Invalid action passed %X", action);
+		return 0;
+	}
+
+	uint32_t offset = params[2];
+
+	const CBaseHandle& handle = *reinterpret_cast<CBaseHandle*>(reinterpret_cast<uintptr_t>(action) + offset);
+	return handle.GetEntryIndex();
+}
+
 cell_t NAT_actions_GetReason(IPluginContext* pContext, const cell_t* params)
 {
-	ActionResult<CBaseEntity>* actionResult = (ActionResult<CBaseEntity>*)params[1];
+	ActionResult<CBaseEntity>* actionResult = get_native_param<ActionResult<CBaseEntity>*>(params, 1);
 	ActionResult<CBaseEntity>* runtimeResult = g_actionsManager.GetActionRuntimeResult();
 
 	if (!runtimeResult)
@@ -224,7 +277,7 @@ cell_t NAT_actions_GetReason(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_SetReason(IPluginContext* pContext, const cell_t* params)
 {
-	ActionResult<CBaseEntity>* actionResult = (ActionResult<CBaseEntity>*)params[1];
+	ActionResult<CBaseEntity>* actionResult = get_native_param<ActionResult<CBaseEntity>*>(params, 1);
 	ActionResult<CBaseEntity>* runtimeResult = g_actionsManager.GetActionRuntimeResult();
 
 	if (!runtimeResult)
@@ -248,7 +301,7 @@ cell_t NAT_actions_SetReason(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_SetOrGetType(IPluginContext* pContext, const cell_t* params)
 {
-	ActionResult<CBaseEntity>* actionResult = (ActionResult<CBaseEntity>*)params[1];
+	ActionResult<CBaseEntity>* actionResult = get_native_param<ActionResult<CBaseEntity>*>(params, 1);
 	ActionResult<CBaseEntity>* runtimeResult = g_actionsManager.GetActionRuntimeResult();
 
 	if (!runtimeResult)
@@ -273,7 +326,7 @@ cell_t NAT_actions_SetOrGetType(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_SetOrGetAction(IPluginContext* pContext, const cell_t* params)
 {
-	ActionResult<CBaseEntity>* actionResult = (ActionResult<CBaseEntity>*)params[1];
+	ActionResult<CBaseEntity>* actionResult = get_native_param<ActionResult<CBaseEntity>*>(params, 1);
 	ActionResult<CBaseEntity>* runtimeResult = g_actionsManager.GetActionRuntimeResult();
 
 	if (!runtimeResult)
@@ -292,15 +345,15 @@ cell_t NAT_actions_SetOrGetAction(IPluginContext* pContext, const cell_t* params
 
 	if (params[0] > 1)
 	{
-		actionResult->m_action = (nb_action_ptr)params[2];
+		actionResult->m_action = get_native_param<nb_action_ptr>(params, 2);
 	}
 
-	return (cell_t)action;
+	return ToPseudoAddress(action);
 }
 
 cell_t NAT_actions_SetOrGetPriority(IPluginContext* pContext, const cell_t* params)
 {
-	EventDesiredResult<CBaseEntity>* actionResult = (EventDesiredResult<CBaseEntity>*)params[1];
+	EventDesiredResult<CBaseEntity>* actionResult = get_native_param<EventDesiredResult<CBaseEntity>*>(params, 1);
 	EventDesiredResult<CBaseEntity>* runtimeResult = g_actionsManager.GetActionRuntimeDesiredResult();
 
 	if (!runtimeResult)
@@ -327,7 +380,7 @@ cell_t NAT_actions_SetOrGetPriority(IPluginContext* pContext, const cell_t* para
 
 cell_t NAT_actions_Continue(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -349,7 +402,7 @@ cell_t NAT_actions_Continue(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_ChangeTo(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -368,13 +421,13 @@ cell_t NAT_actions_ChangeTo(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[3], &reason);
 
-	*runtimeResult = ChangeTo((nb_action_ptr)(params[2]), reason);
+	*runtimeResult = ChangeTo(get_native_param<nb_action_ptr>(params, 2), reason);
 	return Pl_Changed;
 }
 
 cell_t NAT_actions_SuspendFor(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -398,13 +451,13 @@ cell_t NAT_actions_SuspendFor(IPluginContext* pContext, const cell_t* params)
 	if (runtimeAction)
 		runtimeAction->m_eventResult = TryContinue(RESULT_NONE);
 
-	*runtimeResult = SuspendFor((nb_action_ptr)(params[2]), reason);
+	*runtimeResult = SuspendFor(get_native_param<nb_action_ptr>(params, 2), reason);
 	return Pl_Changed;
 }
 
 cell_t NAT_actions_Done(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -429,7 +482,7 @@ cell_t NAT_actions_Done(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_TryContinue(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -451,7 +504,7 @@ cell_t NAT_actions_TryContinue(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_TryChangeTo(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -470,13 +523,13 @@ cell_t NAT_actions_TryChangeTo(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[4], &reason);
 
-	*runtimeResult = TryChangeTo((nb_action_ptr)params[2], (EventResultPriorityType)params[3], reason);
+	*runtimeResult = TryChangeTo(get_native_param<nb_action_ptr>(params, 2), (EventResultPriorityType)params[3], reason);
 	return Pl_Changed;
 }
 
 cell_t NAT_actions_TrySuspendFor(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -495,13 +548,13 @@ cell_t NAT_actions_TrySuspendFor(IPluginContext* pContext, const cell_t* params)
 	char* reason;
 	pContext->LocalToStringNULL(params[4], &reason);
 
-	*runtimeResult = TrySuspendFor((nb_action_ptr)(params[2]), (EventResultPriorityType)params[3], reason);
+	*runtimeResult = TrySuspendFor(get_native_param<nb_action_ptr>(params, 2), (EventResultPriorityType)params[3], reason);
 	return Pl_Changed;
 }
 
 cell_t NAT_actions_TryDone(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -526,7 +579,7 @@ cell_t NAT_actions_TryDone(IPluginContext* pContext, const cell_t* params)
 
 cell_t NAT_actions_TryToSustain(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -556,7 +609,7 @@ cell_t NAT_actions_StorePendingEventResult(IPluginContext* pContext, const cell_
 
 cell_t NAT_actions_GetActionUserData(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -570,10 +623,10 @@ cell_t NAT_actions_GetActionUserData(IPluginContext* pContext, const cell_t* par
 	pContext->LocalToString(params[2], &str);
 	pContext->LocalToPhysAddr(params[3], &pData);
 
-	void* data;
+	cell_t data;
 	if (g_actionsManager.GetUserData(action, str, data))
 	{
-		*pData = (cell_t)data;
+		*pData = data;
 		return 1;
 	}
 
@@ -582,7 +635,7 @@ cell_t NAT_actions_GetActionUserData(IPluginContext* pContext, const cell_t* par
 
 cell_t NAT_actions_SetActionUserData(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -591,10 +644,10 @@ cell_t NAT_actions_SetActionUserData(IPluginContext* pContext, const cell_t* par
 	}
 
 	char* str;
-	void* data = nullptr;
+	cell_t data;
 
 	pContext->LocalToString(params[2], &str);
-	data = (void*)params[3];
+	data = params[3];
 
 	g_actionsManager.SetUserData(action, str, data);
 	return 0;
@@ -602,17 +655,17 @@ cell_t NAT_actions_SetActionUserData(IPluginContext* pContext, const cell_t* par
 
 cell_t NAT_actions_GetActionUserDataIdentity(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 	char* str;
 	cell_t* pData;
 
 	pContext->LocalToString(params[2], &str);
 	pContext->LocalToPhysAddr(params[3], &pData);
 
-	void* data;
+	cell_t data;
 	if (g_actionsManager.GetUserDataIdentity(action, { pContext->GetIdentity(), str }, data))
 	{
-		*pData = (cell_t)data;
+		*pData = data;
 		return 1;
 	}
 
@@ -621,7 +674,7 @@ cell_t NAT_actions_GetActionUserDataIdentity(IPluginContext* pContext, const cel
 
 cell_t NAT_actions_SetActionUserDataIdentity(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -630,10 +683,10 @@ cell_t NAT_actions_SetActionUserDataIdentity(IPluginContext* pContext, const cel
 	}
 
 	char* str;
-	void* data = nullptr;
+	cell_t data;
 
 	pContext->LocalToString(params[2], &str);
-	data = (void*)params[3];
+	data = params[3];
 
 	g_actionsManager.SetUserDataIdentity(action, { pContext->GetIdentity(), str }, data);
 	return 0;
@@ -641,7 +694,7 @@ cell_t NAT_actions_SetActionUserDataIdentity(IPluginContext* pContext, const cel
 
 cell_t NAT_actions_GetActionUserDataVector(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -669,7 +722,7 @@ cell_t NAT_actions_GetActionUserDataVector(IPluginContext* pContext, const cell_
 
 cell_t NAT_actions_SetActionUserDataVector(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -689,7 +742,7 @@ cell_t NAT_actions_SetActionUserDataVector(IPluginContext* pContext, const cell_
 
 cell_t NAT_actions_GetActionUserDataIdentityVector(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 	char* str;
 	cell_t* pVector;
 
@@ -710,7 +763,7 @@ cell_t NAT_actions_GetActionUserDataIdentityVector(IPluginContext* pContext, con
 
 cell_t NAT_actions_SetActionUserDataIdentityVector(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -730,7 +783,7 @@ cell_t NAT_actions_SetActionUserDataIdentityVector(IPluginContext* pContext, con
 
 cell_t NAT_actions_GetActionUserDataString(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -755,7 +808,7 @@ cell_t NAT_actions_GetActionUserDataString(IPluginContext* pContext, const cell_
 
 cell_t NAT_actions_SetActionUserDataString(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -774,7 +827,7 @@ cell_t NAT_actions_SetActionUserDataString(IPluginContext* pContext, const cell_
 
 cell_t NAT_actions_GetActionUserDataIdentityString(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 	char* str, *out;
 
 	pContext->LocalToString(params[2], &str);
@@ -792,7 +845,7 @@ cell_t NAT_actions_GetActionUserDataIdentityString(IPluginContext* pContext, con
 
 cell_t NAT_actions_SetActionUserDataIdentityString(IPluginContext* pContext, const cell_t* params)
 {
-	nb_action_ptr action = (nb_action_ptr)params[1];
+	nb_action_ptr action = get_native_param<nb_action_ptr>(params, 1);
 
 	if (!g_actionsManager.IsValidAction(action))
 	{
@@ -886,7 +939,7 @@ cell_t NAT_actions_ComponentAddress(IPluginContext* pContext, const cell_t* para
 		return pContext->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
 	}
 
-	return (cell_t)component;
+	return ToPseudoAddress(component);
 }
 
 cell_t NAT_actions_ComponentUpkeepCallback(IPluginContext* pContext, const cell_t* params)
@@ -1058,7 +1111,7 @@ cell_t NAT_actions_ComponentCurrentAction(IPluginContext* ctx, const cell_t* par
 		return ctx->ThrowNativeError("Invalid component handle %x (error %d)", hndl, err);
 	}
 
-	return (cell_t)component->CurrentAction();
+	return ToPseudoAddress(component->CurrentAction());
 }
 
 sp_nativeinfo_t g_actionsNatives[] =
@@ -1115,6 +1168,9 @@ sp_nativeinfo_t g_actionsNatives[] =
 
 	{ "BehaviorAction.IsStarted.get",				NAT_actions_IsStarted },
 	{ "BehaviorAction.IsStarted.set",				NAT_actions_IsStarted },
+	
+	{ "BehaviorAction.SetHandleEntity",				NAT_actions_SetHandleEntity },
+	{ "BehaviorAction.GetHandleEntity",				NAT_actions_GetHandleEntity },
 
 	{ "ActionResult.GetReason",						NAT_actions_GetReason },
 	{ "ActionResult.SetReason",						NAT_actions_SetReason },

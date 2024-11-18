@@ -48,7 +48,7 @@ struct ActionUserData
 	
 	// union
 	// {
-	void* data = nullptr;
+	cell_t data;
 	Vector vector;
 	std::string string;
 	// };
@@ -96,21 +96,21 @@ public:
 	inline void AddPending(nb_action_ptr const action);
 	inline void RemovePending(nb_action_ptr const action) noexcept;
 
-	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void* data);
+	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, cell_t data);
 	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, const Vector& vector);
 	inline void SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, std::string_view string);
 
-	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void*& data) const;
+	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, cell_t& data) const;
 	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, Vector& vector) const;
 	inline bool GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, std::string& string) const;
 
 	void ClearUserDataIdentity(IPluginContext* ctx);
 
-	inline void SetUserData(nb_action_ptr action, std::string_view str, void* data);
+	inline void SetUserData(nb_action_ptr action, std::string_view str, cell_t data);
 	inline void SetUserData(nb_action_ptr action, std::string_view str, const Vector& vector);
 	inline void SetUserData(nb_action_ptr action, std::string_view str, std::string_view string);
 	
-	inline bool GetUserData(nb_action_ptr action, std::string_view str, void*& data) const;
+	inline bool GetUserData(nb_action_ptr action, std::string_view str, cell_t& data) const;
 	inline bool GetUserData(nb_action_ptr action, std::string_view str, Vector& vector);
 	inline bool GetUserData(nb_action_ptr action, std::string_view str, std::string& string);
 
@@ -178,7 +178,7 @@ inline bool ActionsManager::IsValidAction(nb_action_ptr action)
 }
 
 
-inline void ActionsManager::SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void* data)
+inline void ActionsManager::SetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, cell_t data)
 {
 	m_actionsIndentityUserData[action][token].data = data;
 }
@@ -193,7 +193,7 @@ inline void ActionsManager::SetUserDataIdentity(nb_action_ptr action, const Acti
 	m_actionsIndentityUserData[action][token].string = string;
 }
 
-inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, void*& data) const
+inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const ActionUserDataIdentity& token, cell_t& data) const
 {
 	try
 	{
@@ -232,7 +232,7 @@ inline bool ActionsManager::GetUserDataIdentity(nb_action_ptr action, const Acti
 	}
 }
 
-inline void ActionsManager::SetUserData(nb_action_ptr action, std::string_view str, void* data)
+inline void ActionsManager::SetUserData(nb_action_ptr action, std::string_view str, cell_t data)
 {
 	m_actionsUserData[action][str].data = data;
 }
@@ -247,7 +247,7 @@ inline void ActionsManager::SetUserData(nb_action_ptr action, std::string_view s
 	m_actionsUserData[action][str].string = string;
 }
 
-inline bool ActionsManager::GetUserData(nb_action_ptr action, std::string_view str, void*& data) const
+inline bool ActionsManager::GetUserData(nb_action_ptr action, std::string_view str, cell_t& data) const
 {
 	try
 	{

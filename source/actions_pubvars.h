@@ -9,6 +9,8 @@
 #include <array>
 #include <string_view>
 
+#include <sp_vm_types.h>
+
 struct StringPolicy
 {
 	static inline uint32_t hash(const char* key)
@@ -106,7 +108,7 @@ public:
 	void SyncListeners(SourcePawn::IPluginContext* pl);
 	void SyncEncoders(SourcePawn::IPluginContext* pl);
 
-	bool SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, void* value);
+	bool SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, cell_t value);
 
 private:
 	bool IsUnique(HashValue value);
