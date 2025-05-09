@@ -6,11 +6,11 @@
 		{
 			"MyNextBotPointer"
 			{
-				"windows" "74"
-				"windows64" "74"
+				"windows" "75"
+				"windows64" "75"
 				
-				"linux" "75"
-				"linux64" "75"
+				"linux" "76"
+				"linux64" "76"
 			}
 			
 			"GetEntity"
