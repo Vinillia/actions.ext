@@ -18,6 +18,7 @@ namespace SourceMod
 }
 
 class IIntention;
+class INextBotComponent;
 class INextBot;
 class CBaseEntity;
 class INextBotEventResponder;
@@ -86,6 +87,9 @@ public:
 	virtual void GetIntentionActions(IIntention* intention, std::vector<nb_action_ptr>& vec);
 
 	nb_action_ptr ActionContainedResponder(IIntention* intention);
+	
+protected:
+	virtual IIntention* TryCastToIntentionComponent(INextBotComponent* component);
 
 public:
 	bool GetEntityActions(CBaseEntity* entity, std::vector<nb_action_ptr>& vec);

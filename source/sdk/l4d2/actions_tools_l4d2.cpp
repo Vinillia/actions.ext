@@ -5,7 +5,10 @@
 #include "NextBotIntentionInterface.h"
 #include "NextBotBehavior.h"
 
+// TO DO: use factory
+#if SOURCE_ENGINE != SE_LEFT4DEAD
 L4D2ActionsTools g_L4D2ActionTools;
+#endif
 
 L4D2ActionsTools::L4D2ActionsTools()
 {
@@ -14,7 +17,7 @@ L4D2ActionsTools::L4D2ActionsTools()
 
 bool L4D2ActionsTools::OnIntentionReset(INextBot* bot, IIntention* intention)
 {
-	if (g_L4D2ActionTools.MySurvivorBotPointer(bot))
+	if (MySurvivorBotPointer(bot))
 	{
 		nb_action_ptr action = ActionNextContainedResponder(intention);
 
@@ -29,7 +32,7 @@ bool L4D2ActionsTools::OnIntentionReset(INextBot* bot, IIntention* intention)
 
 void L4D2ActionsTools::GetIntentionActions(IIntention* intention, std::vector<nb_action_ptr>& vec)
 {
-	if (g_L4D2ActionTools.MySurvivorBotPointer(intention->GetBot()))
+	if (MySurvivorBotPointer(intention->GetBot()))
 	{
 		nb_action_ptr action = ActionNextContainedResponder(intention);
 

@@ -61,9 +61,9 @@ bool ActionsTools::GetEntityActions(CBaseEntity* entity, std::vector<nb_action_p
 	if (nextbot == nullptr)
 		return false;
 
-	for (INextBotComponent* i = nextbot->m_componentList; i != nullptr; i = i->m_nextComponent)
+	for (INextBotComponent* comp = nextbot->m_componentList; comp != nullptr; comp = comp->m_nextComponent)
 	{
-		IIntention* intention = dynamic_cast<IIntention*>(i);
+		IIntention* intention = TryCastToIntentionComponent(comp);
 
 		if (intention == nullptr)
 			continue;
@@ -72,6 +72,11 @@ bool ActionsTools::GetEntityActions(CBaseEntity* entity, std::vector<nb_action_p
 	}
 
 	return true;
+}
+
+IIntention* ActionsTools::TryCastToIntentionComponent(INextBotComponent* component)
+{
+	return dynamic_cast<IIntention*>(component);
 }
 
 bool ActionsTools::LoadGameConfigFile(IGameConfig* config, char* error, size_t maxlen)
