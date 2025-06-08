@@ -148,7 +148,7 @@ public:
 		}
 		else if constexpr (std::is_same_v<type, Vector>)
 		{
-			fn->PushArray((cell_t*)ToPseudoAddress(&arg), sizeof(Vector));
+			fn->PushArray(const_cast<cell_t*>(reinterpret_cast<const cell_t*>(&arg)), sizeof(Vector));
 		}
 		else if constexpr (std::is_same_v<type, const char*>)
 		{

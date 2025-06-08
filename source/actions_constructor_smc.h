@@ -1,9 +1,15 @@
 #ifndef _INCLUDE_ACTIONS_CONSTRUCTOR_SMC_H
 #define _INCLUDE_ACTIONS_CONSTRUCTOR_SMC_H
 
-#include <string>
-#include <sm_hashmap.h>
 #include "extension.h"
+
+#include <string>
+
+#if __has_include(<sm_stringhashmap.h>)
+#include <sm_stringhashmap.h>
+#else
+#include <sm_hashmap.h>
+#endif
 
 namespace SourceMod
 {

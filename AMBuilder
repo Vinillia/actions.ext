@@ -4,6 +4,21 @@ import os
 # Name of your extesion, this will also be it's file name.
 projectName = 'actions'
 
+gameFiles = {
+    'l4d': [
+        'source/sdk/l4d/actions_processor.cpp',
+        'source/sdk/l4d/actions_tools_l4d.cpp'
+    ],
+    'l4d2': [
+        'source/sdk/l4d2/actions_processor.cpp',
+        'source/sdk/l4d2/actions_tools_l4d2.cpp'
+    ],
+    'tf2': [
+        'source/sdk/tf2/actions_processor.cpp',
+        'source/sdk/tf2/actions_tools_tf2.cpp'
+    ]
+}
+
 # smsdk_ext.cpp will be automatically added later
 sourceFiles = [
     'source/sdk/shared/NextBotBehaviorShared.cpp',
@@ -18,8 +33,22 @@ sourceFiles = [
     'safetyhook/src/easy.cpp', 'safetyhook/src/inline_hook.cpp',
     'safetyhook/src/mid_hook.cpp', 'safetyhook/src/os.linux.cpp',
     'safetyhook/src/os.windows.cpp', 'safetyhook/src/utility.cpp',
-    'safetyhook/src/vmt_hook.cpp',
+    'safetyhook/src/vmt_hook.cpp'
+]
+
+asmSources = [os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c')]
+
+detourSources = [
     os.path.join(Extension.sm_root, 'public', 'CDetour', 'detours.cpp')
+]
+
+libUdisSources = [
+    os.path.join(Extension.sm_root, 'public', 'libudis86', 'decode.c'),
+    os.path.join(Extension.sm_root, 'public', 'libudis86', 'itab.c'),
+    os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn.c'),
+    os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-att.c'),
+    os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-intel.c'),
+    os.path.join(Extension.sm_root, 'public', 'libudis86', 'udis86.c')
 ]
 
 project = builder.LibraryProject(projectName)
@@ -35,6 +64,9 @@ else:
     ]
 
 project.sources += sourceFiles
+project.sources += detourSources
+project.sources += asmSources
+project.sources += libUdisSources
 
 for sdk_name in Extension.sdks:
     sdk = Extension.sdks[sdk_name]
@@ -49,12 +81,26 @@ for sdk_name in Extension.sdks:
             project, builder, cxx, projectName + '.ext.' + sdk['extension'],
             sdk)
 
+        binary.sources += gameFiles[sdk_name]
         binary.compiler.cxxincludes += [
             os.path.join(builder.sourcePath, 'safetyhook', 'include'),
             os.path.join(builder.sourcePath, 'safetyhook'),
             os.path.join(builder.sourcePath, 'source', 'sdk', 'shared'),
             os.path.join(builder.sourcePath, 'source'),
             os.path.join(builder.sourcePath, 'zydis')
+        ]
+        binary.compiler.includes += [
+            os.path.join(Extension.sm_root, 'public', 'safetyhook', 'include'),
+            os.path.join(Extension.sm_root, 'public', 'safetyhook', 'zydis'),
+            os.path.join(Extension.sm_root, 'public', 'CDetour'),
+            os.path.join(Extension.sm_root, 'public', 'asm'),
+            os.path.join(Extension.sm_root, 'public', 'libudis86'),
+            os.path.join(Extension.sm_root, 'public')
+            #os.path.join(sdk.path, 'game')
+        ]
+
+        binary.compiler.includes += [
+            os.path.join(Extension.sm_root, 'public', 'safetyhook', 'zydis'),
         ]
 
         binary.compiler.cxxincludes += [
@@ -72,7 +118,8 @@ for sdk_name in Extension.sdks:
                 '-Wno-reinterpret-base-class', '-Wno-infinite-recursion',
                 '-Wno-expansion-to-defined',
                 '-Wno-implicit-const-int-float-conversion', '-std=c++17',
-                '-Wno-register', '-Wno-varargs', '-fexceptions', '-Wno-delete-non-abstract-non-virtual-dtor'
+                '-Wno-register', '-Wno-varargs', '-fexceptions',
+                '-Wno-delete-non-abstract-non-virtual-dtor', '-frtti'
             ]
         binary.compiler.defines += [
             'HAVE_STRING_H', '_GLIBCXX_USE_CXX11_ABI=0'
