@@ -58,6 +58,12 @@
     <Filter Include="sourcemod\zydis">
       <UniqueIdentifier>{23dcd93e-3f4c-49b8-a459-9b4833aae1cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sourcemod\libudis">
+      <UniqueIdentifier>{312db82c-9ad9-4586-aef3-2a169369927a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sourcemod\asm">
+      <UniqueIdentifier>{4f415dc0-eb7d-4532-af96-6e9261cc469e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\source\extension.cpp">
@@ -155,6 +161,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.c">
       <Filter>sourcemod\zydis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\decode.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\itab.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-att.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-intel.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\udis86.c">
+      <Filter>sourcemod\libudis</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\asm\asm.c">
+      <Filter>sourcemod\asm</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

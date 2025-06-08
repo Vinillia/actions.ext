@@ -345,7 +345,14 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\asm\asm.c" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\CDetour\detours.cpp" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\decode.c" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\itab.c" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-att.c" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn-intel.c" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\syn.c" />
+    <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\libudis86\udis86.c" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\allocator.cpp" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\easy.cpp" />
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\src\inline_hook.cpp" />
