@@ -80,9 +80,20 @@ struct ActionUserDataIdentity
 
 class ActionsManager
 {
+private:
 	using ActionsContanier = ke::HashSet<nb_action_ptr, ke::PointerPolicy<nb_action>>;
 	using UserDataMap = std::unordered_map<std::string_view, ActionUserData, ActionUserData::Hash, ActionUserData::Equal>;
 	using UserDataIdentityMap = std::unordered_map<ActionUserDataIdentity, ActionUserData, ActionUserDataIdentity::Hash, ActionUserDataIdentity::Equal>;
+
+public:
+	using ActionId = int32_t;
+	static inline constexpr ActionId null_action_id = 0;
+
+private:
+	// there are extremly rare cases when the same multiple actions can be registered for the same entity besides user's intervention
+	using entity_action_map = std::unordered_multimap<ActionId, nb_action_ptr>;
+
+	static inline ActionId global_action_id = 1;
 
 public:
 	ActionsManager();
@@ -125,6 +136,12 @@ public:
 	inline void SetRuntimeAction(nb_action_ptr action);
 	inline nb_action_ptr GetRuntimeAction() const noexcept;
 
+	ActionId RegisterActionID(std::string_view name);
+	ActionId FindActionID(std::string_view name) const;
+
+	nb_action_ptr LookupEntityAction(CBaseEntity* entity, ActionId id) const;
+	nb_action_ptr LookupEntityAction(CBaseEntity* entity, const char* name) const;
+
 	/* 
 	* error: no member named 'value' in 'std::is_copy_constructible<std::reference_wrapper<std::any>>'
 	* clang or whatever thinks std::any is not copy-constructible
@@ -148,6 +165,9 @@ protected:
 	virtual void OnActionCreated(nb_action_ptr action);
 	virtual void OnActionDestroyed(nb_action_ptr action);
 
+	void StoreEntityAction(nb_action_ptr action, ActionId id);
+	void DeleteEntityAction(nb_action_ptr action, ActionId id);
+
 private:
 	ActionsContanier m_actions;
 	std::unordered_set<nb_action_ptr> m_actionsPending;
@@ -156,6 +176,10 @@ private:
 	std::unordered_map<nb_action_ptr, UserDataMap> m_actionsUserData;
 	std::unordered_map<nb_action_ptr, UserDataIdentityMap> m_actionsIndentityUserData;
 
+	std::unordered_map<std::string, ActionId> m_actionIDs;
+
+	std::vector<entity_action_map> m_entityActions;
+	
 	nb_action_ptr m_pRuntimeAction;
 	std::stack<std::any> m_runtimeResult;
 };

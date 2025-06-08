@@ -3,10 +3,12 @@
 #include "extension.h"
 
 extern ConVar ext_actions_debug;
+extern ConVar ext_actions_debug_cache;
 ActionsManager g_actionsManager;
 
 ActionsManager::ActionsManager()
 {
+	m_entityActions.resize(MAX_EDICTS);
 	m_actions.init();
 }
 
@@ -153,13 +155,112 @@ void ActionsManager::OnActionCreated(nb_action_ptr action)
 		RemovePending(action);
 
 	BeginActionProcessing(action);
-	g_sdkActions.OnActionCreated(action);
+	
+	ActionId id = RegisterActionID(action->GetName());
+
+	StoreEntityAction(action, id);
+	g_sdkActions.OnActionCreated(action, id);
 }
 
 void ActionsManager::OnActionDestroyed(nb_action_ptr action)
 {
-	g_sdkActions.OnActionDestroyed(action);
+	ActionId id = FindActionID(action->GetName());
+
+	g_sdkActions.OnActionDestroyed(action, id);
+	DeleteEntityAction(action, id);
 	StopActionProcessing(action);
 	RemovePending(action);
 	ClearUserData(action);
+}
+
+void ActionsManager::StoreEntityAction(nb_action_ptr action, ActionId id)
+{
+	cell_t index = GetActionActorEntIndex(action);
+
+	if (index >= static_cast<cell_t>(m_entityActions.size()))
+	{
+		m_entityActions.resize(index);
+	}
+
+	m_entityActions[index].emplace(id, action);
+	
+	if (ext_actions_debug_cache.GetBool())
+	{
+		MsgSM("%.3f:%i: Stored action %s ( %i, 0x%X )", gpGlobals->curtime, index, action->GetName(), id, action);
+	}
+}
+
+void ActionsManager::DeleteEntityAction(nb_action_ptr action, ActionId action_id)
+{
+	cell_t index = GetActionActorEntIndex(action);
+
+	if (index >= static_cast<cell_t>(m_entityActions.size()))
+		return;
+
+	auto& map = m_entityActions[index];
+	for (auto it = map.find(action_id); it != map.end() && it->first == action_id; ) 
+	{
+		if (it->second == action)
+		{
+			it = map.erase(it);
+			break;
+		}
+		else 
+		{
+			++it;
+		}
+	}
+}
+
+ActionsManager::ActionId ActionsManager::RegisterActionID(std::string_view name)
+{
+	auto it = m_actionIDs.find(name.data());
+	if (it != m_actionIDs.end())
+		return it->second;
+
+	ActionId& id = m_actionIDs[name.data()];
+	id = global_action_id++;
+
+	if (ext_actions_debug_cache.GetBool())
+	{
+		MsgSM("Registered ActionId %s ( %i )", name.data(), id);
+	}
+
+	return id;
+}
+
+ActionsManager::ActionId ActionsManager::FindActionID(std::string_view name) const
+{
+	auto it = m_actionIDs.find(name.data());
+	if (it != m_actionIDs.end())
+		return it->second;
+
+	return null_action_id;
+}
+
+nb_action_ptr ActionsManager::LookupEntityAction(CBaseEntity* entity, ActionId id) const
+{
+	if (id == null_action_id)
+		return nullptr;
+
+	cell_t index = gamehelpers->EntityToBCompatRef(entity);
+
+	if (index == -1)
+		return nullptr;
+
+	if (index >= static_cast<cell_t>(m_entityActions.size()))
+		return nullptr;
+
+	auto range = m_entityActions[index].equal_range(id);
+	for (auto it = range.first; it != range.second; ++it) 
+	{
+		return it->second;
+	}
+
+	return nullptr;
+}
+
+nb_action_ptr ActionsManager::LookupEntityAction(CBaseEntity* entity, const char* name) const
+{
+	return LookupEntityAction(entity, FindActionID(name));
 }

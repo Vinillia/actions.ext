@@ -24,6 +24,7 @@ SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
 
 ConVar ext_actions_debug("ext_actions_debug", "0", FCVAR_NONE, "1 - Enable debug, 0 - Disable debug");
+ConVar ext_actions_debug_cache("ext_actions_debug_cache", "0", FCVAR_NONE, "1 - Enable debug, 0 - Disable debug");
 ConVar ext_actions_debug_memory("ext_actions_debug_memory", "0", FCVAR_NONE, "Enable allocation logging");
 
 CGlobalVars* gpGlobals = nullptr; 
@@ -77,8 +78,8 @@ void SDKActions::SDK_OnAllLoaded()
 {
 	SM_GET_LATE_IFACE(BINTOOLS, bintools);
 
-	m_fwdOnActionCreated = forwards->CreateForward("OnActionCreated", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
-	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 3, NULL, Param_Cell, Param_Cell, Param_String);
+	m_fwdOnActionCreated = forwards->CreateForward("OnActionCreated", ET_Ignore, 4, NULL, Param_Cell, Param_Cell, Param_String, Param_Cell);
+	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 4, NULL, Param_Cell, Param_Cell, Param_String, Param_Cell);
 
 	CreateActionsHook();
 }
@@ -138,7 +139,7 @@ void SDKActions::OnPluginUnloaded(IPlugin* plugin)
 	g_actionsPropagationPost.RemoveListener(plugin->GetBaseContext());
 }
 
-void SDKActions::OnActionCreated(nb_action_ptr action)
+void SDKActions::OnActionCreated(nb_action_ptr action, ActionsManager::ActionId id)
 {
 	if (ext_actions_debug_memory.GetBool())
 		MsgSM("%.3f:%i: NEW ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
@@ -146,10 +147,11 @@ void SDKActions::OnActionCreated(nb_action_ptr action)
 	m_fwdOnActionCreated->PushCell(ToPseudoAddress(action));
 	m_fwdOnActionCreated->PushCell(g_actionsManager.GetActionActorEntIndex(action));
 	m_fwdOnActionCreated->PushString(action->GetName());
+	m_fwdOnActionCreated->PushCell(static_cast<cell_t>(id));
 	m_fwdOnActionCreated->Execute();
 }
 
-void SDKActions::OnActionDestroyed(nb_action_ptr action)
+void SDKActions::OnActionDestroyed(nb_action_ptr action, ActionsManager::ActionId id)
 {
 	if (ext_actions_debug_memory.GetBool())
 		MsgSM("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), action->GetName(), action);
@@ -160,6 +162,7 @@ void SDKActions::OnActionDestroyed(nb_action_ptr action)
 	m_fwdOnActionDestroyed->PushCell(ToPseudoAddress(action));
 	m_fwdOnActionDestroyed->PushCell(g_actionsManager.GetActionActorEntIndex(action));
 	m_fwdOnActionDestroyed->PushString(action->GetName());
+	m_fwdOnActionDestroyed->PushCell(static_cast<cell_t>(id));
 	m_fwdOnActionDestroyed->Execute();
 }
 

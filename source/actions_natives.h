@@ -1114,10 +1114,75 @@ cell_t NAT_actions_ComponentCurrentAction(IPluginContext* ctx, const cell_t* par
 	return ToPseudoAddress(component->CurrentAction());
 }
 
+cell_t NAT_actions_LookupEntityActionById(IPluginContext* pContext, const cell_t* params)
+{
+	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[1]);
+
+	if (!entity)
+	{
+		pContext->ReportError("Invalid entity index %i", params[1]);
+		return 0;
+	}
+
+	if (!g_pActionsTools->MyNextBotPointer(entity))
+	{
+		pContext->ReportError("Invalid nextbot entity %i", params[1]);
+		return 0;
+	}
+
+	nb_action_ptr action = g_actionsManager.LookupEntityAction(entity, params[2]);
+	return ToPseudoAddress(action);
+}
+
+cell_t NAT_actions_LookupEntityActionByName(IPluginContext* pContext, const cell_t* params)
+{
+	CBaseEntity* entity = gamehelpers->ReferenceToEntity(params[1]);
+
+	if (!entity)
+	{
+		pContext->ReportError("Invalid entity index %i", params[1]);
+		return 0;
+	}
+	
+	if (!g_pActionsTools->MyNextBotPointer(entity))
+	{
+		pContext->ReportError("Invalid nextbot entity %i", params[1]);
+		return 0;
+	}
+
+	char* name;
+	pContext->LocalToString(params[2], &name);
+
+	nb_action_ptr action = g_actionsManager.LookupEntityAction(entity, name);
+	return ToPseudoAddress(action);
+}
+
+cell_t NAT_actions_RegisterActionId(IPluginContext* pContext, const cell_t* params)
+{
+	char* name;
+	pContext->LocalToString(params[1], &name);
+
+	return static_cast<cell_t>(g_actionsManager.RegisterActionID(name));
+}
+
+cell_t NAT_actions_FindActionId(IPluginContext* pContext, const cell_t* params)
+{
+	char* name;
+	pContext->LocalToString(params[1], &name);
+
+	return static_cast<cell_t>(g_actionsManager.FindActionID(name));
+}
+
 sp_nativeinfo_t g_actionsNatives[] =
 {
 	{ "__action_setlistener",						NAT_actions_setlistener },
 	{ "__action_removelistener",					NAT_actions_removelistener },
+
+	{ "ActionsManager.RegisterActionId",			NAT_actions_RegisterActionId },
+	{ "ActionsManager.FindActionId",				NAT_actions_FindActionId },
+
+	{ "ActionsManager.LookupEntityActionById",		NAT_actions_LookupEntityActionById },
+	{ "ActionsManager.LookupEntityActionByName",	NAT_actions_LookupEntityActionByName },
 
 	{ "ActionsManager.SetActionUserDataIdentity",	NAT_actions_SetActionUserDataIdentity },
 	{ "ActionsManager.GetActionUserDataIdentity",	NAT_actions_GetActionUserDataIdentity },

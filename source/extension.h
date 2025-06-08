@@ -36,6 +36,8 @@
 #include "smsdk_ext.h"
 #include "actionsdefs.h"
 
+#include "actions_manager.h"
+
 static inline cell_t ToPseudoAddress(void* address)
 {
 #if defined(PLATFORM_64BITS)
@@ -98,8 +100,8 @@ public: // IPluginsListener
 	virtual void OnPluginUnloaded(IPlugin* plugin) override;
 
 public: // ActionsManager
-	virtual void OnActionCreated(nb_action_ptr action);
-	virtual void OnActionDestroyed(nb_action_ptr action);
+	virtual void OnActionCreated(nb_action_ptr action, ActionsManager::ActionId id);
+	virtual void OnActionDestroyed(nb_action_ptr action, ActionsManager::ActionId id);
 
 public: // IClientListener
 	virtual void OnClientDisconnecting(int client) override;
