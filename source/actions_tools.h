@@ -83,13 +83,13 @@ public:
 
 public:
 	virtual bool OnIntentionReset(INextBot* bot, IIntention* intention);
+	virtual bool OnNextBotReset(INextBot* bot);
 	virtual bool LoadGameConfigFile(SourceMod::IGameConfig* config, char* error, size_t maxlen);
 	virtual void GetIntentionActions(IIntention* intention, std::vector<nb_action_ptr>& vec);
-
-	nb_action_ptr ActionContainedResponder(IIntention* intention);
-	
-protected:
 	virtual IIntention* TryCastToIntentionComponent(INextBotComponent* component);
+
+protected:
+	nb_action_ptr ActionContainedResponder(IIntention* intention);
 
 public:
 	bool GetEntityActions(CBaseEntity* entity, std::vector<nb_action_ptr>& vec);

@@ -12,7 +12,8 @@
 #include <NextBotIntentionInterface.h>
 
 CDetour* g_pNextBotResetDetour = nullptr;
-int g_iHookID = -1;
+
+std::unordered_map<void*, int> g_vtable_hookids;
 
 SH_DECL_HOOK0_void(IIntention, Reset, SH_NOATTRIB, 0);
 void IIntention_ResetPost()
@@ -30,23 +31,31 @@ DETOUR_DECL_MEMBER0(INextBot__Reset, void)
 
 	DETOUR_MEMBER_CALL(INextBot__Reset)();
 
+	//g_pActionsTools->OnNextBotReset(bot);
+
 	for (INextBotComponent* component = bot->m_componentList; component != nullptr; component = component->m_nextComponent)
 	{
-		IIntention* intention = dynamic_cast<IIntention*>(component);
+		IIntention* intention = g_pActionsTools->TryCastToIntentionComponent(component);
 
-		if (intention == nullptr)
+		if (!intention)
 			continue;
 
 		g_pActionsTools->OnIntentionReset(bot, intention);
 
-		if (g_iHookID == -1)
-		{
-			g_iHookID = SH_ADD_VPHOOK(IIntention, Reset, intention, IIntention_ResetPost, true);
+		void* vtable = *reinterpret_cast<void**>(intention);
 
-			if (g_iHookID == -1)
-			{
-				MsgSM("Failed to setup hook IIntention::Reset hook");
-			}
+		if (g_vtable_hookids.find(vtable) != g_vtable_hookids.end())
+			continue;
+
+		int hookid = SH_ADD_VPHOOK(IIntention, Reset, intention, IIntention_ResetPost, true);
+
+		if (hookid == -1)
+		{
+			MsgSM("Failed to setup hook IIntention::Reset hook");
+		}
+		else
+		{
+			g_vtable_hookids[vtable] = hookid;
 		}
 	}
 }
@@ -72,9 +81,10 @@ void DestroyActionsHook()
 		g_pNextBotResetDetour = nullptr;
 	}
 
-	if (g_iHookID != -1)
+	for (auto [key, value] : g_vtable_hookids)
 	{
-		SH_REMOVE_HOOK_ID(g_iHookID);
-		g_iHookID = -1;
+		SH_REMOVE_HOOK_ID(value);
 	}
+
+	g_vtable_hookids.clear();
 }

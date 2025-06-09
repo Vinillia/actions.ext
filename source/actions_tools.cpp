@@ -44,6 +44,21 @@ bool ActionsTools::OnIntentionReset(INextBot* bot, IIntention* intention)
 	return true;
 }
 
+bool ActionsTools::OnNextBotReset(INextBot* bot)
+{
+	for (INextBotComponent* component = bot->m_componentList; component != nullptr; component = component->m_nextComponent)
+	{
+		IIntention* intention = TryCastToIntentionComponent(component);
+
+		if (intention == nullptr)
+			continue;
+
+		OnIntentionReset(bot, intention);
+	}
+
+	return true;
+}
+
 void ActionsTools::GetIntentionActions(IIntention* intention, std::vector<nb_action_ptr>& vec)
 {
 	nb_action_ptr head = ActionContainedResponder(intention);
