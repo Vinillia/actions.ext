@@ -1,7 +1,7 @@
 #pragma once
 
 #ifndef _INCLUDE_ACTIONS_TOOLS_L4D_H
-#define _INCLUDE_ACTIONS_TOOLS_L4D_Hs
+#define _INCLUDE_ACTIONS_TOOLS_L4D_H
 
 #include "../l4d2/actions_tools_l4d2.h"
 
