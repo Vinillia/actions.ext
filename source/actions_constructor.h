@@ -225,7 +225,7 @@ public:
 	bool AddParameter(SourceMod::PassType type, int flags = 0, const ActionEncoder* encoder = nullptr);
 	bool Finish();
 
-	bool ConstructParamsBuffer(SourcePawn::IPluginContext* ctx, const cell_t* params, cell_t* buffer, cell_t numParams);
+	bool ConstructParamsBuffer(SourcePawn::IPluginContext* ctx, const cell_t* params, void** buffer, cell_t numParams);
 	nb_action_ptr Execute(SourcePawn::IPluginContext* ctx, const cell_t* params, cell_t numParams);
 
 private:

@@ -47,7 +47,7 @@ ActionConstructor::~ActionConstructor()
 		m_call->Destroy();
 }
 
-bool ActionConstructor::ConstructParamsBuffer(IPluginContext* ctx, const cell_t* params, cell_t* buffer, cell_t numParams)
+bool ActionConstructor::ConstructParamsBuffer(IPluginContext* ctx, const cell_t* params, void** buffer, cell_t numParams)
 {
 	if (numParams - 1 > SP_MAX_EXEC_PARAMS)
 	{
@@ -59,7 +59,7 @@ bool ActionConstructor::ConstructParamsBuffer(IPluginContext* ctx, const cell_t*
 	for (int i = 0; i < numParams; i++)
 	{
 		ctx->LocalToPhysAddr(params[i + 2], &addr);
-		buffer[i] = (cell_t)addr;
+		buffer[i] = reinterpret_cast<void*>(addr);
 	}
 
 	return true;
@@ -79,7 +79,7 @@ nb_action_ptr ActionConstructor::Execute(IPluginContext* ctx, const cell_t* para
 	if (m_actionSize <= sizeof(nb_action))
 		throw std::runtime_error("Bad action size");
 
-	cell_t paramsBuffer[SP_MAX_EXEC_PARAMS] = {};
+	void* paramsBuffer[SP_MAX_EXEC_PARAMS] = {};
 	if (!ConstructParamsBuffer(ctx, params, paramsBuffer, numParams))
 		throw std::runtime_error("Failed to construct params buffer");
 
