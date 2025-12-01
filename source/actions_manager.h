@@ -95,6 +95,37 @@ private:
 
 	static inline ActionId global_action_id = 1;
 
+	enum class RuntimeResultKind : uint8_t
+	{
+		Unknown = 0,
+		ActionResult,
+		EventDesiredResult,
+	};
+
+	struct RuntimeResultEntry
+	{
+		void* ptr = nullptr;
+		RuntimeResultKind kind = RuntimeResultKind::Unknown;
+
+		static RuntimeResultEntry FromRaw(void* p, RuntimeResultKind k = RuntimeResultKind::Unknown) noexcept
+		{
+			RuntimeResultEntry e;
+			e.ptr = p;
+			e.kind = k;
+			return e;
+		}
+
+		static RuntimeResultEntry FromAction(ActionResult<CBaseEntity>* p) noexcept
+		{
+			return FromRaw(p, RuntimeResultKind::ActionResult);
+		}
+
+		static RuntimeResultEntry FromDesired(EventDesiredResult<CBaseEntity>* p) noexcept
+		{
+			return FromRaw(p, RuntimeResultKind::EventDesiredResult);
+		}
+	};
+
 public:
 	ActionsManager();
 	~ActionsManager();
@@ -130,8 +161,13 @@ public:
 	void ProcessResult(nb_action_ptr action, const ActionResult<CBaseEntity>& result);
 	void ProcessInitialContainedAction(const ResultType& pl, nb_action_ptr parent, nb_action_ptr oldaction, nb_action_ptr newaction);
 
-	inline void PushRuntimeResult(std::any result);
+	inline void PushRuntimeResult(ActionResult<CBaseEntity>* result) noexcept;
+	inline void PushRuntimeResult(EventDesiredResult<CBaseEntity>* result) noexcept;
+	inline void PushRuntimeResult(void* ptr) noexcept;
+
 	inline void PopRuntimeResult() noexcept;
+
+	inline RuntimeResultEntry* TopRuntimeResult();
 
 	inline void SetRuntimeAction(nb_action_ptr action);
 	inline nb_action_ptr GetRuntimeAction() const noexcept;
@@ -142,13 +178,6 @@ public:
 	nb_action_ptr LookupEntityAction(CBaseEntity* entity, ActionId id) const;
 	nb_action_ptr LookupEntityAction(CBaseEntity* entity, const char* name) const;
 
-	/* 
-	* error: no member named 'value' in 'std::is_copy_constructible<std::reference_wrapper<std::any>>'
-	* clang or whatever thinks std::any is not copy-constructible
-	*/
-	// inline std::optional<std::reference_wrapper<std::any>> TopRuntimeResult() noexcept;
-
-	inline std::any& TopRuntimeResult();
 
 	inline ActionResult<CBaseEntity>* GetActionRuntimeResult();
 	inline EventDesiredResult<CBaseEntity>* GetActionRuntimeDesiredResult();
@@ -181,7 +210,8 @@ private:
 	std::vector<entity_action_map> m_entityActions;
 	
 	nb_action_ptr m_pRuntimeAction;
-	std::stack<std::any> m_runtimeResult;
+
+	std::stack<RuntimeResultEntry> m_runtimeResult;
 };
 
 inline void ActionsManager::Add(nb_action_ptr const action, CBaseEntity* const entity)
@@ -325,14 +355,25 @@ inline void ActionsManager::RemovePending(nb_action_ptr const action) noexcept
 	m_actionsPending.erase(action);
 }
 
-inline void ActionsManager::PushRuntimeResult(std::any result)
+inline void ActionsManager::PushRuntimeResult(ActionResult<CBaseEntity>* result) noexcept
 {
-	m_runtimeResult.push(result);
+	m_runtimeResult.push(RuntimeResultEntry::FromAction(result));
+}
+
+inline void ActionsManager::PushRuntimeResult(EventDesiredResult<CBaseEntity>* result) noexcept
+{
+	m_runtimeResult.push(RuntimeResultEntry::FromDesired(result));
+}
+
+inline void ActionsManager::PushRuntimeResult(void* ptr) noexcept
+{
+	m_runtimeResult.push(RuntimeResultEntry::FromRaw(ptr, RuntimeResultKind::Unknown));
 }
 
 inline void ActionsManager::PopRuntimeResult() noexcept
 {
-	m_runtimeResult.pop();
+	if (!m_runtimeResult.empty())
+		m_runtimeResult.pop();
 }
 
 inline void ActionsManager::SetRuntimeAction(nb_action_ptr action)
@@ -345,42 +386,36 @@ inline nb_action_ptr ActionsManager::GetRuntimeAction() const noexcept
 	return m_pRuntimeAction;
 }
 
-inline std::any& ActionsManager::TopRuntimeResult()
+inline ActionsManager::RuntimeResultEntry* ActionsManager::TopRuntimeResult()
 {
 	if (m_runtimeResult.empty())
-		throw std::runtime_error("Invalid runtime result access");
+		return nullptr;
 
-	return m_runtimeResult.top();
+	return &m_runtimeResult.top();
 }
 
 inline ActionResult<CBaseEntity>* ActionsManager::GetActionRuntimeResult()
 {
-	try
-	{
- 		std::any& result = TopRuntimeResult();
-		return std::any_cast<ActionResult<CBaseEntity>*>(result);
-	}
-	catch (const std::runtime_error&)
-	{
+	RuntimeResultEntry* entry = TopRuntimeResult();
+	if (!entry)
 		return nullptr;
-	}
-	catch (...)
-	{
-		return (ActionResult<CBaseEntity>*)GetActionRuntimeDesiredResult();
-	}
+
+	if (entry->kind == RuntimeResultKind::ActionResult || entry->kind == RuntimeResultKind::EventDesiredResult)
+		return static_cast<ActionResult<CBaseEntity>*>(entry->ptr);
+
+	return nullptr;
 }
 
 inline EventDesiredResult<CBaseEntity>* ActionsManager::GetActionRuntimeDesiredResult()
 {
-	try
-	{
-		std::any& result = TopRuntimeResult();
-		return std::any_cast<EventDesiredResult<CBaseEntity>*>(result);
-	}
-	catch (...)
-	{
+	RuntimeResultEntry* entry = TopRuntimeResult();
+	if (!entry)
 		return nullptr;
-	}
+
+	if (entry->kind == RuntimeResultKind::EventDesiredResult)
+		return static_cast<EventDesiredResult<CBaseEntity>*>(entry->ptr);
+
+	return nullptr;
 }
 
 inline void ActionsManager::SetActionActor(nb_action_ptr action, CBaseEntity* actor) noexcept
