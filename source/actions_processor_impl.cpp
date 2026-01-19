@@ -117,14 +117,34 @@ void StopActionProcessing()
 	}
 }
 
+SwapList autoSwapList;
+
 Autoswap::Autoswap(const void* action)
 {
 	m_action = const_cast<void*>(action);
+	m_node.swap = this;
+
+	// If there's an existing swap, unswap it first
+	if (!autoSwapList.empty())
+	{
+		Autoswap* parent = autoSwapList.front()->swap;
+		__action_unswap_vtable(parent->m_action);
+	}
+
+	autoSwapList.push_front(&m_node);
 	__action_swap_vtable(m_action);
 }
 
 Autoswap::~Autoswap()
 {
-	__action_unswap_vtable(m_action);
+	// Restore parent
+	if (!autoSwapList.empty())
+	{
+		Autoswap* parent = autoSwapList.front()->swap;
+		__action_swap_vtable(m_action);
+	}
+
+	__action_unswap_vtable(const_cast<void*>(m_action));
+	SwapList::erase(&m_node);
 }
 
