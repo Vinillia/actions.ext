@@ -174,9 +174,9 @@ ResultType ProcessHandlerImplVoid(M&& method, nb_action_ptr action, HashValue ha
 }
 
 template<typename M, typename A, typename ...Args>
-inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Args&& ...args)
+inline decltype(auto) ProcessHandlerEx(const HashFunction& hf, A action, M&& handler, Args&& ...args)
 {
-	Autoswap guard(action);
+	Autoswap guard(action, &hf);
 	using TReturn = decltype(((action)->*handler)(args...));
 
 	// Error C2131 expression did not evaluate to a constant
@@ -226,19 +226,19 @@ inline decltype(auto) ProcessHandlerEx(HashValue hash, A action, M&& handler, Ar
 	if constexpr (!std::is_void_v<TReturn>)
 	{
 		Execution<TReturn> execution = {};
-		execution.handler = ProcessHandlerImpl(ul, reinterpret_cast<nb_action_ptr>(action), hash, execution.result, std::forward<Args>(args)...);
+		execution.handler = ProcessHandlerImpl(ul, reinterpret_cast<nb_action_ptr>(action), hf.hash, execution.result, std::forward<Args>(args)...);
 		return execution;
 	}
 	else
 	{
-		return ProcessHandlerImplVoid(ul, reinterpret_cast<nb_action_ptr>(action), hash, std::forward<Args>(args)...);
+		return ProcessHandlerImplVoid(ul, reinterpret_cast<nb_action_ptr>(action), hf.hash, std::forward<Args>(args)...);
 	}
 }
 
 template<typename M, typename A, typename ...Args>
-inline decltype(auto) ProcessHandler(HashValue hash, A action, M&& handler, Args&& ...args)
+inline decltype(auto) ProcessHandler(const HashFunction& hf, A action, M&& handler, Args&& ...args)
 {
-	return ProcessHandlerEx(hash, action, std::forward<M>(handler), std::forward<Args>(args)...).result;
+	return ProcessHandlerEx(hf, action, std::forward<M>(handler), std::forward<Args>(args)...).result;
 }
 
 #endif // !_INCLUDE_ACTIONS_PROCESSOR_SHARED_H

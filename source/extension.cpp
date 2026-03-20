@@ -36,8 +36,6 @@ ActionConstructor_SMC g_actionsConstructorSMC;
 ActionConstructor_SMC* g_pActionConstructorSMC = &g_actionsConstructorSMC;
 #endif
 
-extern void InitVirtualMap();
-
 bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 {
 	m_htActionComponent = 0;
@@ -55,8 +53,26 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 		return false;
 	}
 
-	InitVirtualMap();
-	g_publicsManager.InitializePublicVariables();
+	try
+	{
+		g_publicsManager.InitializePublicVariables();
+	}
+	catch (const std::exception& ex)
+	{
+		V_snprintf(error, static_cast<int>(maxlen), "Failed to initialize public variables: %s", ex.what());
+		return false;
+	}
+
+	try
+	{
+		gProcessorFunctions = std::make_unique<ProcessorFunctions>();
+	}
+	catch (const std::exception& ex)
+	{
+		V_snprintf(error, static_cast<int>(maxlen), "Failed to initialize processor functions: %s", ex.what());
+		return false;
+	}
+
 	CDetourManager::Init(g_pSM->GetScriptingEngine(), m_pConfig);
 
 	sharesys->AddNatives(myself, g_actionsNatives);
@@ -110,7 +126,10 @@ bool SDKActions::SDK_OnMetamodLoad(ISmmAPI* ismm, char* error, size_t maxlen, bo
 void SDKActions::SDK_OnUnload()
 {
 	if (m_pConfig)
+	{
 		gameconfs->CloseGameConfigFile(m_pConfig);
+		m_pConfig = nullptr;
+	}
 
 	if (m_htActionComponent)
 		g_pHandleSys->RemoveType(m_htActionComponent, myself->GetIdentity());

@@ -25,6 +25,12 @@ bool ActionPropagation::AddListener(nb_action_ptr action, HashValue hash, IPlugi
 		return false;
 	}
 
+	if (!hash)
+	{
+		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Invalid hash value");
+		return false;
+	}
+
 	auto& v = m_actionsListeners[action][hash];
 	auto listener = std::find_if(v.cbegin(), v.cend(), [fn](const ActionListener& listener) { return listener.fn == fn; });
 
@@ -40,6 +46,12 @@ bool ActionPropagation::RemoveListener(nb_action_ptr action, HashValue hash, IPl
 	if (!g_actionsManager.IsValidAction(action))
 	{
 		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Attempt to hook invalid action");
+		return false;
+	}
+
+	if (!hash)
+	{
+		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Invalid hash value");
 		return false;
 	}
 

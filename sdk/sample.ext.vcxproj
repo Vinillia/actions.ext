@@ -414,6 +414,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="actions_vtableswap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.h" />

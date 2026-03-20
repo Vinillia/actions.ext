@@ -112,6 +112,8 @@ public:
 	inline HandleType_t GetComponentHT() const noexcept { return m_htActionComponent; };
 	inline HandleType_t GetConstructorHT() const noexcept { return m_htActionConstructor; };
 
+	IGameConfig* GetGameConfig() const { return m_pConfig; };
+
 private:
 	IGameConfig* m_pConfig;
 

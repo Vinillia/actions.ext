@@ -10,6 +10,7 @@
 #include <string_view>
 
 #include <sp_vm_types.h>
+#include <unordered_map>
 
 struct StringPolicy
 {
@@ -17,14 +18,14 @@ struct StringPolicy
 	{
 		return ke::FastHashCharSequence(key, strlen(key));
 	}
-	static inline bool matches(const char* find, const std::string_view& key)
+	static inline bool matches(const char* find, const std::string& key)
 	{
 		return key.compare(find) == 0;
 	}
 };
 
 using HashValue = unsigned int;
-using PublicVars = ke::HashMap<std::string_view, HashValue, StringPolicy>;
+using PublicVars = ke::HashMap<std::string, HashValue, StringPolicy>;
 
 namespace compile
 {
@@ -100,6 +101,7 @@ public:
 	~ActionPublicsManager();
 
 	bool AddHash(const char* pubvar, HashValue hash, bool force = false);
+
 	HashValue GetHash(const char* name);
 	const char* GetName(HashValue hash);
 
@@ -110,11 +112,32 @@ public:
 
 	bool SetPluginPubVar(SourcePawn::IPluginContext* pl, const char* name, cell_t value);
 
+	enum class InsertMethodHashMode
+	{
+		Normal,
+		Overload,
+		Alias
+	};
+
+
 private:
 	bool IsUnique(HashValue value);
 	void InitializePublicVariables();
 
-public:
+	void InsertMethodHash(
+		const char* method,
+		const char* value = nullptr,
+		InsertMethodHashMode mode = InsertMethodHashMode::Normal);
+
+
+	static std::string ActionPublicsManager::BuildHashString(
+		std::string_view prefix,
+		const char* method,
+		const char* value,
+		InsertMethodHashMode mode,
+		const char* aliasPart);
+
+private:
 	PublicVars m_varMap;
 };
 

@@ -17,7 +17,6 @@ do \
 	g_publicsManager.AddHash(hash.data(), compile::hash(fn)); \
 } while(0)
 
-
 #define INSERT_METHOD_HASH_OVERLOAD(method, overload, type) \
 do \
 {	\
@@ -159,74 +158,118 @@ bool ActionPublicsManager::AddHash(const char* pubvar, HashValue hash, bool forc
 	return true;
 }
 
+void ActionPublicsManager::InsertMethodHash(
+	const char* method,
+	const char* value,
+	InsertMethodHashMode mode)
+{
+	std::string pubvar = BuildHashString(pubvar_prefix, method, value, mode, value);
+	std::string fn = BuildHashString(method_prefix, method, value, mode, method);
+
+	HashValue hash = compile::hash(fn.c_str());
+
+	g_publicsManager.AddHash(pubvar.c_str(), hash, mode == InsertMethodHashMode::Alias);
+}
+
 void ActionPublicsManager::InitializePublicVariables()
 {
-	INSERT_METHOD_HASH(OnStart);
-	INSERT_METHOD_HASH(Update);
-	INSERT_METHOD_HASH(OnEnd);
-	INSERT_METHOD_HASH(OnSuspend);
-	INSERT_METHOD_HASH(OnResume);
-	
-	INSERT_METHOD_HASH(InitialContainedAction);
-	
-	INSERT_METHOD_HASH(OnLeaveGround);
-	INSERT_METHOD_HASH(OnLandOnGround);
-	INSERT_METHOD_HASH(OnContact);
-	INSERT_METHOD_HASH(OnMoveToSuccess);
-	INSERT_METHOD_HASH(OnMoveToFailure);
-	INSERT_METHOD_HASH(OnStuck);
-	INSERT_METHOD_HASH(OnUnStuck);
-	INSERT_METHOD_HASH(OnPostureChanged);
-	INSERT_METHOD_HASH(OnAnimationActivityComplete);
-	INSERT_METHOD_HASH(OnAnimationActivityInterrupted);
-	INSERT_METHOD_HASH(OnAnimationEvent);
-	INSERT_METHOD_HASH(OnIgnite);
-	INSERT_METHOD_HASH(OnInjured);
-	INSERT_METHOD_HASH(OnKilled);
-	INSERT_METHOD_HASH(OnOtherKilled);
-	INSERT_METHOD_HASH(OnSight);
-	INSERT_METHOD_HASH(OnLostSight);
-	INSERT_METHOD_HASH(OnThreatChanged);
-	INSERT_METHOD_HASH(OnSound);
-	INSERT_METHOD_HASH(OnSpokeConcept);
-	INSERT_METHOD_HASH(OnNavAreaChanged);
-	INSERT_METHOD_HASH(OnModelChanged);
-	INSERT_METHOD_HASH(OnPickUp);
-	INSERT_METHOD_HASH(OnDrop);
-	INSERT_METHOD_HASH(OnShoved);
-	INSERT_METHOD_HASH(OnBlinded);
-	INSERT_METHOD_HASH(OnEnteredSpit);
-	INSERT_METHOD_HASH(OnHitByVomitJar);
-	INSERT_METHOD_HASH(OnCommandAttack);
-	INSERT_METHOD_HASH(OnCommandAssault);
-	INSERT_METHOD_HASH(OnCommandRetreat);
-	INSERT_METHOD_HASH(OnCommandPause);
-	INSERT_METHOD_HASH(OnCommandResume);
-	INSERT_METHOD_HASH(OnCommandString);
+	InsertMethodHash("OnStart");
+	InsertMethodHash("Update");
+	InsertMethodHash("OnEnd");
+	InsertMethodHash("OnSuspend");
+	InsertMethodHash("OnResume");
 
-	INSERT_METHOD_HASH(IsAbleToBlockMovementOf);
-	INSERT_METHOD_HASH(ShouldPickUp);
-	INSERT_METHOD_HASH(ShouldHurry);
-	INSERT_METHOD_HASH(IsHindrance);
-	INSERT_METHOD_HASH(SelectTargetPoint);
-	INSERT_METHOD_HASH(IsPositionAllowed);
-	INSERT_METHOD_HASH(QueryCurrentPath);
-	INSERT_METHOD_HASH(SelectMoreDangerousThreat);
+	InsertMethodHash("InitialContainedAction");
 
-	INSERT_METHOD_HASH(OnActorEmoted);
-	INSERT_METHOD_HASH(OnTerritoryContested);
-	INSERT_METHOD_HASH(OnTerritoryCaptured);
-	INSERT_METHOD_HASH(OnTerritoryLost);
-	INSERT_METHOD_HASH(OnWeaponFired);
-	INSERT_METHOD_HASH(OnWin);
+	InsertMethodHash("OnLeaveGround");
+	InsertMethodHash("OnLandOnGround");
+	InsertMethodHash("OnContact");
+	InsertMethodHash("OnMoveToSuccess");
+	InsertMethodHash("OnMoveToFailure");
+	InsertMethodHash("OnStuck");
+	InsertMethodHash("OnUnStuck");
+	InsertMethodHash("OnPostureChanged");
+	InsertMethodHash("OnAnimationActivityComplete");
+	InsertMethodHash("OnAnimationActivityInterrupted");
+	InsertMethodHash("OnAnimationEvent");
+	InsertMethodHash("OnIgnite");
+	InsertMethodHash("OnInjured");
+	InsertMethodHash("OnKilled");
+	InsertMethodHash("OnOtherKilled");
+	InsertMethodHash("OnSight");
+	InsertMethodHash("OnLostSight");
+	InsertMethodHash("OnThreatChanged");
+	InsertMethodHash("OnSound");
+	InsertMethodHash("OnSpokeConcept");
+	InsertMethodHash("OnNavAreaChanged");
+	InsertMethodHash("OnModelChanged");
+	InsertMethodHash("OnPickUp");
+	InsertMethodHash("OnDrop");
+	InsertMethodHash("OnShoved");
+	InsertMethodHash("OnBlinded");
+	InsertMethodHash("OnEnteredSpit");
+	InsertMethodHash("OnHitByVomitJar");
+	InsertMethodHash("OnCommandAttack");
+	InsertMethodHash("OnCommandAssault");
+	InsertMethodHash("OnCommandRetreat");
+	InsertMethodHash("OnCommandPause");
+	InsertMethodHash("OnCommandResume");
+	InsertMethodHash("OnCommandString");
 
-	INSERT_METHOD_HASH(ShouldRetreat);
-	INSERT_METHOD_HASH(ShouldAttack);
-	
-	INSERT_METHOD_HASH_OVERLOAD(OnCommandApproach, ByEntity, EventDesiredResult< CBaseEntity >(ActionProcessor::*)(CBaseEntity*, const Vector&, float));
-	INSERT_METHOD_HASH_OVERLOAD(OnCommandApproach, ByVector, EventDesiredResult< CBaseEntity >(ActionProcessor::*)(CBaseEntity*, CBaseEntity*));
-	
+	InsertMethodHash("IsAbleToBlockMovementOf");
+	InsertMethodHash("ShouldPickUp");
+	InsertMethodHash("ShouldHurry");
+	InsertMethodHash("IsHindrance");
+	InsertMethodHash("SelectTargetPoint");
+	InsertMethodHash("IsPositionAllowed");
+	InsertMethodHash("QueryCurrentPath");
+	InsertMethodHash("SelectMoreDangerousThreat");
+
+	InsertMethodHash("OnActorEmoted");
+	InsertMethodHash("OnTerritoryContested");
+	InsertMethodHash("OnTerritoryCaptured");
+	InsertMethodHash("OnTerritoryLost");
+	InsertMethodHash("OnWeaponFired");
+	InsertMethodHash("OnWin");
+
+	InsertMethodHash("ShouldRetreat");
+	InsertMethodHash("ShouldAttack");
+
+	InsertMethodHash("OnCommandApproach", "ByEntity", InsertMethodHashMode::Overload);
+	InsertMethodHash("OnCommandApproach", "ByVector", InsertMethodHashMode::Overload);
+
 	// Backwards compatibility
-	INSERT_METHOD_HASH_NAME(Update, OnUpdate, true);
-	INSERT_METHOD_HASH_NAME(InitialContainedAction, OnInitialContainedAction, true);
+	InsertMethodHash("Update", "OnUpdate", InsertMethodHashMode::Alias);
+	InsertMethodHash("InitialContainedAction", "OnInitialContainedAction", InsertMethodHashMode::Alias);
+}
+
+std::string ActionPublicsManager::BuildHashString(
+	std::string_view prefix,
+	const char* method,
+	const char* value,
+	InsertMethodHashMode mode,
+	const char* aliasPart)
+{
+	std::string result(prefix);
+
+	switch (mode)
+	{
+	case InsertMethodHashMode::Normal:
+		result += method;
+		break;
+
+	case InsertMethodHashMode::Overload:
+		result += method;
+		result += value;
+		break;
+
+	case InsertMethodHashMode::Alias:
+		result += aliasPart;
+		break;
+
+	default:
+		throw std::invalid_argument("Invalid InsertMethodHashMode");
+	}
+
+	return result;
 }

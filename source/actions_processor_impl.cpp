@@ -12,24 +12,7 @@
 CDetour* g_pDestructorLock = nullptr;
 extern ActionProcessorShared* g_pActionProcessor;
 
-void __action_swap_vtable(void* action)
-{
-	auto r = g_virtualMap.find((nb_action_ptr)action);
-
-	if (!r.found())
-	{
-		WarningSM("Autoswap couldn't find vtable");
-		return;
-	}
-
-	__internal_data data = r->value;
-	vtable_swap(action, &data);
-}
-
-void __action_unswap_vtable(void* action)
-{
-	vtable_swap(action, g_pActionProcessor);
-}
+std::unique_ptr<ProcessorFunctions> gProcessorFunctions;
 
 #ifdef _WIN32
 DETOUR_DECL_MEMBER1(ActionProcessor__Destructor, void, bool, flag)
@@ -53,62 +36,48 @@ DETOUR_DECL_MEMBER0(ActionProcessor__Destructor, void)
 	delete action;
 }
 
-bool BeginActionProcessing(nb_action_ptr action)
+void SetupDestructor()
 {
-	if (!g_pDestructorLock)
+	auto get_vtable = [](void* object) -> void**
 	{
+		return *reinterpret_cast<void***>(object);
+	};
+
+	static bool first = true;
+	if (first)
+	{
+		first = false;
+
 #ifdef _WIN32
-		g_pDestructorLock = CDetourManager::CreateDetour(GET_MEMBER_CALLBACK(ActionProcessor__Destructor), GET_MEMBER_TRAMPOLINE(ActionProcessor__Destructor), (void*)(vtable_get00(g_pActionProcessor)[0]));
+		g_pDestructorLock = CDetourManager::CreateDetour(GET_MEMBER_CALLBACK(ActionProcessor__Destructor), GET_MEMBER_TRAMPOLINE(ActionProcessor__Destructor), (void*)(get_vtable(g_pActionProcessor)[0]));
 #else		
-		g_pDestructorLock = CDetourManager::CreateDetour(GET_MEMBER_CALLBACK(ActionProcessor__Destructor), GET_MEMBER_TRAMPOLINE(ActionProcessor__Destructor), (void*)(vtable_get00(g_pActionProcessor)[1]));
+		g_pDestructorLock = CDetourManager::CreateDetour(GET_MEMBER_CALLBACK(ActionProcessor__Destructor), GET_MEMBER_TRAMPOLINE(ActionProcessor__Destructor), (void*)(get_vtable(g_pActionProcessor)[1]));
 #endif
 		if (!g_pDestructorLock)
 		{
 			WarningSM("Failed to create ActionProcessor__Destructor detour");
-			return false;
 		}
 
 		g_pDestructorLock->EnableDetour();
 	}
+}
 
-	auto r = g_virtualMap.findForAdd(action);
-	if (r.found())
-	{
-		// WarningSM("BeginActionProcessing called two times!");
-		return false;
-	}
-
-	__internal_data data = { vtable_get00(action), vtable_get01(action) };
-	g_virtualMap.add(r, action, data);
-	vtable_swap(action, g_pActionProcessor);
+bool BeginActionProcessing(nb_action_ptr action)
+{
+	SetupDestructor();
+	g_swap_manager.BeginActionProcessing(action);
 	return true;
 }
 
 bool StopActionProcessing(nb_action_ptr action)
 {
-	auto r = g_virtualMap.find(action);
-
-	if (!r.found())
-	{
-		// WarningSM("StopActionProcessing failed to find action!");
-		return false;
-	}
-
-	__internal_data data = r->value;
-	vtable_swap(action, &data);
-	g_virtualMap.remove(r);
+	g_swap_manager.StopActionProcessing(action);
 	return true;
 }
 
 void StopActionProcessing()
 {
-	auto iter = g_virtualMap.iter();
-
-	while (!iter.empty())
-	{
-		StopActionProcessing(iter->key);
-		iter.next();
-	}
+	g_swap_manager.StopActionProcessing();
 
 	if (g_pDestructorLock)
 	{
@@ -117,14 +86,27 @@ void StopActionProcessing()
 	}
 }
 
-Autoswap::Autoswap(const void* action)
+Autoswap::Autoswap(const void* action, const HashFunction* hf)
 {
-	m_action = const_cast<void*>(action);
-	__action_swap_vtable(m_action);
+	m_action = reinterpret_cast<nb_action_ptr>(const_cast<void*>(action));
+	m_hashFunction = hf;
+	g_swap_manager.SwapAction(m_action, hf);
 }
 
 Autoswap::~Autoswap()
 {
-	__action_unswap_vtable(m_action);
+	g_swap_manager.UnSwapAction(m_action, m_hashFunction);
 }
 
+HashFunction::HashFunction(const char* name, bool contextual) : is_contextual(contextual)
+{
+	IGameConfig* config = g_sdkActions.GetGameConfig();
+	
+	if (!config)
+		throw std::runtime_error("Failed to get game config");
+
+	if (!config->GetOffset(name, &offset))
+		throw std::runtime_error("Failed to get offset for " + std::string(name));
+
+	hash = compile::hash(name);
+}

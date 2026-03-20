@@ -1,50 +1,76 @@
 #pragma once
 
+#include <stdint.h>
+#include <vector>
 #include <unordered_map>
+#include <memory>
 
 using vtable_ptr = uintptr_t*;
 
-struct __internal_data
+struct HashFunction;
+
+static constexpr inline size_t vtable00_size = 200;
+static constexpr inline size_t vtable01_size = 10;
+
+struct vtable
 {
-	vtable_ptr vptr00;
-	vtable_ptr vptr01;
+	void* functions[vtable00_size] = {};
 };
 
-ke::HashMap<nb_action_ptr, __internal_data, ke::PointerPolicy<nb_action>> g_virtualMap;
-
-void InitVirtualMap()
+struct object_internals
 {
-	g_virtualMap.init();
-}
+	union
+	{
+		struct
+		{
+			vtable_ptr vptr00;
+			vtable_ptr vptr01;
+		} raw;
 
-template<typename T1, typename T2>
-inline void vtable_swap(T1* l, T2* r)
+		struct
+		{
+			vtable* vptr00;
+			vtable* vptr01;
+		} vt;
+	};
+};
+
+
+class ActionSwapManager
 {
-	__internal_data* sl = reinterpret_cast<__internal_data*>(l);
-	__internal_data* sr = reinterpret_cast<__internal_data*>(r);
+	friend class ActionsManager;
 
-	sl->vptr00 = sr->vptr00;
-	sl->vptr01 = sr->vptr01;
-}
+	static constexpr inline size_t vtable00_size = 200;
+	static constexpr inline size_t vtable01_size = 10;
 
-template<typename T1>
-inline void vtable_swap(T1* l, __internal_data* r)
-{
-	__internal_data* sl = reinterpret_cast<__internal_data*>(l);
+private:
+	struct object_processor
+	{
+		vtable* vptr00;
+		vtable* vptr01;
+	};
 
-	sl->vptr00 = r->vptr00;
-	sl->vptr01 = r->vptr01;
-}
+public:
+	ActionSwapManager() = default;
 
-template<typename T1>
-inline vtable_ptr vtable_get00(T1* base)
-{
-	return reinterpret_cast<__internal_data*>(base)->vptr00;
-}
+	void SwapAction(nb_action_ptr action, const HashFunction* hf);
+	void UnSwapAction(nb_action_ptr action, const HashFunction* hf);
 
-template<typename T1>
-inline vtable_ptr vtable_get01(T1* base)
-{
-	return reinterpret_cast<__internal_data*>(base)->vptr01;
-}
+	void BeginActionProcessing(nb_action_ptr action);
+	void StopActionProcessing(nb_action_ptr action);
+	void StopActionProcessing();
 
+private:
+	void SetActionProcessorVtable(nb_action_ptr action);
+	void ResetActionVtable(nb_action_ptr action);
+
+	void SwitchFunction(nb_action_ptr action, const HashFunction* hf, bool toOriginal);
+
+
+private:
+	std::vector<nb_action_ptr> _swapped_actions;
+	std::unordered_map<nb_action_ptr, object_internals> _original_vtable;
+	std::unordered_map<nb_action_ptr, object_internals*> _action_processor_slot;
+};
+
+extern ActionSwapManager g_swap_manager;

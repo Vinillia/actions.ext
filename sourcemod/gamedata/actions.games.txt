@@ -31,7 +31,6 @@
 				"windows" 		"\xC7\x41\x14\x19\xFC\xFF\xFF"
 				"windows64" 	"\x40\x53\x48\x83\xEC\x20\x48\x8B\x59\x08\x33\xC0"
 				"linux" 		"@_ZN8INextBot5ResetEv"
-				"linux" 		"@_ZN8INextBot5ResetEv"
 			}
 		}
 	}
@@ -90,6 +89,336 @@
 			{
 				"windows" "46"
 				"linux" "47"
+			}
+			
+			"&ActionProcessor::FirstContainedResponder"
+			{
+				"windows" "1"
+				"linux" "2"
+			}		
+			
+			"&ActionProcessor::NextContainedResponder"
+			{
+				"windows" "2"
+				"linux" "3"
+			}			
+			
+			"&ActionProcessor::GetName"
+			{
+				"windows" "40"
+				"linux" "41"
+			}
+
+			"&ActionProcessor::IsNamed"
+			{
+				"windows" "41"
+				"linux" "42"
+			}
+
+			"&ActionProcessor::GetFullName"
+			{
+				"windows" "42"
+				"linux" "43"
+			}
+
+			"&ActionProcessor::OnStart"
+			{
+				"windows" "43"
+				"linux" "44"
+			}
+
+			"&ActionProcessor::Update"
+			{
+				"windows" "44"
+				"linux" "45"
+			}
+
+			"&ActionProcessor::OnEnd"
+			{
+				"windows" "45"
+				"linux" "46"
+			}
+
+			"&ActionProcessor::OnSuspend"
+			{
+				"windows" "46"
+				"linux" "47"
+			}
+
+			"&ActionProcessor::OnResume"
+			{
+				"windows" "47"
+				"linux" "48"
+			}
+
+			"&ActionProcessor::InitialContainedAction"
+			{
+				"windows" "48"
+				"linux" "49"
+			}
+
+			"&ActionProcessor::OnLeaveGround"
+			{
+				"windows" "49"
+				"linux" "50"
+			}
+
+			"&ActionProcessor::OnLandOnGround"
+			{
+				"windows" "50"
+				"linux" "51"
+			}
+
+			"&ActionProcessor::OnContact"
+			{
+				"windows" "51"
+				"linux" "52"
+			}
+
+			"&ActionProcessor::OnMoveToSuccess"
+			{
+				"windows" "52"
+				"linux" "53"
+			}
+
+			"&ActionProcessor::OnMoveToFailure"
+			{
+				"windows" "53"
+				"linux" "54"
+			}
+
+			"&ActionProcessor::OnStuck"
+			{
+				"windows" "54"
+				"linux" "55"
+			}
+
+			"&ActionProcessor::OnUnStuck"
+			{
+				"windows" "55"
+				"linux" "56"
+			}
+
+			"&ActionProcessor::OnPostureChanged"
+			{
+				"windows" "56"
+				"linux" "57"
+			}
+
+			"&ActionProcessor::OnAnimationActivityComplete"
+			{
+				"windows" "57"
+				"linux" "58"
+			}
+
+			"&ActionProcessor::OnAnimationActivityInterrupted"
+			{
+				"windows" "58"
+				"linux" "59"
+			}
+
+			"&ActionProcessor::OnAnimationEvent"
+			{
+				"windows" "59"
+				"linux" "60"
+			}
+
+			"&ActionProcessor::OnIgnite"
+			{
+				"windows" "60"
+				"linux" "61"
+			}
+
+			"&ActionProcessor::OnInjured"
+			{
+				"windows" "61"
+				"linux" "62"
+			}
+
+			"&ActionProcessor::OnKilled"
+			{
+				"windows" "62"
+				"linux" "63"
+			}
+
+			"&ActionProcessor::OnOtherKilled"
+			{
+				"windows" "63"
+				"linux" "64"
+			}
+
+			"&ActionProcessor::OnSight"
+			{
+				"windows" "64"
+				"linux" "65"
+			}
+
+			"&ActionProcessor::OnLostSight"
+			{
+				"windows" "65"
+				"linux" "66"
+			}
+
+			"&ActionProcessor::OnThreatChanged"
+			{
+				"windows" "66"
+				"linux" "67"
+			}
+
+			"&ActionProcessor::OnSound"
+			{
+				"windows" "67"
+				"linux" "68"
+			}
+
+			"&ActionProcessor::OnSpokeConcept"
+			{
+				"windows" "68"
+				"linux" "69"
+			}
+
+			"&ActionProcessor::OnNavAreaChanged"
+			{
+				"windows" "69"
+				"linux" "70"
+			}
+
+			"&ActionProcessor::OnModelChanged"
+			{
+				"windows" "70"
+				"linux" "71"
+			}
+
+			"&ActionProcessor::OnPickUp"
+			{
+				"windows" "71"
+				"linux" "72"
+			}
+
+			"&ActionProcessor::OnDrop"
+			{
+				"windows" "72"
+				"linux" "73"
+			}
+
+			"&ActionProcessor::OnShoved"
+			{
+				"windows" "73"
+				"linux" "74"
+			}
+
+			"&ActionProcessor::OnBlinded"
+			{
+				"windows" "74"
+				"linux" "75"
+			}
+
+			"&ActionProcessor::OnEnteredSpit"
+			{
+				"windows" "75"
+				"linux" "76"
+			}
+
+			"&ActionProcessor::OnHitByVomitJar"
+			{
+				"windows" "76"
+				"linux" "77"
+			}
+
+			"&ActionProcessor::OnCommandAttack"
+			{
+				"windows" "77"
+				"linux" "78"
+			}
+
+			"&ActionProcessor::OnCommandAssault"
+			{
+				"windows" "78"
+				"linux" "79"
+			}
+
+			"&ActionProcessor::OnCommandApproachByEntity"
+			{
+				"windows" "79"
+				"linux" "81"
+			}
+
+			"&ActionProcessor::OnCommandApproachByVector"
+			{
+				"windows" "80"
+				"linux" "80"
+			}
+
+			"&ActionProcessor::OnCommandRetreat"
+			{
+				"windows" "81"
+				"linux" "82"
+			}
+
+			"&ActionProcessor::OnCommandPause"
+			{
+				"windows" "82"
+				"linux" "83"
+			}
+
+			"&ActionProcessor::OnCommandResume"
+			{
+				"windows" "83"
+				"linux" "84"
+			}
+
+			"&ActionProcessor::OnCommandString"
+			{
+				"windows" "84"
+				"linux" "85"
+			}
+
+			"&ActionProcessor::IsAbleToBlockMovementOf"
+			{
+				"windows" "85"
+				"linux" "86"
+			}
+			
+			"&ActionProcessor::ShouldPickUp"
+			{
+				"windows" "1"
+				"linux" "2"
+			}
+
+			"&ActionProcessor::ShouldHurry"
+			{
+				"windows" "2"
+				"linux" "3"
+			}
+
+			"&ActionProcessor::IsHindrance"
+			{
+				"windows" "3"
+				"linux" "4"
+			}
+
+			"&ActionProcessor::SelectTargetPoint"
+			{
+				"windows" "4"
+				"linux" "5"
+			}
+
+			"&ActionProcessor::IsPositionAllowed"
+			{
+				"windows" "5"
+				"linux" "6"
+			}
+
+			"&ActionProcessor::QueryCurrentPath"
+			{
+				"windows" "6"
+				"linux" "7"
+			}
+
+			"&ActionProcessor::SelectMoreDangerousThreat"
+			{
+				"windows" "7"
+				"linux" "8"
 			}
 		}
 		

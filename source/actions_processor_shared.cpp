@@ -15,73 +15,68 @@ ActionProcessorShared::ActionProcessorShared()
 // Shared Handlers
 //-----------------------------------------------------------------------------
 
+
 INextBotEventResponder* ActionProcessorShared::FirstContainedResponder(void) const
 {
-	Autoswap guard(this);
+	Autoswap guard(this, &gProcessorFunctions->FirstContainedResponder);
 	return this->FirstContainedResponder();
 }
 
 INextBotEventResponder* ActionProcessorShared::NextContainedResponder(INextBotEventResponder* current) const
 {
-	Autoswap guard(this);
+	Autoswap guard(this, &gProcessorFunctions->NextContainedResponder);
 	return this->NextContainedResponder(current);
 }
 
 const char* ActionProcessorShared::GetName(void) const
 {
-	Autoswap guard(this);
+	Autoswap guard(this, &gProcessorFunctions->GetName);
 	return this->GetName();
 }
 
 bool ActionProcessorShared::IsNamed(const char* name) const
 {
-	Autoswap guard(this);
+	Autoswap guard(this, &gProcessorFunctions->IsNamed);
 	return this->IsNamed(name);
 }
 
 const char* ActionProcessorShared::GetFullName(void) const
 {
-	Autoswap guard(this);
+	Autoswap guard(this, &gProcessorFunctions->GetFullName);
 	return this->GetFullName();
 }
 
 ActionResult< CBaseEntity >	ActionProcessorShared::OnStart(CBaseEntity* me, Action< CBaseEntity >* priorAction)
 {
-	constexpr HashValue hash = compile::hash("&ActionProcessor::OnStart");
-	return ProcessHandler(hash, this, &ActionProcessorShared::OnStart, me, priorAction);
+	return ProcessHandler(gProcessorFunctions->OnStart, this, &ActionProcessorShared::OnStart, me, priorAction);
 }
 
 ActionResult< CBaseEntity >	ActionProcessorShared::Update(CBaseEntity* me, float interval)
 {
-	constexpr HashValue hash = compile::hash("&ActionProcessor::Update");
-	return ProcessHandler(hash, this, &ActionProcessorShared::Update, me, interval);
+	return ProcessHandler(gProcessorFunctions->Update, this, &ActionProcessorShared::Update, me, interval);
 }
 
 void ActionProcessorShared::OnEnd(CBaseEntity* me, Action< CBaseEntity >* nextAction)
 {
 	g_actionsManager.SetActionActor(this, nullptr);
 	g_actionsManager.SetActionActor(nextAction, me);
-	 
-	constexpr HashValue hash = compile::hash("&ActionProcessor::OnEnd");
-	ProcessHandlerEx(hash, this, &ActionProcessorShared::OnEnd, me, nextAction);
+	
+	ProcessHandlerEx(gProcessorFunctions->OnEnd, this, &ActionProcessorShared::OnEnd, me, nextAction);
 }
 
 ActionResult< CBaseEntity >	ActionProcessorShared::OnSuspend(CBaseEntity* me, Action< CBaseEntity >* interruptingAction)
 {
-	constexpr HashValue hash = compile::hash("&ActionProcessor::OnSuspend");
-	return ProcessHandler(hash, this, &ActionProcessorShared::OnSuspend, me, interruptingAction);
+	return ProcessHandler(gProcessorFunctions->OnSuspend, this, &ActionProcessorShared::OnSuspend, me, interruptingAction);
 }
 
 ActionResult< CBaseEntity >	ActionProcessorShared::OnResume(CBaseEntity* me, Action< CBaseEntity >* interruptingAction)
 {
-	constexpr HashValue hash = compile::hash("&ActionProcessor::OnResume");
-	return ProcessHandler(hash, this, &ActionProcessorShared::OnResume, me, interruptingAction);
+	return ProcessHandler(gProcessorFunctions->OnResume, this, &ActionProcessorShared::OnResume, me, interruptingAction);
 }
 
 Action< CBaseEntity >* ActionProcessorShared::InitialContainedAction(CBaseEntity* me)
 {
-	constexpr HashValue hash = compile::hash("&ActionProcessor::InitialContainedAction");
-	Execution<Action<CBaseEntity>*> execution = ProcessHandlerEx(hash, this, &ActionProcessorShared::InitialContainedAction, me);
+	Execution<Action<CBaseEntity>*> execution = ProcessHandlerEx(gProcessorFunctions->InitialContainedAction, this, &ActionProcessorShared::InitialContainedAction, me);
 	g_actionsManager.ProcessInitialContainedAction(execution.handler.result_type, this, execution.handler.result, execution.result);
 	return execution.result;
 }

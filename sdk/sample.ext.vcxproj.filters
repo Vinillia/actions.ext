@@ -183,6 +183,9 @@
     <ClCompile Include="..\..\..\..\..\SDK\sourcemod\public\asm\asm.c">
       <Filter>sourcemod\asm</Filter>
     </ClCompile>
+    <ClCompile Include="actions_vtableswap.cpp">
+      <Filter>actions</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\source\extension.h">
