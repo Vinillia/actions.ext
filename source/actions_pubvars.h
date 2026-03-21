@@ -130,7 +130,7 @@ private:
 		InsertMethodHashMode mode = InsertMethodHashMode::Normal);
 
 
-	static std::string ActionPublicsManager::BuildHashString(
+	static std::string BuildHashString(
 		std::string_view prefix,
 		const char* method,
 		const char* value,

@@ -3,7 +3,7 @@
 #include "actions_processor_impl.h"
 
 #include <algorithm>
-
+#include <cstring>
 extern class ActionProcessorShared* g_pActionProcessor;
 
 ActionSwapManager g_swap_manager;

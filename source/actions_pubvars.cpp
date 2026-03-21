@@ -5,38 +5,6 @@
 #include "actions_encoders.h"
 #include "actionsdefs.h"
 
-#define _MAKESTR(x) #x
-#define MAKESTR(x) _MAKESTR(x)
-
-#define INSERT_METHOD_HASH(method) \
-do \
-{	\
-	static constexpr std::string_view _method = MAKESTR(method); \
-	static constexpr auto hash = compile::concat<pubvar_prefix, _method>; \
-	static constexpr std::string_view fn = compile::concat<method_prefix, _method>; \
-	g_publicsManager.AddHash(hash.data(), compile::hash(fn)); \
-} while(0)
-
-#define INSERT_METHOD_HASH_OVERLOAD(method, overload, type) \
-do \
-{	\
-	static constexpr std::string_view _method = MAKESTR(method); \
-	static constexpr std::string_view _overload = MAKESTR(overload); \
-	static constexpr auto hash = compile::concat<pubvar_prefix, _method, _overload>; \
-	static constexpr auto fn = compile::concat<method_prefix, _method, _overload>; \
-	g_publicsManager.AddHash(hash.data(), compile::hash(fn)); \
-} while(0)
-
-
-#define INSERT_METHOD_HASH_NAME(method, name, force) \
-do \
-{	\
-	static constexpr std::string_view _method = MAKESTR(method); \
-	static constexpr std::string_view _name = MAKESTR(name); \
-	static constexpr auto value = compile::concat<pubvar_prefix, _name>; \
-	g_publicsManager.AddHash(value.data(), compile::hash(method_prefix), force); \
-} while(0)
-
 ActionPublicsManager g_publicsManager;
 
 ActionPublicsManager::ActionPublicsManager()
