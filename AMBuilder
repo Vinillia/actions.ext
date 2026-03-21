@@ -33,7 +33,7 @@ sourceFiles = [
     'safetyhook/src/easy.cpp', 'safetyhook/src/inline_hook.cpp',
     'safetyhook/src/mid_hook.cpp', 'safetyhook/src/os.linux.cpp',
     'safetyhook/src/os.windows.cpp', 'safetyhook/src/utility.cpp',
-    'safetyhook/src/vmt_hook.cpp'
+    'safetyhook/src/vmt_hook.cpp', 'source/actions_vtableswap.cpp'
 ]
 
 asmSources = [os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c')]
@@ -122,7 +122,8 @@ for sdk_name in Extension.sdks:
                 '-Wno-delete-non-abstract-non-virtual-dtor', '-frtti'
             ]
         binary.compiler.defines += [
-            'HAVE_STRING_H', '_GLIBCXX_USE_CXX11_ABI=0', 'INCLUDE_ACTIONS_CONSTRUCTOR'
+            'HAVE_STRING_H', '_GLIBCXX_USE_CXX11_ABI=0',
+            'INCLUDE_ACTIONS_CONSTRUCTOR'
         ]
 
 Extension.extensions += builder.Add(project)
