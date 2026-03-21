@@ -31,6 +31,7 @@
 				"windows" 		"\xC7\x41\x14\x19\xFC\xFF\xFF"
 				"windows64" 	"\x40\x53\x48\x83\xEC\x20\x48\x8B\x59\x08\x33\xC0"
 				"linux" 		"@_ZN8INextBot5ResetEv"
+				"linux" 		"@_ZN8INextBot5ResetEv"
 			}
 		}
 	}
@@ -91,6 +92,18 @@
 				"linux" "47"
 			}
 			
+			"IContextualQuery::Size"
+			{
+				"windows" "7"
+				"linux" "8"
+			}		
+							
+			"ActionProcessor::Size"
+			{
+				"windows" "85"
+				"linux" "86"
+			}		
+						
 			"&ActionProcessor::FirstContainedResponder"
 			{
 				"windows" "1"
