@@ -53,6 +53,7 @@ private:
 public:
 	ActionSwapManager() = default;
 
+	void Init();
 	void SwapAction(nb_action_ptr action, const HashFunction* hf);
 	void UnSwapAction(nb_action_ptr action, const HashFunction* hf);
 

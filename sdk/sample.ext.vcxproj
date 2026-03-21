@@ -373,6 +373,7 @@
     <ClCompile Include="..\source\actions_constructor.cpp" />
     <ClCompile Include="..\source\actions_tools.cpp" />
     <ClCompile Include="..\source\actions_processor_shared.cpp" />
+    <ClCompile Include="..\source\actions_vtableswap.cpp" />
     <ClCompile Include="..\source\extension.cpp" />
     <ClCompile Include="..\source\hook.cpp" />
     <ClCompile Include="..\source\sdk\l4d2\actions_processor.cpp">
@@ -414,7 +415,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Left 4 Dead 1|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="actions_vtableswap.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\..\SDK\sourcemod\public\safetyhook\zydis\Zydis.h" />

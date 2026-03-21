@@ -19,6 +19,7 @@
 #include "actions_commands.h"
 #include "actions_constructor.h"
 #include "actions_caller.h"
+#include "actions_vtableswap.h"
 
 SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
@@ -70,6 +71,16 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	catch (const std::exception& ex)
 	{
 		V_snprintf(error, static_cast<int>(maxlen), "Failed to initialize processor functions: %s", ex.what());
+		return false;
+	}
+
+	try
+	{
+		g_swap_manager.Init();
+	}
+	catch (const std::exception& ex)
+	{
+		V_snprintf(error, static_cast<int>(maxlen), "Failed to initialize swap manager: %s", ex.what());
 		return false;
 	}
 
