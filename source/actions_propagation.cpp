@@ -1,137 +1,187 @@
 #include "actions_propagation.h"
-
-#include <amtl/am-vector.h>
-#include <vector>
-#include <optional>
-
 #include "extension.h"
 
 ActionPropagation g_actionsPropagationPre;
 ActionPropagation g_actionsPropagationPost;
 
-ActionPropagation::ActionPropagation() : m_isInExecution(false)
+ListenerVector* ActionPropagation::FindListeners(nb_action_ptr action, HashValue hash) noexcept
 {
+	auto actionIt = m_actionsListeners.find(action);
+	if (actionIt == m_actionsListeners.end())
+		return nullptr;
+
+	auto methodIt = actionIt->second.find(hash);
+	if (methodIt == actionIt->second.end())
+		return nullptr;
+
+	return &methodIt->second;
 }
 
-ActionPropagation::~ActionPropagation()
+bool ActionPropagation::MarkRemoved(ActionListener& listener) noexcept
 {
+	if (listener.removed)
+		return false;
+
+	listener.removed = true;
+	m_cleanupPending = true;
+	return true;
+}
+
+void ActionPropagation::CleanupRemovedListeners() noexcept
+{
+	if (m_executionDepth != 0 || !m_cleanupPending)
+		return;
+
+	for (auto actionIt = m_actionsListeners.begin(); actionIt != m_actionsListeners.end();)
+	{
+		auto& methods = actionIt->second;
+
+		for (auto methodIt = methods.begin(); methodIt != methods.end();)
+		{
+			auto& listeners = methodIt->second;
+
+			// std::erase_if 
+
+			listeners.erase(
+				std::remove_if(listeners.begin(), listeners.end(), [](const ActionListener& listener)
+				{
+					return listener.removed;
+				}),
+				listeners.end());
+
+			if (listeners.empty())
+				methodIt = methods.erase(methodIt);
+			else
+				++methodIt;
+		}
+
+		if (methods.empty())
+			actionIt = m_actionsListeners.erase(actionIt);
+		else
+			++actionIt;
+	}
+
+	m_cleanupPending = false;
 }
 
 bool ActionPropagation::AddListener(nb_action_ptr action, HashValue hash, IPluginFunction* fn)
 {
+	IPluginContext* context = fn->GetParentRuntime()->GetDefaultContext();
+
 	if (!g_actionsManager.IsValidAction(action))
 	{
-		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Attempt to hook invalid action");
+		context->ReportError("Attempt to hook invalid action");
 		return false;
 	}
 
 	if (!hash)
 	{
-		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Invalid hash value");
+		context->ReportError("Invalid hash value");
 		return false;
 	}
 
-	auto& v = m_actionsListeners[action][hash];
-	auto listener = std::find_if(v.cbegin(), v.cend(), [fn](const ActionListener& listener) { return listener.fn == fn; });
+	CleanupRemovedListeners();
 
-	if (listener != v.end())
+	auto& listeners = m_actionsListeners[action][hash];
+	const auto listener = std::find_if(listeners.cbegin(), listeners.cend(), [fn](const ActionListener& listener)
+	{
+		return !listener.removed && listener.fn == fn;
+	});
+
+	if (listener != listeners.cend())
 		return false;
 
-	m_actionsListeners[action][hash].emplace_back(hash, fn);
+	listeners.emplace_back(hash, fn, context);
 	return true;
 }
 
 bool ActionPropagation::RemoveListener(nb_action_ptr action, HashValue hash, IPluginFunction* fn)
 {
-	if (!g_actionsManager.IsValidAction(action))
+	auto* listeners = FindListeners(action, hash);
+	if (!listeners)
+		return false;
+
+	const auto listener = std::find_if(listeners->begin(), listeners->end(), [fn](const ActionListener& listener)
 	{
-		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Attempt to hook invalid action");
-		return false;
-	}
+		return !listener.removed && listener.fn == fn;
+	});
 
-	if (!hash)
-	{
-		fn->GetParentRuntime()->GetDefaultContext()->ReportError("Invalid hash value");
-		return false;
-	}
-
-	auto& v = m_actionsListeners[action][hash];
-	auto listener = std::find_if(v.begin(), v.end(), [fn](const ActionListener& listener) { return listener.fn == fn; });
-
-	if (listener == v.end())
+	if (listener == listeners->end())
 		return false;
 
-	if (HandleRemoveProcess(&v, listener))
-		return true;
-
-	v.erase(listener);
+	MarkRemoved(*listener);
+	CleanupRemovedListeners();
 	return true;
 }
 
 bool ActionPropagation::RemoveListener(nb_action_ptr action, HashValue hash, IPluginContext* ctx)
 {
-	auto& v = m_actionsListeners[action][hash];
-	auto result = std::find_if(v.begin(), v.end(), [ctx](const ActionListener& listener)
-		{ 
-			return ctx == listener.fn->GetParentRuntime()->GetDefaultContext(); 
-		});
-	
-	if (result == v.end())
+	auto* listeners = FindListeners(action, hash);
+	if (!listeners)
 		return false;
 
-	if (HandleRemoveProcess(&v, result))
-		return true;
+	const auto listener = std::find_if(listeners->begin(), listeners->end(), [ctx](const ActionListener& listener)
+	{
+		return !listener.removed && listener.context == ctx;
+	});
 
-	v.erase(result);
+	if (listener == listeners->end())
+		return false;
+
+	MarkRemoved(*listener);
+	CleanupRemovedListeners();
 	return true;
 }
 
 ActionListener* ActionPropagation::HasListener(nb_action_ptr action, HashValue hash, IPluginFunction* fn)
 {
-	auto& list = m_actionsListeners[action][hash];
+	auto* listeners = FindListeners(action, hash);
+	if (!listeners)
+		return nullptr;
 
-	for (auto iter = list.begin(); iter != list.end(); iter++)
+	const auto listener = std::find_if(listeners->begin(), listeners->end(), [fn](const ActionListener& listener)
 	{
-		if (iter->fn == fn && iter->hash == hash)
-		{
-			return &(*iter);
-		}
-	}
+		return !listener.removed && listener.fn == fn;
+	});
 
-	return nullptr;
+	return listener != listeners->end() ? &*listener : nullptr;
 }
 
 void ActionPropagation::RemoveActionListeners(nb_action_ptr action)
 {
-	auto& list = m_actionsListeners[action];
-	list.clear();
+	auto actionIt = m_actionsListeners.find(action);
+	if (actionIt == m_actionsListeners.end())
+		return;
+
+	if (m_executionDepth == 0)
+	{
+		m_actionsListeners.erase(actionIt);
+		return;
+	}
+
+	for (auto& method : actionIt->second)
+	{
+		for (auto& listener : method.second)
+			MarkRemoved(listener);
+	}
 }
 
 void ActionPropagation::RemoveListener(IPluginContext* ctx)
 {
-	for (auto& methods : m_actionsListeners)
+	if (!ctx)
+		return;
+
+	for (auto& action : m_actionsListeners)
 	{
-		for (auto& list : methods.second)
+		for (auto& method : action.second)
 		{
-			auto& listener = list.second;
-			for (auto it = listener.begin(); it != listener.end();)
+			for (auto& listener : method.second)
 			{
-				if (it->fn->GetParentRuntime()->GetDefaultContext() == ctx)
-				{
-					if (HandleRemoveProcess(&listener, it))
-					{
-						it++;
-					}
-					else
-					{
-						it = listener.erase(it);
-					}
-				}
-				else
-				{
-					it++;
-				}
+				if (!listener.removed && listener.context == ctx)
+					MarkRemoved(listener);
 			}
 		}
 	}
+
+	CleanupRemovedListeners();
 }

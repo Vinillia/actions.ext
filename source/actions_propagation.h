@@ -14,7 +14,6 @@
 #include <unordered_map>
 #include <vector>
 #include <type_traits>
-#include <list>
 
 template<class Actor>
 struct ActionResult;
@@ -34,15 +33,19 @@ inline constexpr bool is_action_result_v = is_action_result<T>::value || is_acti
 struct ActionListener
 {
 	ActionListener() = default;
-	ActionListener(HashValue _hash, IPluginFunction* _fn) : hash(_hash), fn(_fn)
+	ActionListener(HashValue hash, IPluginFunction* fn, IPluginContext* context)
+		: hash(hash), fn(fn), context(context)
 	{
 	}
 
-	HashValue hash;
-	IPluginFunction* fn;
+	HashValue hash = 0;
+	IPluginFunction* fn = nullptr;
+	IPluginContext* context = nullptr;
+	bool removed = false;
 };
 
-using MethodListeners = std::unordered_map<HashValue, std::list<ActionListener>>;
+using ListenerVector = std::vector<ActionListener>;
+using MethodListeners = std::unordered_map<HashValue, ListenerVector>;
 using ActionListeners = std::unordered_map<nb_action_ptr, MethodListeners>;
 
 extern ConVar ext_actions_debug_memory;
@@ -61,23 +64,31 @@ inline bool is_result_same(const EventDesiredResult<CBaseEntity>& left, const Ev
 
 class ActionPropagation
 {
-	struct runtime_deletor
+	class execution_guard
 	{
-		using container_t = MethodListeners::mapped_type;
-		using item_t = container_t::iterator;
-
-		runtime_deletor(container_t* data, const item_t& item)
-			: data(data), item(item)
+	public:
+		explicit execution_guard(ActionPropagation& owner) noexcept
+			: m_owner(owner)
 		{
+			++m_owner.m_executionDepth;
 		}
 
-		container_t* data;
-		item_t item;
+		~execution_guard() noexcept
+		{
+			--m_owner.m_executionDepth;
+			m_owner.CleanupRemovedListeners();
+		}
+
+		execution_guard(const execution_guard&) = delete;
+		execution_guard& operator=(const execution_guard&) = delete;
+
+	private:
+		ActionPropagation& m_owner;
 	};
 
 public:
-	ActionPropagation();
-	~ActionPropagation();
+	ActionPropagation() = default;
+	~ActionPropagation() = default;
 
 public:
 	template<typename T>
@@ -164,17 +175,30 @@ public:
 	template<typename TReturn, typename ...Args>
 	ResultType ProcessMethod(nb_action_ptr action, HashValue hash, TReturn* result, Args&&... args)
 	{
-		auto& listeners = m_actionsListeners[action][hash];
+		auto* listeners = FindListeners(action, hash);
+		if (!listeners || listeners->empty())
+			return Pl_Continue;
 
-		ResultType returnResult, executeResult = Pl_Continue;
 
-		returnResult = executeResult;
-		m_isInExecution = true;
+		std::size_t dispatchCount = listeners->size();
+		execution_guard guard(*this);
+
+		ResultType returnResult = Pl_Continue;
 		g_actionsManager.SetRuntimeAction(action);
 
-		for (auto it = listeners.begin(); it != listeners.end(); it++)
+		for (std::size_t i = 0; i < dispatchCount; ++i)
 		{
-			IPluginFunction* fn = it->fn;
+			if ((*listeners)[i].removed)
+				continue;
+
+			IPluginFunction* const fn = (*listeners)[i].fn;
+			if (!fn)
+			{
+				MarkRemoved((*listeners)[i]);
+				continue;
+			}
+
+			ResultType executeResult = Pl_Continue;
 			TReturn saveResult;
 
 			if constexpr (!std::is_null_pointer_v<TReturn>)
@@ -199,11 +223,6 @@ public:
 				{
 					fn->PushCellByRef((cell_t*)result);
 				}
-				//else
-				//{
-				//	static_assert(std::is_same_v<TReturn, void>, "Unsupported type");
-				//	static_assert(!std::is_same_v<TReturn, void>, "Unsupported type");
-				//}
 			}
 
 			fn->Execute((cell_t*)&executeResult);
@@ -212,17 +231,15 @@ public:
 			{
 				if (executeResult < Pl_Changed && !is_result_same(saveResult, *result))
 				{
-					// plugin changed result but returned Plugin_Continue. It's ok but we need to do something otherwise we might crash later.
 					fn->GetParentRuntime()->GetDefaultContext()->BlamePluginError(fn, "Changing result with Plugin_Continue is an error");
 
-					// delete plugin's action and use prior as the most safest result
 					if (result->m_action && result->m_action != saveResult.m_action)
 					{
 						delete result->m_action;
 						*result = saveResult;
 					}
 
-					RemoveListener(action, it->hash, it->fn);
+					MarkRemoved((*listeners)[i]);
 				}
 
 				if (saveResult.m_action && saveResult.m_action != result->m_action)
@@ -230,7 +247,6 @@ public:
 					if (ext_actions_debug_memory.GetBool())
 						MsgSM("%.3f:%i: DELETE ACTION %s ( 0x%X )", gpGlobals->curtime, g_actionsManager.GetActionActorEntIndex(action), saveResult.m_action->GetName(), saveResult.m_action);
 
-					// delete an outdated action
 					delete saveResult.m_action;
 					saveResult.m_action = nullptr;
 				}
@@ -245,21 +261,16 @@ public:
 			{
 				if constexpr (!std::is_null_pointer_v<TReturn>)
 				{
-					// changing result with Pl_Continue is forbidden
 					*result = saveResult;
 				}
 			}
 			else if (executeResult > returnResult)
 			{
-				// new result is more superior
 				returnResult = executeResult;
 			}
 		}
 
 		g_actionsManager.SetRuntimeAction(nullptr);
-
-		m_isInExecution = false;
-		ProcessDeletors();
 
 		return returnResult;
 	}
@@ -273,35 +284,17 @@ public:
 	ActionListener* HasListener(nb_action_ptr action, HashValue hash, IPluginFunction* fn);
 
 private:
-	inline bool HandleRemoveProcess(runtime_deletor::container_t* container, runtime_deletor::item_t& item);
-	inline void ProcessDeletors();
+	ListenerVector* FindListeners(nb_action_ptr action, HashValue hash) noexcept;
+	bool MarkRemoved(ActionListener& listener) noexcept;
+	void CleanupRemovedListeners() noexcept;
 
 protected:
 	ActionListeners m_actionsListeners;
 
 private:
-	std::vector<runtime_deletor> m_deletors;
-	bool m_isInExecution;
+	std::size_t m_executionDepth = 0;
+	bool m_cleanupPending = false;
 };
-
-inline bool ActionPropagation::HandleRemoveProcess(runtime_deletor::container_t* container, runtime_deletor::item_t& item)
-{
-	if (!m_isInExecution)
-		return false;
-
-	m_deletors.emplace_back(container, item);
-	return true;
-}
-
-inline void ActionPropagation::ProcessDeletors()
-{
-	for (auto& iter : m_deletors)
-	{
-		iter.data->erase(iter.item);
-	}
-
-	m_deletors.clear();
-}
 
 extern ActionPropagation g_actionsPropagationPre;
 extern ActionPropagation g_actionsPropagationPost;
