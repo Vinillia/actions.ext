@@ -1,25 +1,23 @@
 #include "extension.h"
 #include "hook.h"
 
-#include "actions_processor_impl.h"
-#include "actions_pubvars.h"
-#include "actions_propagation.h"
-#include "actions_manager.h"
-#include "actions_pubvars.h"
-#include "actions_component.h"
-#include "actions_tools.h"
-// #include "actions_container.h"
+#include "actions/processor/processor.h"
+#include "actions/propagation/propagation.h"
+#include "actions/manager/manager.h"
+#include "actions/component/component.h"
 
-#include "actions_natives.h"
-#include "actions_legacy.h"
+#include "actions/runtime/pubvars.h"
+#include "actions/runtime/tools.h"
+// #include "actions_container.h"
 
 #include <CDetour/detours.h>
 #include <compat_wrappers.h>
 
 #include "actions_commands.h"
-#include "actions_constructor.h"
-#include "actions_caller.h"
-#include "actions_vtableswap.h"
+#include "actions/constructor/constructor.h"
+#include "actions/processor/vtableswap.h"
+
+#include "actions/natives/natives.h"
 
 SDKActions g_sdkActions;
 SMEXT_LINK(&g_sdkActions);
@@ -88,7 +86,7 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 
 	sharesys->AddNatives(myself, g_actionsNatives);
 	sharesys->AddNatives(myself, g_actionsNativesLegacy); 
-	sharesys->AddNatives(myself, g_actionsNativesCaller);
+	sharesys->AddNatives(myself, g_actionsNativesConstructor);
 
 #ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 	gameconfs->AddUserConfigHook("ActionConstructors", &g_actionsConstructorSMC);
@@ -164,7 +162,6 @@ void SDKActions::OnPluginLoaded(IPlugin* plugin)
 
 void SDKActions::OnPluginUnloaded(IPlugin* plugin)
 {
-	g_actionsManager.ClearUserDataIdentity(plugin->GetBaseContext());
 	g_actionsPropagationPre.RemoveListener(plugin->GetBaseContext());
 	g_actionsPropagationPost.RemoveListener(plugin->GetBaseContext());
 }

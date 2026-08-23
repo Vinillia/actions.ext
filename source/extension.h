@@ -34,9 +34,9 @@
 
 #include <IBinTools.h>
 #include "smsdk_ext.h"
-#include "actionsdefs.h"
 
-#include "actions_manager.h"
+#include "actions/defs.h"
+#include "actions/manager/manager.h"
 
 static inline cell_t ToPseudoAddress(void* address)
 {

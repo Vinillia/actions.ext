@@ -2,128 +2,131 @@
 import os
 
 # Name of your extesion, this will also be it's file name.
-projectName = 'actions'
+projectName = "actions"
 
 gameFiles = {
-    'l4d': [
-        'source/sdk/l4d/actions_processor.cpp',
-        'source/sdk/l4d/actions_tools_l4d.cpp'
+    "l4d": [
+        "source/sdk/l4d/actions_processor.cpp",
+        "source/sdk/l4d/actions_tools_l4d.cpp",
     ],
-    'l4d2': [
-        'source/sdk/l4d2/actions_processor.cpp',
-        'source/sdk/l4d2/actions_tools_l4d2.cpp'
+    "l4d2": [
+        "source/sdk/l4d2/actions_processor.cpp",
+        "source/sdk/l4d2/actions_tools_l4d2.cpp",
     ],
-    'tf2': [
-        'source/sdk/tf2/actions_processor.cpp',
-        'source/sdk/tf2/actions_tools_tf2.cpp'
-    ]
+    "tf2": [
+        "source/sdk/tf2/actions_processor.cpp",
+        "source/sdk/tf2/actions_tools_tf2.cpp",
+    ],
 }
 
 # smsdk_ext.cpp will be automatically added later
 sourceFiles = [
-    'source/sdk/shared/NextBotBehaviorShared.cpp',
-    'source/sdk/shared/NextBotComponentInterface.cpp',
-    'source/sdk/shared/NextBotInterface.cpp', 'source/actions_tools.cpp',
-    'source/actions_processor_shared.cpp', 'source/actions_processor_impl.cpp',
-    'source/actions_constructor_smc.cpp', 'source/actions_constructor.cpp',
-    'source/actions_custom_legacy.cpp', 'source/actions_component.cpp',
-    'source/actions_manager.cpp', 'source/actions_propagation.cpp',
-    'source/actions_pubvars.cpp', 'source/hook.cpp', 'source/extension.cpp',
-    'safetyhook/zydis/Zydis.c', 'safetyhook/src/allocator.cpp',
-    'safetyhook/src/easy.cpp', 'safetyhook/src/inline_hook.cpp',
-    'safetyhook/src/mid_hook.cpp', 'safetyhook/src/os.linux.cpp',
-    'safetyhook/src/os.windows.cpp', 'safetyhook/src/utility.cpp',
-    'safetyhook/src/vmt_hook.cpp', 'source/actions_vtableswap.cpp'
+    # Shared NextBot
+    "source/sdk/shared/NextBotBehaviorShared.cpp",
+    "source/sdk/shared/NextBotComponentInterface.cpp",
+    "source/sdk/shared/NextBotInterface.cpp",
+    # Actions
+    "source/actions/component/component.cpp",
+    "source/actions/constructor/config_parser.cpp",
+    "source/actions/constructor/constructor.cpp",
+    "source/actions/legacy/custom_legacy.cpp",
+    "source/actions/manager/manager.cpp",
+    "source/actions/processor/processor.cpp",
+    "source/actions/processor/shared.cpp",
+    "source/actions/processor/vtableswap.cpp",
+    "source/actions/propagation/propagation.cpp",
+    "source/actions/runtime/pubvars.cpp",
+    "source/actions/runtime/tools.cpp",
+    # Extension
+    "source/hook.cpp",
+    "source/extension.cpp",
+    # SafetyHook
+    "safetyhook/zydis/Zydis.c",
+    "safetyhook/src/allocator.cpp",
+    "safetyhook/src/easy.cpp",
+    "safetyhook/src/inline_hook.cpp",
+    "safetyhook/src/mid_hook.cpp",
+    "safetyhook/src/os.linux.cpp",
+    "safetyhook/src/os.windows.cpp",
+    "safetyhook/src/utility.cpp",
+    "safetyhook/src/vmt_hook.cpp",
 ]
 
-asmSources = [os.path.join(Extension.sm_root, 'public', 'asm', 'asm.c')]
-
-detourSources = [
-    os.path.join(Extension.sm_root, 'public', 'CDetour', 'detours.cpp')
-]
-
-libUdisSources = [
-    os.path.join(Extension.sm_root, 'public', 'libudis86', 'decode.c'),
-    os.path.join(Extension.sm_root, 'public', 'libudis86', 'itab.c'),
-    os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn.c'),
-    os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-att.c'),
-    os.path.join(Extension.sm_root, 'public', 'libudis86', 'syn-intel.c'),
-    os.path.join(Extension.sm_root, 'public', 'libudis86', 'udis86.c')
-]
+detourSources = [os.path.join(Extension.sm_root, "public", "CDetour", "detours.cpp")]
 
 project = builder.LibraryProject(projectName)
 
-if os.path.isfile(
-        os.path.join(builder.currentSourcePath, 'sdk', 'smsdk_ext.cpp')):
+if os.path.isfile(os.path.join(builder.currentSourcePath, "sdk", "smsdk_ext.cpp")):
     # Use the copy included in the project
-    project.sources += [os.path.join('sdk', 'smsdk_ext.cpp')]
+    project.sources += [os.path.join("sdk", "smsdk_ext.cpp")]
 else:
     # Use the copy included with SM 1.6 and newer
-    project.sources += [
-        os.path.join(Extension.sm_root, 'public', 'smsdk_ext.cpp')
-    ]
+    project.sources += [os.path.join(Extension.sm_root, "public", "smsdk_ext.cpp")]
 
 project.sources += sourceFiles
 project.sources += detourSources
-project.sources += asmSources
-project.sources += libUdisSources
 
 for sdk_name in Extension.sdks:
     sdk = Extension.sdks[sdk_name]
-    if sdk['name'] in ['mock']:
+    if sdk["name"] in ["mock"]:
         continue
 
     for cxx in builder.targets:
-        if not cxx.target.arch in sdk['platforms'][cxx.target.platform]:
+        if not cxx.target.arch in sdk["platforms"][cxx.target.platform]:
             continue
 
         binary = Extension.HL2ExtConfig(
-            project, builder, cxx, projectName + '.ext.' + sdk['extension'],
-            sdk)
+            project, builder, cxx, projectName + ".ext." + sdk["extension"], sdk
+        )
 
         binary.sources += gameFiles[sdk_name]
         binary.compiler.cxxincludes += [
-            os.path.join(builder.sourcePath, 'safetyhook', 'include'),
-            os.path.join(builder.sourcePath, 'safetyhook'),
-            os.path.join(builder.sourcePath, 'source', 'sdk', 'shared'),
-            os.path.join(builder.sourcePath, 'source'),
-            os.path.join(builder.sourcePath, 'zydis')
+            os.path.join(builder.sourcePath, "safetyhook", "include"),
+            os.path.join(builder.sourcePath, "safetyhook"),
+            os.path.join(builder.sourcePath, "source", "sdk", "shared"),
+            os.path.join(builder.sourcePath, "source"),
+            os.path.join(builder.sourcePath, "zydis"),
         ]
         binary.compiler.includes += [
-            os.path.join(Extension.sm_root, 'public', 'safetyhook', 'include'),
-            os.path.join(Extension.sm_root, 'public', 'safetyhook', 'zydis'),
-            os.path.join(Extension.sm_root, 'public', 'CDetour'),
-            os.path.join(Extension.sm_root, 'public', 'asm'),
-            os.path.join(Extension.sm_root, 'public', 'libudis86'),
-            os.path.join(Extension.sm_root, 'public')
-            #os.path.join(sdk.path, 'game')
+            os.path.join(Extension.sm_root, "public", "safetyhook", "include"),
+            os.path.join(Extension.sm_root, "public", "safetyhook", "zydis"),
+            os.path.join(Extension.sm_root, "public", "CDetour"),
+            os.path.join(Extension.sm_root, "public", "asm"),
+            os.path.join(Extension.sm_root, "public", "libudis86"),
+            os.path.join(Extension.sm_root, "public"),
+            # os.path.join(sdk.path, 'game')
         ]
 
         binary.compiler.includes += [
-            os.path.join(Extension.sm_root, 'public', 'safetyhook', 'zydis'),
+            os.path.join(Extension.sm_root, "public", "safetyhook", "zydis"),
         ]
 
         binary.compiler.cxxincludes += [
-            os.path.join(builder.sourcePath, 'source', 'sdk', sdk_name),
-            os.path.join(builder.sourcePath, 'source', 'sdk', sdk_name,
-                         'nextbot')
+            os.path.join(builder.sourcePath, "source", "sdk", sdk_name),
+            os.path.join(builder.sourcePath, "source", "sdk", sdk_name, "nextbot"),
         ]
 
-        if binary.compiler.vendor == 'msvc':
-            binary.compiler.defines += ['_CRT_NO_VA_START_VALIDATION']
-            binary.compiler.cxxflags.append('/std:c++17')
-            binary.compiler.linkflags.append('legacy_stdio_definitions.lib')
-        elif binary.compiler.family == 'clang':
+        if binary.compiler.vendor == "msvc":
+            binary.compiler.defines += ["_CRT_NO_VA_START_VALIDATION"]
+            binary.compiler.cxxflags.append("/std:c++17")
+            binary.compiler.linkflags.append("legacy_stdio_definitions.lib")
+        elif binary.compiler.family == "clang":
             binary.compiler.cxxflags += [
-                '-Wno-reinterpret-base-class', '-Wno-infinite-recursion',
-                '-Wno-expansion-to-defined',
-                '-Wno-implicit-const-int-float-conversion', '-std=c++17',
-                '-Wno-register', '-Wno-varargs', '-fexceptions',
-                '-Wno-delete-non-abstract-non-virtual-dtor', '-frtti'
+                "-Wno-reinterpret-base-class",
+                "-Wno-infinite-recursion",
+                "-Wno-expansion-to-defined",
+                "-Wno-implicit-const-int-float-conversion",
+                "-std=c++17",
+                "-Wno-register",
+                "-Wno-varargs",
+                "-fexceptions",
+                "-Wno-delete-non-abstract-non-virtual-dtor",
+                "-frtti",
             ]
         binary.compiler.defines += [
-            'HAVE_STRING_H', '_GLIBCXX_USE_CXX11_ABI=0',
-            'INCLUDE_ACTIONS_CONSTRUCTOR'
+            "HAVE_STRING_H",
+            "_GLIBCXX_USE_CXX11_ABI=0",
+            "INCLUDE_ACTIONS_CONSTRUCTOR",
         ]
 
 Extension.extensions += builder.Add(project)

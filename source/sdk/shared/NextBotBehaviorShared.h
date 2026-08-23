@@ -1,7 +1,7 @@
-#ifndef _INCLUDE_NEXTBOT_BEHAVIOR_SHARED_H
-#define _INCLUDE_NEXTBOT_BEHAVIOR_SHARED_H
+#ifndef NEXTBOT_BEHAVIOR_SHARED_H
+#define NEXTBOT_BEHAVIOR_SHARED_H
 
-#include "actionsdefs.h"
+#include "actions/defs.h"
 
 #define PROCESS_EVENT( METHOD )								\
 		{													\
@@ -160,4 +160,4 @@ namespace behavior
 	void ApplyResult_Debug_Done(CBaseEntity* me, nb_action_ptr action, nb_action_ptr newAction, nb_action_ptr resumedAction, nb_behavior_ptr behavior, const ActionResult<CBaseEntity>& result);
 }
 
-#endif // !_INCLUDE_NEXTBOT_BEHAVIOR_SHARED_H
+#endif // !NEXTBOT_BEHAVIOR_SHARED_H

@@ -1,6 +1,7 @@
-#include "actionsdefs.h"
+#include "actions/defs.h"
+#include "actions/manager/manager.h"
+
 #include "actions_tools_l4d2.h"
-#include "actions_manager.h"
 
 #include "NextBotIntentionInterface.h"
 #include "NextBotBehavior.h"
@@ -37,7 +38,7 @@ void L4D2ActionsTools::GetIntentionActions(IIntention* intention, std::vector<nb
 		nb_action_ptr action = ActionNextContainedResponder(intention);
 
 		if (action)
-			m_insertAction(action, vec);
+			InsertAction(action, vec);
 	}
 
 	ActionsTools::GetIntentionActions(intention, vec);
