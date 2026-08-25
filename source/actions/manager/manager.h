@@ -127,8 +127,8 @@ public:
 	template<typename T>
 	void SetUserData(nb_action_ptr action, std::string_view key, T&& value)
 	{
-		m_actionsUserData[action][std::string(key)] =
-			std::forward<T>(value);
+		std::string keyString(key);
+		m_actionsUserData[action][keyString] = value;
 	}
 
 	template<typename T>
