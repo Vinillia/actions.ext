@@ -1,16 +1,11 @@
-#pragma once
+#ifndef ACTIONS_TOOLS_TF2_H
+#define ACTIONS_TOOLS_TF2_H
 
-#ifndef _INCLUDE_ACTIONS_TOOLS_L4D2_H
-#define _INCLUDE_ACTIONS_TOOLS_L4D2_H
-
-#include "../../actions_tools.h"
-
-class Intention;
-class INextBot;
+#include "actions/runtime/tools.h"
 
 class TF2ActionsTools : public ActionsTools
 {
 public:
 };
 
-#endif // !_INCLUDE_ACTIONS_TOOLS_L4D2_H
+#endif // !ACTIONS_TOOLS_TF2_H

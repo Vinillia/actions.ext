@@ -146,7 +146,7 @@ namespace actions_natives
 				if (entity)
 					handle = reinterpret_cast<IHandleEntity*>(entity)->GetRefEHandle();
 				else
-					handle = INVALID_EHANDLE_INDEX;
+					handle.Term();
 
 				return 0;
 			},

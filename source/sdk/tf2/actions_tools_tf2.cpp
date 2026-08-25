@@ -1,6 +1,6 @@
-#include "actionsdefs.h"
+#include "actions/defs.h"
+#include "actions/manager/manager.h"
 #include "actions_tools_tf2.h"
-#include "actions_manager.h"
 
 #include "NextBotIntentionInterface.h"
 #include "NextBotBehavior.h"
