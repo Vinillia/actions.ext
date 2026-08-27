@@ -192,7 +192,9 @@ namespace actions_natives
 				if (action)
 				{
 					g_actionsManager.SetActionActor(action, nullptr);
-					g_actionsManager.Add(action);
+					g_actionsManager.AddPending(action);
+
+					BeginActionProcessing(action);
 				}
 
 				return ToPseudoAddress(action);
