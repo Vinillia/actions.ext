@@ -17,6 +17,18 @@
 template <typename... Ts>
 using void_t = void;
 
+template<class Actor>
+struct ActionResult;
+
+template<class Actor>
+struct EventDesiredResult;
+
+template<typename T>
+struct is_action_result : public std::is_same<T, ActionResult<CBaseEntity>> {};
+
+template<typename T>
+struct is_action_desire_result : public std::is_same<T, EventDesiredResult<CBaseEntity>> {};
+
 template <class K, typename T, typename = void>
 struct is_class_member : std::false_type {};
 
@@ -144,6 +156,12 @@ Handler<TReturn> ProcessHandlerImpl(TMethod&& method, nb_action_ptr action, Hash
 	}
 
 	plpost = g_actionsPropagationPost.ProcessMethod<TReturn, Args...>(action, hash, &newResult, std::forward<Args>(args)...);
+	
+	{
+		TransitionContext context(hash, newResult);
+		g_sdkActions.OnActionTransition(action, context);
+	}
+
 	g_actionsManager.PopRuntimeResult();
 
 	// Either pre or post listeners changed result. Use handler's return

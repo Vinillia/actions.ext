@@ -87,6 +87,7 @@ bool SDKActions::SDK_OnLoad(char* error, size_t maxlen, bool late)
 	sharesys->AddNatives(myself, g_actionsNatives);
 	sharesys->AddNatives(myself, g_actionsNativesLegacy); 
 	sharesys->AddNatives(myself, g_actionsNativesConstructor);
+	sharesys->AddNatives(myself, g_actionsTransitionNatives);
 
 #ifdef INCLUDE_ACTIONS_CONSTRUCTOR
 	gameconfs->AddUserConfigHook("ActionConstructors", &g_actionsConstructorSMC);
@@ -105,6 +106,8 @@ void SDKActions::SDK_OnAllLoaded()
 
 	m_fwdOnActionCreated = forwards->CreateForward("OnActionCreated", ET_Ignore, 4, NULL, Param_Cell, Param_Cell, Param_String, Param_Cell);
 	m_fwdOnActionDestroyed = forwards->CreateForward("OnActionDestroyed", ET_Ignore, 4, NULL, Param_Cell, Param_Cell, Param_String, Param_Cell);
+	
+	m_fwdOnActionTransition = forwards->CreateForward("OnActionTransition", ET_Ignore, 2, NULL, Param_Cell, Param_Cell);
 
 	CreateActionsHook();
 }
@@ -140,11 +143,19 @@ void SDKActions::SDK_OnUnload()
 		m_pConfig = nullptr;
 	}
 
-	if (m_htActionComponent)
-		g_pHandleSys->RemoveType(m_htActionComponent, myself->GetIdentity());
+	auto release_handle_type = [](HandleType_t& type)
+		{
+			if (type)
+			{
+				g_pHandleSys->RemoveType(type, myself->GetIdentity());
+			}
 
-	if (m_htActionConstructor)
-		g_pHandleSys->RemoveType(m_htActionConstructor, myself->GetIdentity());
+			type = 0;
+		};
+
+	release_handle_type(m_htActionComponent);
+	release_handle_type(m_htActionConstructor);
+	release_handle_type(m_htActionTransitionContext);
 
 	forwards->ReleaseForward(m_fwdOnActionCreated);
 	forwards->ReleaseForward(m_fwdOnActionDestroyed);
@@ -193,6 +204,36 @@ void SDKActions::OnActionDestroyed(nb_action_ptr action, ActionsManager::ActionI
 	m_fwdOnActionDestroyed->Execute();
 }
 
+void SDKActions::OnActionTransition(nb_action_ptr action, const TransitionContext &context)
+{
+	if (context.kind == TransitionContext::Kind::ActionResult || 
+		context.kind == TransitionContext::Kind::DesiredResult)
+	{
+		const ActionResult<CBaseEntity>* result = context.As<ActionResult<CBaseEntity>>();
+
+		if (!result->IsRequestingChange())
+			return;
+	}
+
+	HandleError error = HandleError_None;
+
+	Handle_t handle = g_pHandleSys->CreateHandle(m_htActionTransitionContext, const_cast<TransitionContext*>(&context), myself->GetIdentity(),myself->GetIdentity(), &error);
+
+	if (!handle)
+		return;
+
+	m_fwdOnActionTransition->PushCell(ToPseudoAddress(action));
+	m_fwdOnActionTransition->PushCell(handle);
+	m_fwdOnActionTransition->Execute();
+
+	HandleSecurity security;
+
+	security.pOwner = myself->GetIdentity();
+	security.pIdentity = myself->GetIdentity();
+
+	g_pHandleSys->FreeHandle(handle, &security);
+}
+
 bool SDKActions::RegisterConCommandBase(ConCommandBase* command)
 {
 	return META_REGCVAR(command);
@@ -203,7 +244,31 @@ bool SDKActions::CreateHandleTypes(HandleError* err)
 	m_htActionComponent = g_pHandleSys->CreateType("ActionComponent", this, 0, NULL, NULL, myself->GetIdentity(), err);
 	m_htActionConstructor = g_pHandleSys->CreateType("ActionConstructor", this, 0, NULL, NULL, myself->GetIdentity(), err);
 
+	if (!CreateTransitionContextHandleType(err))
+		return false;
+
 	return m_htActionComponent != 0 && m_htActionConstructor != 0;
+}
+
+bool SDKActions::CreateTransitionContextHandleType(HandleError* err)
+{
+    HandleAccess access;
+    g_pHandleSys->InitAccessDefaults(nullptr, &access);
+
+    access.access[HandleAccess_Delete] = HANDLE_RESTRICT_IDENTITY;
+    access.access[HandleAccess_Clone] = HANDLE_RESTRICT_IDENTITY;
+
+    m_htActionTransitionContext = g_pHandleSys->CreateType(
+        "ActionTransitionContext",
+        &m_transitionContextDispatcher,
+        0,
+        nullptr,
+        &access,
+        myself->GetIdentity(),
+        err
+    );
+	
+	return m_htActionTransitionContext != 0;
 }
 
 void SDKActions::OnClientDisconnecting(int client)

@@ -13,18 +13,6 @@
 #include <vector>
 #include <type_traits>
 
-template<class Actor>
-struct ActionResult;
-
-template<class Actor>
-struct EventDesiredResult;
-
-template<typename T>
-struct is_action_result : public std::is_same<T, ActionResult<CBaseEntity>> {};
-
-template<typename T>
-struct is_action_desire_result : public std::is_same<T, EventDesiredResult<CBaseEntity>> {};
-
 template<typename T>
 inline constexpr bool is_action_result_v = is_action_result<T>::value || is_action_desire_result<T>::value;
 

@@ -179,13 +179,13 @@ namespace actions_natives
 		return Vector(sp_ctof(vec[0]), sp_ctof(vec[1]), sp_ctof(vec[2]));
 	}
 
-	static inline Vector* native_vector_ptr_extractor(IPluginContext* context, cell_t param, cell_t)
+	static inline Vector* native_vector_ptr_extractor(IPluginContext* context, cell_t param, cell_t num)
 	{
-		cell_t* vec = nullptr;
+		cell_t* vec;
 		context->LocalToPhysAddr(param, &vec);
 
 		if (context->GetNullRef(SP_NULL_VECTOR) == vec)
-			return nullptr;
+			throw format_exception("NULL not allowed!");
 
 		return reinterpret_cast<Vector*>(vec);
 	}

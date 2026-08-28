@@ -10,6 +10,7 @@
 #include "actions/natives/components.h"
 #include "actions/natives/manager.h"
 #include "actions/natives/legacy.h"
+#include "actions/natives/transition.h"
 
 sp_nativeinfo_t g_actionsNatives[] =
 {
@@ -91,6 +92,24 @@ sp_nativeinfo_t g_actionsNativesLegacy[] =
 	{ "ActionsManager.Iterator",    actions_natives::native_legacy_iterate_entity_actions },
 	{ "ActionsManager.GetAction",   actions_natives::native_legacy_find_entity_action },
 	{ "ActionsManager.Create",      actions_natives::native_legacy_create_action },
+
+	{ nullptr, nullptr }
+};
+
+sp_nativeinfo_t g_actionsTransitionNatives[] =
+{
+	{ "ActionTransitionContext.Type.get",    			actions_natives::native_transition_context_get_kind },
+	{ "ActionTransitionContext.GetFloat",    			actions_natives::native_transition_context_get_float },
+	{ "ActionTransitionContext.GetInt",    				actions_natives::native_transition_context_get_int },
+	{ "ActionTransitionContext.GetBool",    			actions_natives::native_transition_context_get_bool },
+	{ "ActionTransitionContext.GetPathFollower",    	actions_natives::native_transition_context_get_path_follower },
+	{ "ActionTransitionContext.GetKnownEntity",    		actions_natives::native_transition_context_get_known_entity },
+	{ "ActionTransitionContext.GetVector",    			actions_natives::native_transition_context_get_vector },
+	{ "ActionTransitionContext.GetActionResult",    	actions_natives::native_transition_context_get_action_result },
+	{ "ActionTransitionContext.GetEventDesiredResult",  actions_natives::native_transition_context_get_desired_result },
+	{ "ActionTransitionContext.GetAction",  			actions_natives::native_transition_context_get_action_ptr },
+	{ "ActionTransitionContext.GetQueryResult",  		actions_natives::native_transition_context_get_query_result },
+	{ "ActionTransitionContext.GetFunctionName",  		actions_natives::native_transition_context_get_function_name },
 
 	{ nullptr, nullptr }
 };
