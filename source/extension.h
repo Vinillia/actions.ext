@@ -108,58 +108,58 @@ public:
 
     TransitionContext() = delete;
 
-    TransitionContext(HashValue hash, nb_action_ptr& action) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, nb_action_ptr& action) :
+		  hash(fhash),
           kind(Kind::ActionPtr),
           value(&action)
     {
     }
 
-    TransitionContext(HashValue hash, ActionResult<CBaseEntity>& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, ActionResult<CBaseEntity>& result) :
+		  hash(fhash),
           kind(Kind::ActionResult),
           value(&result)
     {
     }
 
-    TransitionContext(HashValue hash, EventDesiredResult<CBaseEntity>& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, EventDesiredResult<CBaseEntity>& result) :
+		  hash(fhash),
           kind(Kind::DesiredResult),
           value(&result)
     {
     }
 	
-    TransitionContext(HashValue hash, bool& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, bool& result) :
+		  hash(fhash),
           kind(Kind::PlainData),
-          value(&result),
-          size(sizeof(bool))
+          size(sizeof(bool)),
+          value(&result)
     {
     }
 
-    TransitionContext(HashValue hash, QueryResultType& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, QueryResultType& result) :
+		  hash(fhash),
           kind(Kind::QueryResult),
           value(&result)
     {
     }
 
-    TransitionContext(HashValue hash, Vector& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, Vector& result) :
+		  hash(fhash),
           kind(Kind::Vector),
           value(&result)
     {
     }
 
-    TransitionContext(HashValue hash, PathFollower*& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, PathFollower*& result) :
+		  hash(fhash),
           kind(Kind::PathFollower),
           value(&result)
     {
     }
 
-    TransitionContext(HashValue hash, const CKnownEntity*& result) :
-		  hash(hash),
+    TransitionContext(HashValue fhash, const CKnownEntity*& result) :
+		  hash(fhash),
           kind(Kind::KnownEntity),
           value(&result)
     {
@@ -187,9 +187,9 @@ public:
     }
 
 public:
+    HashValue hash;
     Kind kind;
-	int32 size;
-	HashValue hash;
+    int32 size = 0;
 
 private:
     void* value;

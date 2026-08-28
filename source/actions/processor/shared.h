@@ -17,18 +17,6 @@
 template <typename... Ts>
 using void_t = void;
 
-template<class Actor>
-struct ActionResult;
-
-template<class Actor>
-struct EventDesiredResult;
-
-template<typename T>
-struct is_action_result : public std::is_same<T, ActionResult<CBaseEntity>> {};
-
-template<typename T>
-struct is_action_desire_result : public std::is_same<T, EventDesiredResult<CBaseEntity>> {};
-
 template <class K, typename T, typename = void>
 struct is_class_member : std::false_type {};
 

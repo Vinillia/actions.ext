@@ -3,6 +3,8 @@
 #ifndef _ICNLUDE_ACTIONSDEFS_H
 #define _ICNLUDE_ACTIONSDEFS_H
 
+#include <type_traits>
+
 class CBaseEntity;
 
 template<class Actor>
@@ -10,6 +12,19 @@ class Behavior;
 
 template<class Actor>
 class Action;
+
+template<class Actor>
+struct ActionResult;
+
+template<class Actor>
+struct EventDesiredResult;
+
+template<typename T>
+struct is_action_result : public std::is_same<T, ActionResult<CBaseEntity>> {};
+
+template<typename T>
+struct is_action_desire_result : public std::is_same<T, EventDesiredResult<CBaseEntity>> {};
+
 
 using nb_behavior = Behavior<CBaseEntity>;
 using nb_behavior_ptr = nb_behavior*;
