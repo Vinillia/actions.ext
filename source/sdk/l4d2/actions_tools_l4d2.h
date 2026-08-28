@@ -3,7 +3,7 @@
 #ifndef _INCLUDE_ACTIONS_TOOLS_L4D2_H
 #define _INCLUDE_ACTIONS_TOOLS_L4D2_H
 
-#include "../../actions_tools.h"
+#include "actions/runtime/tools.h"
 
 class Intention;
 class INextBot;

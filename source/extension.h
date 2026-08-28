@@ -34,9 +34,9 @@
 
 #include <IBinTools.h>
 #include "smsdk_ext.h"
-#include "actionsdefs.h"
 
-#include "actions_manager.h"
+#include "actions/defs.h"
+#include "actions/manager/manager.h"
 
 static inline cell_t ToPseudoAddress(void* address)
 {
@@ -71,6 +71,130 @@ inline TReturn FromPseudoAddress(cell_t address)
 	return reinterpret_cast<TReturn>(FromPseudoAddress(address));
 }
 
+template <typename>
+inline constexpr bool always_false_v = false;
+
+class TransitionContext
+{
+public:
+    class HandleDispatcher : public IHandleTypeDispatch
+    {
+        void OnHandleDestroy(HandleType_t type, void* object) override
+        {
+        }
+
+        bool GetHandleApproxSize(
+            HandleType_t type,
+            void* object,
+            unsigned int* pSize) override
+        {
+            *pSize = sizeof(TransitionContext);
+            return true;
+        }
+    };
+
+public:
+    enum class Kind
+    {
+        PlainData,
+        QueryResult,
+        ActionPtr,
+        ActionResult,
+        DesiredResult,
+        Vector,
+        PathFollower,
+        KnownEntity
+    };
+
+    TransitionContext() = delete;
+
+    TransitionContext(HashValue fhash, nb_action_ptr& action) :
+		  hash(fhash),
+          kind(Kind::ActionPtr),
+          value(&action)
+    {
+    }
+
+    TransitionContext(HashValue fhash, ActionResult<CBaseEntity>& result) :
+		  hash(fhash),
+          kind(Kind::ActionResult),
+          value(&result)
+    {
+    }
+
+    TransitionContext(HashValue fhash, EventDesiredResult<CBaseEntity>& result) :
+		  hash(fhash),
+          kind(Kind::DesiredResult),
+          value(&result)
+    {
+    }
+	
+    TransitionContext(HashValue fhash, bool& result) :
+		  hash(fhash),
+          kind(Kind::PlainData),
+          size(sizeof(bool)),
+          value(&result)
+    {
+    }
+
+    TransitionContext(HashValue fhash, QueryResultType& result) :
+		  hash(fhash),
+          kind(Kind::QueryResult),
+          value(&result)
+    {
+    }
+
+    TransitionContext(HashValue fhash, Vector& result) :
+		  hash(fhash),
+          kind(Kind::Vector),
+          value(&result)
+    {
+    }
+
+    TransitionContext(HashValue fhash, PathFollower*& result) :
+		  hash(fhash),
+          kind(Kind::PathFollower),
+          value(&result)
+    {
+    }
+
+    TransitionContext(HashValue fhash, const CKnownEntity*& result) :
+		  hash(fhash),
+          kind(Kind::KnownEntity),
+          value(&result)
+    {
+    }
+
+    template <typename T>
+    TransitionContext(T&)
+    {
+        static_assert(
+            always_false_v<T>,
+            "Unsupported TransitionContext type"
+        );
+    }
+
+    template<typename T>
+    T* As()
+    {
+        return static_cast<T*>(value);
+    }
+
+    template<typename T>
+    const T* As() const
+    {
+        return static_cast<const T*>(value);
+    }
+
+public:
+    HashValue hash;
+    Kind kind;
+    int32 size = 0;
+
+private:
+    void* value;
+};
+
 class SDKActions : public SDKExtension, public IPluginsListener, public IConCommandBaseAccessor, public IClientListener, public IHandleTypeDispatch
 {
 public: // SDKExtension
@@ -103,6 +227,8 @@ public: // ActionsManager
 	virtual void OnActionCreated(nb_action_ptr action, ActionsManager::ActionId id);
 	virtual void OnActionDestroyed(nb_action_ptr action, ActionsManager::ActionId id);
 
+	void OnActionTransition(nb_action_ptr action, const TransitionContext& context);
+
 public: // IClientListener
 	virtual void OnClientDisconnecting(int client) override;
 
@@ -111,15 +237,26 @@ public:
 
 	inline HandleType_t GetComponentHT() const noexcept { return m_htActionComponent; };
 	inline HandleType_t GetConstructorHT() const noexcept { return m_htActionConstructor; };
+	inline HandleType_t GetTransitionContextHT() const noexcept { return m_htActionTransitionContext; };
+
+	IGameConfig* GetGameConfig() const { return m_pConfig; };
+
+private:
+	bool CreateTransitionContextHandleType(HandleError* err);
 
 private:
 	IGameConfig* m_pConfig;
 
 	HandleType_t m_htActionComponent;
 	HandleType_t m_htActionConstructor;
+	HandleType_t m_htActionTransitionContext;
+
+	IForward* m_fwdOnActionTransition;
 
 	IForward* m_fwdOnActionCreated;
 	IForward* m_fwdOnActionDestroyed;
+
+	TransitionContext::HandleDispatcher m_transitionContextDispatcher;
 };
 
 extern SDKActions g_sdkActions;

@@ -1,9 +1,9 @@
 #include <CDetour/detours.h>
-#include "actionsdefs.h"
-#include "actions_manager.h"
-#include "actions_component.h"
-#include "actions_processor.h"
-#include "actions_tools.h"
+#include "actions/defs.h"
+#include "actions/manager/manager.h"
+#include "actions/component/component.h"
+#include "actions/processor/processor.h"
+#include "actions/runtime/tools.h"
 #include "hook.h"
 
 #include <NextBotInterface.h>

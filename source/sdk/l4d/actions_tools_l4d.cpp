@@ -1,7 +1,7 @@
-#include "actionsdefs.h"
+#include "actions/defs.h"
 #include "actions_tools_l4d.h"
-#include "NextBotComponentInterface.h"
 
+#include "NextBotComponentInterface.h"
 #include <am-platform.h>
 
 #include "../../l4d2/actions_tools_l4d2.cpp"

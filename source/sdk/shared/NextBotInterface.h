@@ -1,5 +1,5 @@
-#ifndef _INCLUDE_NEXTBOT_INTERFACE_H
-#define _INCLUDE_NEXTBOT_INTERFACE_H
+#ifndef NEXTBOT_INTERFACE_H
+#define NEXTBOT_INTERFACE_H
 
 #include "NextBotEventResponderInterface.h"
 #include "NextBotDebug.h"
@@ -48,4 +48,4 @@ inline INextBotEventResponder* INextBot::NextContainedResponder(INextBotEventRes
 
 
 
-#endif // !_INCLUDE_NEXTBOT_INTERFACE_H
+#endif // !NEXTBOT_INTERFACE_H

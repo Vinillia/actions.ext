@@ -1,9 +1,7 @@
-#pragma once
+#ifndef ACTIONS_PROCESSOR_H
+#define ACTIONS_PROCESSOR_H
 
-#ifndef _INCLUDE_ACTIONS_PROCESSOR
-#define _INCLUDE_ACTIONS_PROCESSOR
-
-#include "actions_processor_shared.h"
+#include "actions/processor/shared.h"
 
 class ActionProcessor : public ActionProcessorShared
 {
@@ -52,4 +50,4 @@ public:
 	virtual const CKnownEntity* SelectMoreDangerousThreat(const INextBot* me, const CBaseCombatCharacter* subject, const CKnownEntity* threat1, const CKnownEntity* threat2) const override;
 };
 
-#endif // !_INCLUDE_ACTIONS_PROCESSOR
+#endif // !ACTIONS_PROCESSOR_H
