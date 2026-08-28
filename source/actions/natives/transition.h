@@ -121,7 +121,7 @@ namespace actions_natives
 			{
 				validate_context_kind(context, TransitionContext::Kind::ActionPtr);
 
-				return reinterpret_cast<cell_t>(*context->As<nb_action_ptr>());
+				return ToPseudoAddress(*context->As<nb_action_ptr>());
 			},
 			native_transition_context_extractor);
 	}
@@ -135,7 +135,7 @@ namespace actions_natives
 			{
 				validate_context_kind(context, TransitionContext::Kind::ActionResult);
 
-				return reinterpret_cast<cell_t>(context->As<ActionResult<CBaseEntity>>());
+				return ToPseudoAddress(context->As<ActionResult<CBaseEntity>>());
 			},
 			native_transition_context_extractor);
 	}
@@ -149,7 +149,7 @@ namespace actions_natives
 			{
 				validate_context_kind(context, TransitionContext::Kind::DesiredResult);
 
-				return reinterpret_cast<cell_t>(context->As<EventDesiredResult<CBaseEntity>>());
+				return ToPseudoAddress(context->As<EventDesiredResult<CBaseEntity>>());
 			},
 			native_transition_context_extractor);
 	}
@@ -178,7 +178,7 @@ namespace actions_natives
 			[](TransitionContext* context) -> cell_t
 			{
 				validate_context_kind(context, TransitionContext::Kind::PathFollower);
-				return reinterpret_cast<cell_t>(*context->As<PathFollower*>());
+				return ToPseudoAddress(*context->As<PathFollower*>());
 			},
 			native_transition_context_extractor);
 	}
@@ -191,7 +191,7 @@ namespace actions_natives
 			[](TransitionContext* context) -> cell_t
 			{
 				validate_context_kind(context, TransitionContext::Kind::KnownEntity);
-				return reinterpret_cast<cell_t>(*context->As<CKnownEntity*>());
+				return ToPseudoAddress(*context->As<CKnownEntity*>());
 			},
 			native_transition_context_extractor);
 	}
