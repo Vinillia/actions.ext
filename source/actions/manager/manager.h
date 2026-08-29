@@ -37,7 +37,7 @@ class ActionsManager
 {
 private:
 	using ActionsContanier = ke::HashSet<nb_action_ptr, ke::PointerPolicy<nb_action>>;
-	using UserDataMap = std::unordered_map<std::string_view, ActionUserData>;
+	using UserDataMap = std::unordered_map<std::string, ActionUserData>;
 
 public:
 	using ActionId = int32_t;
