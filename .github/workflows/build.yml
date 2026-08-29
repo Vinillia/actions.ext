@@ -1,0 +1,270 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+      - ci/add-workflow
+    tags:
+      - '*'
+
+  pull_request:
+    branches:
+      - master
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}-${{ matrix.sm_version }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        os:
+          - ubuntu-22.04
+          - ubuntu-latest
+          - windows-latest
+
+        sm_version:
+          - sm-1.12
+          - sm-latest
+
+        include:
+          # Operating systems
+          - os: windows-latest
+            compiler_cc: msvc
+
+          - os: ubuntu-latest
+            compiler_cc: clang-21
+            compiler_cxx: clang++-21
+
+          - os: ubuntu-22.04
+            compiler_cc: clang-21
+            compiler_cxx: clang++-21
+
+          - sm_version: sm-1.12
+            sm_branch: 1.12-dev
+            mm_branch: 1.12-dev
+            hl2sdk_manifest_prepare: false
+
+          - sm_version: sm-latest
+            sm_branch: master
+            mm_branch: master
+            hl2sdk_manifest_prepare: false
+
+    steps:
+      # -------------------------------------------------------
+      # Environment
+      # -------------------------------------------------------
+
+      - name: Setup Environment
+        shell: bash
+        run: |
+          echo "GITHUB_SHA_SHORT=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      # -------------------------------------------------------
+      # Linux
+      # -------------------------------------------------------
+
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          sudo dpkg --add-architecture i386
+
+          sudo apt-get update
+          sudo apt-get install -y \
+          g++-multilib \
+          wget \
+          ca-certificates
+
+          wget -q https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 21
+          
+      - name: Select Clang Compiler
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          echo "CC=${{ matrix.compiler_cc }}" >> "$GITHUB_ENV"
+          echo "CXX=${{ matrix.compiler_cxx }}" >> "$GITHUB_ENV"
+
+          ${{ matrix.compiler_cc }} --version
+          ${{ matrix.compiler_cxx }} --version
+
+      # -------------------------------------------------------
+      # Windows
+      # -------------------------------------------------------
+
+      - name: Add MSBuild to PATH
+        if: runner.os == 'Windows'
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Install Windows Dependencies
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: |
+          :: Find latest Visual Studio installation and initialize x86 tools.
+          for /f "usebackq delims=*" %%i in (`vswhere -latest -property installationPath`) do (
+            call "%%i\Common7\Tools\vsdevcmd.bat" -arch=x86 -host_arch=x64
+          )
+
+          :: Export Visual Studio environment variables for following steps.
+          for /f "delims== tokens=1,*" %%a in ('set') do (
+            echo %%a=%%b>>"%GITHUB_ENV%"
+          )
+
+      # -------------------------------------------------------
+      # Python
+      # -------------------------------------------------------
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python Dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      # -------------------------------------------------------
+      # AlliedModders
+      # -------------------------------------------------------
+
+      - name: Prepare AlliedModders Directory
+        shell: bash
+        run: |
+          mkdir -p alliedmodders
+
+      - name: Install AMBuild
+        working-directory: alliedmodders
+        shell: bash
+        run: |
+          git clone https://github.com/alliedmodders/ambuild ambuild
+          python -m pip install ./ambuild
+
+      - name: Prepare SourceMod
+        working-directory: alliedmodders
+        shell: bash
+        run: |
+          git clone \
+          --branch "${{ matrix.sm_branch }}" \
+          https://github.com/alliedmodders/sourcemod \
+          sourcemod
+
+          cd sourcemod
+
+          git submodule sync --recursive
+          git submodule update --init --recursive --force
+
+          git submodule status --recursive
+
+      # -------------------------------------------------------
+      # HL2SDK
+      # -------------------------------------------------------
+
+      - name: Prepare SDKs
+        working-directory: alliedmodders
+        shell: bash
+        run: |
+          git clone --mirror \
+            https://github.com/alliedmodders/hl2sdk \
+            hl2sdk-proxy-repo
+
+          git clone \
+            --branch l4d2 \
+            hl2sdk-proxy-repo \
+            hl2sdk-l4d2
+
+          git clone \
+            --branch l4d \
+            hl2sdk-proxy-repo \
+            hl2sdk-l4d
+
+          git clone \
+            --branch tf2 \
+            hl2sdk-proxy-repo \
+            hl2sdk-tf2
+
+      # -------------------------------------------------------
+      # Metamod:Source
+      # -------------------------------------------------------
+
+      - name: Prepare Metamod Source
+        working-directory: alliedmodders
+        shell: bash
+        run: |
+          git clone \
+            --branch "${{ matrix.mm_branch }}" \
+            https://github.com/alliedmodders/metamod-source \
+            metamod-source
+
+      # -------------------------------------------------------
+      # HL2SDK Manifest
+      # -------------------------------------------------------
+
+      - name: Setup SourceMod HL2SDK Manifest
+        if: matrix.hl2sdk_manifest_prepare != true
+        shell: bash
+        run: |
+          echo "HL2SDKMANIFEST=${{ github.workspace }}/alliedmodders/sourcemod/hl2sdk-manifests" >> "$GITHUB_ENV"
+
+      - name: Prepare Legacy HL2SDK Manifest
+        if: matrix.hl2sdk_manifest_prepare == true
+        working-directory: alliedmodders
+        shell: bash
+        run: |
+          git clone \
+            https://github.com/alliedmodders/hl2sdk-manifests \
+            hl2sdk-manifests
+
+          echo "HL2SDKMANIFEST=${{ github.workspace }}/alliedmodders/hl2sdk-manifests" >> "$GITHUB_ENV"
+
+      # -------------------------------------------------------
+      # Project
+      # -------------------------------------------------------
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          path: src
+          submodules: recursive
+          fetch-depth: 0
+
+      # -------------------------------------------------------
+      # Build
+      # -------------------------------------------------------
+
+      - name: Run AMBuild
+        working-directory: src
+        shell: bash
+        run: |
+          mkdir -p build
+          cd build
+
+          python ../configure.py \
+            --hl2sdk-root="${{ github.workspace }}/alliedmodders" \
+            --sm-path="${{ github.workspace }}/alliedmodders/sourcemod" \
+            --mms-path="${{ github.workspace }}/alliedmodders/metamod-source" \
+            --sdks=tf2,l4d2,l4d \
+            --enable-optimize
+
+          ambuild
+
+      # -------------------------------------------------------
+      # Artifact
+      # -------------------------------------------------------
+
+      - name: Upload Binary Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: actions-${{ matrix.os }}-${{ matrix.sm_version }}
+          path: src/build/package
+          if-no-files-found: error
